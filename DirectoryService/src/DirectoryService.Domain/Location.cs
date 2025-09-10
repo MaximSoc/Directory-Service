@@ -10,8 +10,11 @@ namespace DirectoryService.Domain
 {
     public class Location
     {
-        private List<DepartmentLocation> _departmentLocation = [];
-        public Location(LocationName name, Address address, TimeZone timezone,
+        private List<DepartmentLocation> _departmentLocations = [];
+        public Location
+            (LocationName name,
+            Address address,
+            TimeZone timezone,
             IEnumerable<DepartmentLocation> departmentLocations)
         {
             Id = Guid.NewGuid();
@@ -22,7 +25,7 @@ namespace DirectoryService.Domain
 
             Timezone = timezone;
 
-            _departmentLocation = departmentLocations.ToList();
+            _departmentLocations = departmentLocations.ToList();
 
             CreatedAt = DateTime.UtcNow;
         }
@@ -41,6 +44,6 @@ namespace DirectoryService.Domain
 
         public DateTime UpdatedAt { get; private set; }
 
-        public IReadOnlyList<DepartmentLocation> Departments => _departmentLocation;
+        public IReadOnlyList<DepartmentLocation> Departments => _departmentLocations;
     }
 }

@@ -18,8 +18,13 @@ namespace DirectoryService.Domain
 
         private List<DepartmentPosition> _departmentPositions = [];
 
-        public Department(DepartmentName name, DepartmentIdentifier identifier, short depth,
-            Guid? parentId, Path path, IEnumerable<DepartmentLocation> departmentLocations,
+        public Department
+            (DepartmentName name,
+            DepartmentIdentifier identifier,
+            short depth,
+            Guid? parentId,
+            Path path,
+            IEnumerable<DepartmentLocation> departmentLocations,
             IEnumerable<DepartmentPosition> departmentPositions)
         {
             Id = Guid.NewGuid();
