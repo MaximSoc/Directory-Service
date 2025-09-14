@@ -14,7 +14,7 @@ namespace DirectoryService.Domain.ValueObjects.PositionVO
 
         private const int MAX_LENGTH = 100;
         public string Value { get; }
-        private PositionName(string value)
+        public PositionName(string value)
         {
             Value = value;
         }

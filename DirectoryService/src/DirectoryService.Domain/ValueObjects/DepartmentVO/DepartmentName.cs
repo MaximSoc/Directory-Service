@@ -13,7 +13,7 @@ namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 
         private const int MAX_LENGTH = 150;
         public string Value { get; }
-        private DepartmentName(string value)
+        public DepartmentName(string value)
         {
             Value = value;
         }

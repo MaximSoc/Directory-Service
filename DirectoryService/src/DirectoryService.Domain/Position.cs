@@ -10,7 +10,14 @@ namespace DirectoryService.Domain
     public class Position
     {
         private List<DepartmentPosition> _departmentPositions = [];
-        public Position(PositionName name, Description? description, IEnumerable<DepartmentPosition> departmentPositions)
+
+        // EF Core
+        private Position()
+        {
+            
+        }
+
+        public Position(PositionName name, PositionDescription? description, IEnumerable<DepartmentPosition> departmentPositions)
         {
             Id = Guid.NewGuid();
 
@@ -24,9 +31,9 @@ namespace DirectoryService.Domain
         }
         public Guid Id { get; private set; }
 
-        public PositionName Name { get; private set; }
+        public PositionName Name { get; private set; } = null!;
 
-        public Description? Description { get; private set; }
+        public PositionDescription? Description { get; private set; }
 
         public bool IsActive { get; private set; }
 
