@@ -7,22 +7,22 @@ using CSharpFunctionalExtensions;
 
 namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 {
-    public record Path
+    public record DepartmentPath
     {
         public string Value { get; }
-        private Path(string value)
+        public DepartmentPath(string value)
         {
             Value = value;
         }
 
-        public static Result<Path, string> Create (string value)
+        public static Result<DepartmentPath, string> Create (string value)
         {
             if (string.IsNullOrEmpty(value))
             {
                 return "Path cannot be empty";
             }
 
-            return new Path(value);
+            return new DepartmentPath(value);
         }
     }
 }

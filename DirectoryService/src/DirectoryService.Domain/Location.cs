@@ -4,17 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DirectoryService.Domain.ValueObjects.LocationVO;
-using TimeZone = DirectoryService.Domain.ValueObjects.LocationVO.TimeZone;
+using LocationTimeZone = DirectoryService.Domain.ValueObjects.LocationVO.LocationTimeZone;
 
 namespace DirectoryService.Domain
 {
     public class Location
     {
         private List<DepartmentLocation> _departmentLocations = [];
+
+        // EF Core
+        private Location()
+        {
+            
+        }
+
         public Location
             (LocationName name,
-            Address address,
-            TimeZone timezone,
+            LocationAddress address,
+            LocationTimeZone timezone,
             IEnumerable<DepartmentLocation> departmentLocations)
         {
             Id = Guid.NewGuid();
@@ -32,11 +39,11 @@ namespace DirectoryService.Domain
 
         public Guid Id { get; private set; }
 
-        public LocationName Name { get; private set; }
+        public LocationName Name { get; private set; } = null!;
 
-        public Address Address { get; private set; }
+        public LocationAddress Address { get; private set; } = null!;
 
-        public TimeZone Timezone { get; private set; }
+        public LocationTimeZone Timezone { get; private set; } = null!;
 
         public bool IsActive { get; private set; }
 

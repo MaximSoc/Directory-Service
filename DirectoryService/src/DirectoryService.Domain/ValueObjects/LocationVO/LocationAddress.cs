@@ -7,22 +7,22 @@ using CSharpFunctionalExtensions;
 
 namespace DirectoryService.Domain.ValueObjects.LocationVO
 {
-    public record Address
+    public record LocationAddress
     {
         public string Value { get; }
-        private Address(string value)
+        public LocationAddress(string value)
         {
             Value = value;
         }
 
-        public static Result<Address, string> Create(string value)
+        public static Result<LocationAddress, string> Create(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
                 return "Address cannot be empty";
             }
 
-            return new Address(value);
+            return new LocationAddress(value);
         }
     }
 }

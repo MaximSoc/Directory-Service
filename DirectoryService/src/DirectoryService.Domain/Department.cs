@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
-using Path = DirectoryService.Domain.ValueObjects.DepartmentVO.Path;
 
 namespace DirectoryService.Domain
 {
@@ -18,12 +17,17 @@ namespace DirectoryService.Domain
 
         private List<DepartmentPosition> _departmentPositions = [];
 
+        // EF Core
+        private Department()
+        {           
+        }
+
         public Department
             (DepartmentName name,
             DepartmentIdentifier identifier,
             short depth,
             Guid? parentId,
-            Path path,
+            DepartmentPath path,
             IEnumerable<DepartmentLocation> departmentLocations,
             IEnumerable<DepartmentPosition> departmentPositions)
         {
@@ -51,15 +55,15 @@ namespace DirectoryService.Domain
 
         public Guid Id { get; private set; }
 
-        public DepartmentName Name { get; private set; }
+        public DepartmentName Name { get; private set; } = null!;
 
-        public DepartmentIdentifier Identifier { get; private set; }
+        public DepartmentIdentifier Identifier { get; private set; } = null!;
 
         public Guid? ParentId { get; private set; } = null;
 
         public IReadOnlyList<Department> Children => _children;
 
-        public Path Path { get; private set; }
+        public DepartmentPath Path { get; private set; } = null!;
 
         public short Depth { get; private set; }
 

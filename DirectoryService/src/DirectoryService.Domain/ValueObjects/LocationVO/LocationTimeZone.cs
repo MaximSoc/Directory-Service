@@ -8,15 +8,15 @@ using NodaTime;
 
 namespace DirectoryService.Domain.ValueObjects.LocationVO
 {
-    public record TimeZone
+    public record LocationTimeZone
     {
         public string Value { get; }
-        private TimeZone(string value)
+        public LocationTimeZone(string value)
         {
             Value = value;
         }
 
-        public static Result<TimeZone, string> Create(string value)
+        public static Result<LocationTimeZone, string> Create(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -29,7 +29,7 @@ namespace DirectoryService.Domain.ValueObjects.LocationVO
                 return "TimeZone is not correct";
             }
 
-            return new TimeZone(value);
+            return new LocationTimeZone(value);
         }
     }
 }
