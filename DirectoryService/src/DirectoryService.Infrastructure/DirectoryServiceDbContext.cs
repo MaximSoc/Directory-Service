@@ -31,6 +31,8 @@ namespace DirectoryService.Infrastructure
 
         public DbSet<Department> Departments => Set<Department>();
 
+        public DbSet<Location> Locations => Set<Location>();
+
         private ILoggerFactory CreateLoggerFactory() =>
             LoggerFactory.Create(builder => { builder.AddConsole(); });
     }

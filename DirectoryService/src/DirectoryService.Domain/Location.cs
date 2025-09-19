@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using DirectoryService.Domain.ValueObjects.LocationVO;
 using LocationTimeZone = DirectoryService.Domain.ValueObjects.LocationVO.LocationTimeZone;
 
@@ -21,8 +22,8 @@ namespace DirectoryService.Domain
         public Location
             (LocationName name,
             LocationAddress address,
-            LocationTimeZone timezone,
-            IEnumerable<DepartmentLocation> departmentLocations)
+            LocationTimeZone timezone
+            )
         {
             Id = Guid.NewGuid();
 
@@ -31,8 +32,6 @@ namespace DirectoryService.Domain
             Address = address;
 
             Timezone = timezone;
-
-            _departmentLocations = departmentLocations.ToList();
 
             CreatedAt = DateTime.UtcNow;
         }
