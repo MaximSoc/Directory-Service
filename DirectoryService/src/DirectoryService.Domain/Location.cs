@@ -51,14 +51,5 @@ namespace DirectoryService.Domain
         public DateTime UpdatedAt { get; private set; }
 
         public IReadOnlyList<DepartmentLocation> Departments => _departmentLocations;
-
-        public static Result<Location, string> Create
-            (LocationName name,
-            LocationAddress address,
-            LocationTimeZone timezone
-            )
-        {
-            return new Location(name, address, timezone);
-        }
     }
 }

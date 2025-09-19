@@ -20,7 +20,7 @@ namespace DirectoryService.Application
         }
 
         // Метод для создания локации
-        public async Task<Guid> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
+        public async Task<Result<Guid, string>> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
         {
             // бизнес валидация
 
@@ -28,27 +28,36 @@ namespace DirectoryService.Application
 
             // создание доменных моделей
             var locationNameDto = request.Name;
-            var name = LocationName.Create(locationNameDto.Name).Value;
+            var locationNameResult = LocationName.Create(locationNameDto.Name);
+            if (!locationNameResult.IsSuccess)
+                return locationNameResult.Error;
 
             var locationAddressDto = request.Address;
-            var address = LocationAddress.Create
+            var locationAddressResult = LocationAddress.Create
             (locationAddressDto.Country,
             locationAddressDto.Region,
             locationAddressDto.City,
             locationAddressDto.PostalCode,
             locationAddressDto.Street,
             locationAddressDto.ApartamentNumber
-            ).Value;
+            );
+            if (!locationAddressResult.IsSuccess)
+                return locationAddressResult.Error;
 
             var locationTimezone = request.Timezone;
-            var timezone = LocationTimeZone.Create(locationTimezone.Timezone).Value;
+            var locationTimezoneResult = LocationTimeZone.Create(locationTimezone.Timezone);
+            if (!locationTimezoneResult.IsSuccess)
+                return locationTimezoneResult.Error;
 
-            var location = Location.Create(name, address, timezone);
+            var location = new Location(
+            locationNameResult.Value,
+            locationAddressResult.Value,
+            locationTimezoneResult.Value);
 
             // сохранение доменных моделей в базу данных
-            await _locationsRepository.Add(location.Value, cancellationToken);
+            await _locationsRepository.Add(location, cancellationToken);
 
-            return location.Value.Id;
+            return location.Id;
         }
     }
 

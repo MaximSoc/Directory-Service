@@ -11,12 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Repositories
 {
-    public class EFCoreLocationsRepository : ILocationsRepository
+    public class LocationsRepository : ILocationsRepository
     {
         private readonly DirectoryServiceDbContext _dbContext;
-        private readonly ILogger<EFCoreLocationsRepository> _logger;
+        private readonly ILogger<LocationsRepository> _logger;
 
-        public EFCoreLocationsRepository(DirectoryServiceDbContext dbContext, ILogger<EFCoreLocationsRepository> logger)
+        public LocationsRepository(DirectoryServiceDbContext dbContext, ILogger<LocationsRepository> logger)
         {
             _dbContext = dbContext;
             _logger = logger;

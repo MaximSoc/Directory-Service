@@ -1,4 +1,5 @@
-﻿using DirectoryService.Application;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application;
 using DirectoryService.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ namespace DirectoryService.Presentation.Controllers
     public class LocationsController : ControllerBase
     {
         [HttpPost]
-        public async Task<Guid> Create(
+        public async Task<Result<Guid, string>> Create(
             [FromServices] CreateLocationHandler handler,
             [FromBody] CreateLocationRequest request,
             CancellationToken cancellationToken)

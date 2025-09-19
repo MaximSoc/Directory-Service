@@ -12,7 +12,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<DirectoryServiceDbContext>(_ => 
 new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
 
-builder.Services.AddScoped<ILocationsRepository, EFCoreLocationsRepository>();
+builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
 
 builder.Services.AddScoped<CreateLocationHandler>();
 
