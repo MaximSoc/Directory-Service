@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 {
@@ -18,11 +19,16 @@ namespace DirectoryService.Domain.ValueObjects.DepartmentVO
             Value = value;
         }
 
-        public static Result<DepartmentName, string> Create(string value)
+        public static Result<DepartmentName, Error> Create(string value)
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length < MIN_LENGTH || value.Length > MAX_LENGTH)
+            if (string.IsNullOrWhiteSpace(value))
             {
-                return "DepartmentName is not correct";
+                return GeneralErrors.ValueIsRequired("DepartmentName");
+            }
+
+            if (value.Length < MIN_LENGTH || value.Length > MAX_LENGTH)
+            {
+                return GeneralErrors.ValueIsInvalid("DepartmentName");
             }
 
             return new DepartmentName(value);

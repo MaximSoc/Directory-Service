@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 {
@@ -15,11 +16,11 @@ namespace DirectoryService.Domain.ValueObjects.DepartmentVO
             Value = value;
         }
 
-        public static Result<DepartmentPath, string> Create (string value)
+        public static Result<DepartmentPath, Error> Create (string value)
         {
             if (string.IsNullOrEmpty(value))
             {
-                return "Path cannot be empty";
+                return GeneralErrors.ValueIsRequired("DepartmentPath");
             }
 
             return new DepartmentPath(value);

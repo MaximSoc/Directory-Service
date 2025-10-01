@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NodaTime;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.LocationVO
 {
@@ -16,17 +17,17 @@ namespace DirectoryService.Domain.ValueObjects.LocationVO
             Value = value;
         }
 
-        public static Result<LocationTimeZone, string> Create(string value)
+        public static Result<LocationTimeZone, Error> Create(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                return "TimeZone cannot be empty";
+                return GeneralErrors.ValueIsRequired("Timezone");
             }
 
             var timeZoneDB = DateTimeZoneProviders.Tzdb;
             if (timeZoneDB.GetZoneOrNull(value) == null)
             {
-                return "TimeZone is not correct";
+                return GeneralErrors.ValueIsInvalid("Timezone");
             }
 
             return new LocationTimeZone(value);

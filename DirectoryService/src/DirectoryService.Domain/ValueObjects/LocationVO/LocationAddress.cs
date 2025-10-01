@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.LocationVO
 {
@@ -32,7 +33,7 @@ namespace DirectoryService.Domain.ValueObjects.LocationVO
             ApartamentNumber = apartamentNumber;
         }
 
-        public static Result<LocationAddress, string> Create(
+        public static Result<LocationAddress, Error> Create(
             string country,
             string region,
             string city,
@@ -47,7 +48,7 @@ namespace DirectoryService.Domain.ValueObjects.LocationVO
                 || string.IsNullOrWhiteSpace(street)
                 || string.IsNullOrWhiteSpace(apartamentNumber))
             {
-                return "All fields must be filled in";
+                return Error.Validation("value.is.invalid", "All LocationAddress fields are required");
             }
 
             return new LocationAddress(
