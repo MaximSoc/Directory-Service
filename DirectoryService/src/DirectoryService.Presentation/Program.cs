@@ -2,12 +2,32 @@ using DirectoryService.Application;
 using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.Repositories;
+using Microsoft.OpenApi.Models;
+using Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer((schema, context, _) =>
+    {
+        if (context.JsonTypeInfo.Type == typeof(Envelope<Errors>))
+        {
+            if (schema.Properties.TryGetValue("errors", out var errorsProp))
+            {
+                errorsProp.Items.Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.Schema,
+                    Id = "Error"
+                };
+            }
+        }
+
+        return Task.CompletedTask;
+    });
+});
 
 builder.Services.AddScoped<DirectoryServiceDbContext>(_ => 
 new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));

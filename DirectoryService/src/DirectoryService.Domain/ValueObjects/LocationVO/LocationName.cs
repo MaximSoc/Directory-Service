@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.LocationVO
 {
@@ -18,11 +19,16 @@ namespace DirectoryService.Domain.ValueObjects.LocationVO
             Value = value;
         }
 
-        public static Result<LocationName, string> Create(string value)
+        public static Result<LocationName, Error> Create(string value)
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length < MIN_LENGTH || value.Length > MAX_LENGTH)
+            if (string.IsNullOrWhiteSpace(value))
             {
-                return "LocationName is not correct";
+                return GeneralErrors.ValueIsRequired("LocationName");
+            }
+
+            if (value.Length < MIN_LENGTH || value.Length > MAX_LENGTH)
+            {
+                return GeneralErrors.ValueIsInvalid("LocationName");
             }
 
             return new LocationName(value);

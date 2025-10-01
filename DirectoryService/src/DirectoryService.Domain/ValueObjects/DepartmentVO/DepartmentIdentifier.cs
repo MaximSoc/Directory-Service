@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 {
@@ -20,13 +21,21 @@ namespace DirectoryService.Domain.ValueObjects.DepartmentVO
             Value = value;
         }
 
-        public static Result<DepartmentIdentifier, string> Create(string value)
+        public static Result<DepartmentIdentifier, Error> Create(string value)
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length < MIN_LENGTH || value.Length > MAX_LENGTH
-                || !Regex.IsMatch(value, @"^[a-zA-z]+$"))
+            if (string.IsNullOrWhiteSpace(value))
             {
-                return "DepartmentIdentifier is not correct";
+                return GeneralErrors.ValueIsRequired("DepartmentIdentifier");
             }
+
+            if (value.Length < MIN_LENGTH
+                || value.Length > MAX_LENGTH
+                || !Regex.IsMatch(value, @"^[a-zA-z]+$")
+                )
+            {
+                return GeneralErrors.ValueIsInvalid("DepartmentIdentifier");
+            }
+
 
             return new DepartmentIdentifier(value);
         }

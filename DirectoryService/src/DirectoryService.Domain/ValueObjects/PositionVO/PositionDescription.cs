@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.PositionVO
 {
@@ -18,11 +19,11 @@ namespace DirectoryService.Domain.ValueObjects.PositionVO
             Value = value;
         }
 
-        public static Result<PositionDescription, string> Create(string value)
+        public static Result<PositionDescription, Error> Create(string value)
         {
             if (value != null && value.Length > MAX_LENGTH)
             {
-                return "Description is not correct";
+                return GeneralErrors.ValueIsInvalid("PositionDescription");
             }
 
             return new PositionDescription(value);

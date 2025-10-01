@@ -8,6 +8,7 @@ using DirectoryService.Application.Database;
 using DirectoryService.Contracts;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.LocationVO;
+using Shared;
 
 namespace DirectoryService.Application
 {
@@ -20,7 +21,7 @@ namespace DirectoryService.Application
         }
 
         // Метод для создания локации
-        public async Task<Result<Guid, string>> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
+        public async Task<Result<Guid, Errors>> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
         {
             // бизнес валидация
 
@@ -30,7 +31,7 @@ namespace DirectoryService.Application
             var locationNameDto = request.Name;
             var locationNameResult = LocationName.Create(locationNameDto.Name);
             if (!locationNameResult.IsSuccess)
-                return locationNameResult.Error;
+                return locationNameResult.Error.ToErrors();
 
             var locationAddressDto = request.Address;
             var locationAddressResult = LocationAddress.Create
@@ -42,12 +43,12 @@ namespace DirectoryService.Application
             locationAddressDto.ApartamentNumber
             );
             if (!locationAddressResult.IsSuccess)
-                return locationAddressResult.Error;
+                return locationAddressResult.Error.ToErrors();
 
             var locationTimezone = request.Timezone;
             var locationTimezoneResult = LocationTimeZone.Create(locationTimezone.Timezone);
             if (!locationTimezoneResult.IsSuccess)
-                return locationTimezoneResult.Error;
+                return locationTimezoneResult.Error.ToErrors();
 
             var location = new Location(
             locationNameResult.Value,

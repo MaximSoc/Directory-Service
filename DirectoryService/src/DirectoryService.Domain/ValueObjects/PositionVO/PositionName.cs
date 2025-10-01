@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
+using Shared;
 
 namespace DirectoryService.Domain.ValueObjects.PositionVO
 {
@@ -19,11 +20,16 @@ namespace DirectoryService.Domain.ValueObjects.PositionVO
             Value = value;
         }
 
-        public static Result<PositionName, string> Create(string value)
+        public static Result<PositionName, Error> Create(string value)
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length < MIN_LENGTH || value.Length > MAX_LENGTH)
+            if (string.IsNullOrWhiteSpace(value))
             {
-                return "PositionName is not correct";
+                return GeneralErrors.ValueIsRequired("PositionName");
+            }
+
+            if (value.Length < MIN_LENGTH || value.Length > MAX_LENGTH)
+            {
+                return GeneralErrors.ValueIsInvalid("PositionName");
             }
 
             return new PositionName(value);
