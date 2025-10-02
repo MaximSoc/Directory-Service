@@ -55,6 +55,10 @@ namespace DirectoryService.Infrastructure.Configurations
                 .HasConversion(l => l.Value, l => new Domain.ValueObjects.LocationVO.LocationTimeZone(l))
                 .IsRequired()
                 .HasColumnName("timezone");
+
+            builder.HasMany(l => l.DepartmentLocations)
+                .WithOne()
+                .HasForeignKey(l => l.LocationId);
         }
     }
 }

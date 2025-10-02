@@ -25,5 +25,15 @@ namespace Shared
             var label = name == null ? "" : name;
             return Error.Validation("value.is.invalid", $"{label} is required");
         }
+
+        public static Error AlreadyExist()
+        {
+            return Error.Validation("record.already.exist", "Entry already exists");
+        }
+
+        public static Error Failure(string? message = null)
+        {
+            return Error.Failure("server.failure", message ?? "Server error");
+        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Domain
 {
-    public class DepartmentPosition
+    public sealed class DepartmentPosition
     {
         public Guid Id { get; private set; }
 
