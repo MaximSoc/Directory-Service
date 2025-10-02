@@ -50,6 +50,6 @@ namespace DirectoryService.Domain
 
         public DateTime UpdatedAt { get; private set; }
 
-        public IReadOnlyList<DepartmentLocation> Departments => _departmentLocations;
+        public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
     }
 }

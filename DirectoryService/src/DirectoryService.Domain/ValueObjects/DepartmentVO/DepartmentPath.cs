@@ -10,10 +10,23 @@ namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 {
     public record DepartmentPath
     {
+        private const char Separator = '/';
+
         public string Value { get; }
+
         public DepartmentPath(string value)
         {
             Value = value;
+        }
+
+        public static DepartmentPath CreateParent(DepartmentIdentifier identifier)
+        {
+            return new DepartmentPath(identifier.Value);
+        }
+
+        public DepartmentPath CreateChild(DepartmentIdentifier childIdentifier)
+        {
+            return new DepartmentPath(Value + Separator + childIdentifier.Value);
         }
 
         public static Result<DepartmentPath, Error> Create (string value)

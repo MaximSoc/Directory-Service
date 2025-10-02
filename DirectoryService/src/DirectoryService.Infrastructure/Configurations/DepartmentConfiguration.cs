@@ -33,6 +33,39 @@ namespace DirectoryService.Infrastructure.Configurations
                 .HasConversion(d => d.Value, d => new Domain.ValueObjects.DepartmentVO.DepartmentPath(d))
                 .IsRequired()
                 .HasColumnName("path");
+
+            builder.Property(d => d.ParentId)
+                .IsRequired(false);
+
+            builder.Property(d => d.Depth)
+                .IsRequired()
+                .HasColumnName("depth");
+
+            builder.Property(d => d.IsActive)
+                .IsRequired()
+                .HasColumnName("is_active");
+
+            builder.Property(d => d.CreatedAt)
+                .IsRequired()
+                .HasColumnName("created_at");
+
+            builder.Property(d => d.UpdatedAt)
+                .IsRequired()
+                .HasColumnName("updated_at");
+
+            builder.HasMany(d => d.ChildrenDepartments)
+                .WithOne()
+                .IsRequired(false)
+                .HasForeignKey(d => d.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(d => d.DepartmentLocations)
+                .WithOne()
+                .HasForeignKey(d => d.DepartmentId);
+
+            builder.HasMany(d => d.DepartmentPositions)
+                .WithOne()
+                .HasForeignKey(d => d.DepartmentId);
         }
     }
 }
