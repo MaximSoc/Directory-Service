@@ -14,6 +14,7 @@ namespace DirectoryService.Domain.ValueObjects.LocationVO
 
         private const int MAX_LENGTH = 120;
         public string Value { get; }
+
         public LocationName(string value)
         {
             Value = value;

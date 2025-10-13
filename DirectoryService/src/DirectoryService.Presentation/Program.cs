@@ -1,8 +1,10 @@
 using DirectoryService.Application;
 using DirectoryService.Application.Database;
+using DirectoryService.Application.Validation;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.Repositories;
 using DirectoryService.Presentation.Middlewares;
+using FluentValidation;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Shared;
@@ -53,6 +55,8 @@ new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("Directo
 builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
 
 builder.Services.AddScoped<CreateLocationHandler>();
+
+builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
 var app = builder.Build();
 

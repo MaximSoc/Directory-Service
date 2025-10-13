@@ -20,20 +20,20 @@ namespace DirectoryService.Infrastructure.Migrations
                     identifier = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     path = table.Column<string>(type: "text", nullable: false),
-                    Depth = table.Column<short>(type: "smallint", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uuid", nullable: true)
+                    depth = table.Column<int>(type: "integer", nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("department_id", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_departments_departments_DepartmentId",
-                        column: x => x.DepartmentId,
+                        name: "FK_departments_departments_ParentId",
+                        column: x => x.ParentId,
                         principalTable: "departments",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -42,16 +42,16 @@ namespace DirectoryService.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    country = table.Column<string>(type: "text", nullable: false),
+                    region = table.Column<string>(type: "text", nullable: false),
+                    city = table.Column<string>(type: "text", nullable: false),
+                    postalCode = table.Column<string>(type: "text", nullable: false),
+                    street = table.Column<string>(type: "text", nullable: false),
+                    apartamentNumber = table.Column<string>(type: "text", nullable: false),
                     timezone = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    apartamentNumber = table.Column<string>(type: "text", nullable: false),
-                    city = table.Column<string>(type: "text", nullable: false),
-                    country = table.Column<string>(type: "text", nullable: false),
-                    postalCode = table.Column<string>(type: "text", nullable: false),
-                    region = table.Column<string>(type: "text", nullable: false),
-                    street = table.Column<string>(type: "text", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,25 +75,25 @@ namespace DirectoryService.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DepartmentLocation",
+                name: "department_locations",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uuid", nullable: false)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    department_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    location_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DepartmentLocation", x => x.Id);
+                    table.PrimaryKey("PK_department_locations", x => x.id);
                     table.ForeignKey(
-                        name: "FK_DepartmentLocation_departments_DepartmentId",
-                        column: x => x.DepartmentId,
+                        name: "FK_department_locations_departments_department_id",
+                        column: x => x.department_id,
                         principalTable: "departments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DepartmentLocation_locations_LocationId",
-                        column: x => x.LocationId,
+                        name: "FK_department_locations_locations_location_id",
+                        column: x => x.location_id,
                         principalTable: "locations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -125,14 +125,14 @@ namespace DirectoryService.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepartmentLocation_DepartmentId",
-                table: "DepartmentLocation",
-                column: "DepartmentId");
+                name: "IX_department_locations_department_id",
+                table: "department_locations",
+                column: "department_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepartmentLocation_LocationId",
-                table: "DepartmentLocation",
-                column: "LocationId");
+                name: "IX_department_locations_location_id",
+                table: "department_locations",
+                column: "location_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DepartmentPosition_DepartmentId",
@@ -145,16 +145,28 @@ namespace DirectoryService.Infrastructure.Migrations
                 column: "PositionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_departments_DepartmentId",
+                name: "IX_departments_ParentId",
                 table: "departments",
-                column: "DepartmentId");
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "ux_location_address",
+                table: "locations",
+                columns: new[] { "country", "city", "region", "postalCode", "street", "apartamentNumber" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ux_location_name",
+                table: "locations",
+                column: "name",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DepartmentLocation");
+                name: "department_locations");
 
             migrationBuilder.DropTable(
                 name: "DepartmentPosition");
