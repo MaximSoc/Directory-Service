@@ -35,9 +35,9 @@ namespace DirectoryService.Infrastructure.Repositories
                 return location.Id;
             }
 
-            catch (DbUpdateException ex) when (IsDuplicateKeyExcxeption(ex))
+            catch (DbUpdateException ex) when (IsDuplicateKeyException(ex))
             {
-                _logger.LogWarning(ex, "Location with this name already exists");
+                _logger.LogWarning(ex, "Location already exists");
 
                 return GeneralErrors.AlreadyExist().ToErrors();
             }
@@ -50,7 +50,7 @@ namespace DirectoryService.Infrastructure.Repositories
             }
         }
 
-        private bool IsDuplicateKeyExcxeption(DbUpdateException ex)
+        private bool IsDuplicateKeyException(DbUpdateException ex)
         {
             if (ex.InnerException is PostgresException pgex)
             {

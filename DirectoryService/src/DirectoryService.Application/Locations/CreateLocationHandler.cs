@@ -84,35 +84,25 @@ namespace DirectoryService.Application
                 
             var locationTimezoneDto = command.Request.Timezone;
             var locationTimezone = LocationTimeZone.Create(locationTimezoneDto.Timezone);
-               
+
             var location = new Location(
             locationName.Value,
             locationAddress.Value,
             locationTimezone.Value);
 
-            try
+
+            var result = await _locationsRepository.Add(location, cancellationToken);
+
+            if (result.IsSuccess)
             {
-                var result = await _locationsRepository.Add(location, cancellationToken);
+                _logger.LogInformation("Location created succesfully: {LocationId}", location.Id);
 
-                if (result.IsSuccess)
-                {
-                    _logger.LogInformation("Location created succesfully: {LocationId}", location.Id);
-
-                    return result.Value;
-                }
-                else
-                {
-                    return result.Error;
-                }
+                return result.Value;
             }
-            catch ( Exception ex)
+            else
             {
-                _logger.LogError(ex, "Error occured while saving Location: {LocationId}", location.Id);
-
-                return Guid.Empty;
+                return result.Error;
             }
         }
     }
-
-    
 }
