@@ -16,7 +16,9 @@ namespace DirectoryService.Presentation.Controllers
             [FromBody] CreateLocationRequest request,
             CancellationToken cancellationToken)
         {
-            var result = await handler.Handle(request, cancellationToken);
+            var command = new CreateLocationCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
 
             return result;
         }

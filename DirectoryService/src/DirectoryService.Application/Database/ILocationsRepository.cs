@@ -1,14 +1,16 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain;
+using Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DirectoryService.Domain;
 
 namespace DirectoryService.Application.Database
 {
     public interface ILocationsRepository
     {
-        Task<Guid> Add(Location location, CancellationToken cancellationToken);
+        Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken);
     }
 }
