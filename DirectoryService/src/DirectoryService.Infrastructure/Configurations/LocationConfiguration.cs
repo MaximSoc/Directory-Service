@@ -42,46 +42,6 @@ namespace DirectoryService.Infrastructure.Configurations
                        .HasDatabaseName("ux_location_address");
             });
 
-            //builder.ComplexProperty(l => l.Address, tb =>
-            //{
-            //    tb.Property(t => t.Country)
-            //    .IsRequired()
-            //    .HasColumnName("country");
-
-            //    tb.Property(t => t.City)
-            //    .IsRequired()
-            //    .HasColumnName("city");
-
-            //    tb.Property(t => t.Region)
-            //    .IsRequired()
-            //    .HasColumnName("region");
-
-            //    tb.Property(t => t.PostalCode)
-            //    .IsRequired()
-            //    .HasColumnName("postalCode");
-
-            //    tb.Property(t => t.Street)
-            //    .IsRequired()
-            //    .HasColumnName("street");
-
-            //    tb.Property(t => t.ApartamentNumber)
-            //    .IsRequired()
-            //    .HasColumnName("apartamentNumber");
-
-            //});
-
-            //builder.HasIndex(l => new
-            //{
-            //    l.Address.Country,
-            //    l.Address.City,
-            //    l.Address.Region,
-            //    l.Address.PostalCode,
-            //    l.Address.Street,
-            //    l.Address.ApartamentNumber
-            //})                
-            //    .IsUnique()
-            //    .HasDatabaseName("ux_location_address");
-
             builder.Property(l => l.Timezone)
                 .HasConversion(l => l.Value, l => new Domain.ValueObjects.LocationVO.LocationTimeZone(l))
                 .IsRequired()

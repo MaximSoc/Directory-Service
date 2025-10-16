@@ -34,6 +34,8 @@ namespace DirectoryService.Domain
             Timezone = timezone;
 
             CreatedAt = DateTime.UtcNow;
+
+            IsActive = true;
         }
 
         public Guid Id { get; private set; }

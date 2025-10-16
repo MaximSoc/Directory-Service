@@ -33,6 +33,8 @@ namespace DirectoryService.Infrastructure
 
         public DbSet<Location> Locations => Set<Location>();
 
+        public DbSet<Position> Positions => Set<Position>();
+
         private ILoggerFactory CreateLoggerFactory() =>
             LoggerFactory.Create(builder => { builder.AddConsole(); });
     }

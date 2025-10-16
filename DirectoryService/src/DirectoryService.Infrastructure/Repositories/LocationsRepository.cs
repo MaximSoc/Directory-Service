@@ -59,5 +59,17 @@ namespace DirectoryService.Infrastructure.Repositories
 
             return false;
         }
+
+        public async Task<Result<bool, Errors>> AllExistAsync(IReadOnlyCollection<Guid> locationIds, CancellationToken cancellationToken)
+        {
+            if (locationIds.Count == 0)
+                return GeneralErrors.ValueIsRequired("Locations").ToErrors();
+
+            var existingCount = await _dbContext.Locations
+                .Where(l => locationIds.Contains(l.Id))
+                .CountAsync(cancellationToken);
+
+            return existingCount == locationIds.Count;
+        }
     }
 }
