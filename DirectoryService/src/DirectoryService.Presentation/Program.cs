@@ -1,5 +1,8 @@
 using DirectoryService.Application;
 using DirectoryService.Application.Database;
+using DirectoryService.Application.Departments;
+using DirectoryService.Application.Locations;
+using DirectoryService.Application.Positions;
 using DirectoryService.Application.Validation;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.Repositories;
@@ -55,6 +58,14 @@ new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("Directo
 builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
 
 builder.Services.AddScoped<CreateLocationHandler>();
+
+builder.Services.AddScoped<IDepartmentsRepository, DepartmentRepository>();
+
+builder.Services.AddScoped<CreateDepartmentHandler>();
+
+builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
+
+builder.Services.AddScoped<CreatePositionHandler>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 

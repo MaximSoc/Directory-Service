@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DirectoryService.Contracts
+namespace DirectoryService.Contracts.Locations
 {
     public record LocationTimezoneDto(string Timezone);
 }

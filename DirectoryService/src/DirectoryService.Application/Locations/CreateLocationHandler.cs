@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
-using DirectoryService.Contracts;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.LocationVO;
 using Shared;
@@ -13,8 +12,9 @@ using Microsoft.Extensions.Logging;
 using FluentValidation;
 using DirectoryService.Application.Validation;
 using System.Security.Cryptography.X509Certificates;
+using DirectoryService.Contracts.Locations;
 
-namespace DirectoryService.Application
+namespace DirectoryService.Application.Locations
 {
     public record CreateLocationCommand(CreateLocationRequest Request);
 

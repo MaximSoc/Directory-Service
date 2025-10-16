@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts
+﻿namespace DirectoryService.Contracts.Locations
 {
     public record LocationAddressDto(
         string Country,

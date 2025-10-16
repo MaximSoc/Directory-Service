@@ -17,15 +17,17 @@ namespace DirectoryService.Domain
             
         }
 
-        public Position(PositionName name, PositionDescription? description, IEnumerable<DepartmentPosition> departmentPositions)
+        public Position(Guid id, PositionName name, PositionDescription? description, IEnumerable<DepartmentPosition> departmentPositions)
         {
-            Id = Guid.NewGuid();
+            Id = id;
 
             Name = name;
 
             Description = description;
 
             CreatedAt = DateTime.UtcNow;
+
+            IsActive = true;
 
             _departmentPositions = departmentPositions.ToList();
         }

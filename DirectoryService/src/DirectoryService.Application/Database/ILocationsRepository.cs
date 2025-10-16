@@ -12,5 +12,6 @@ namespace DirectoryService.Application.Database
     public interface ILocationsRepository
     {
         Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken);
+        Task<Result<bool, Errors>> AllExistAsync(IReadOnlyCollection<Guid> locationIds, CancellationToken cancellationToken);
     }
 }

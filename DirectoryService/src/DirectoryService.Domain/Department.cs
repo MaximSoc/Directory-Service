@@ -24,17 +24,21 @@ namespace DirectoryService.Domain
         }
 
         public Department
-            (DepartmentName name,
+            (Guid id,
+            DepartmentName name,
             DepartmentIdentifier identifier,
             int depth,
             DepartmentPath path,
-            IEnumerable<DepartmentLocation> departmentLocations)
+            IEnumerable<DepartmentLocation> departmentLocations,
+            Guid? parentId)
         {
-            Id = Guid.NewGuid();
+            Id = id;
 
             Name = name;
             
             Identifier = identifier;
+
+            ParentId = parentId;
 
             IsActive = true;
 
@@ -77,7 +81,7 @@ namespace DirectoryService.Domain
             DepartmentName name,
             DepartmentIdentifier identifier,
             IEnumerable<DepartmentLocation> departmentLocations,
-            Guid? departmentId = null)
+            Guid departmentId)
         {
             var departmentLocationsList = departmentLocations.ToList();
 
@@ -86,11 +90,14 @@ namespace DirectoryService.Domain
                 return Error.Validation("department.location", "Department locations must contain at least one location");
             }
 
+            Guid? parentId = null;
+
             var path = DepartmentPath.CreateParent(identifier);
-            return new Department(name, identifier, 0, path, departmentLocationsList);
+            return new Department(departmentId ,name, identifier, 0, path, departmentLocationsList, parentId);
         }
 
         public static Result<Department, Error> CreateChild(
+            Guid departmentId,
             DepartmentName name,
             DepartmentIdentifier identifier,
             Department parent,
@@ -105,7 +112,7 @@ namespace DirectoryService.Domain
 
             var path = parent.Path.CreateChild(identifier);
 
-            return new Department(name, identifier, parent.Depth + 1, path, departmentLocationsList);
+            return new Department(departmentId, name, identifier, parent.Depth + 1, path, departmentLocationsList, parent.ParentId);
         }
     }
 }

@@ -27,8 +27,23 @@ namespace DirectoryService.Infrastructure.Configurations
                 .HasConversion(p => p.Value, p => new Domain.ValueObjects.PositionVO.PositionDescription(p))
                 .HasMaxLength(1000)
                 .HasColumnName("description")
-                .IsRequired();
+                .IsRequired(false);
 
+            builder.Property(p => p.IsActive)
+                .IsRequired()
+                .HasColumnName("is_active");
+
+            builder.Property(p => p.CreatedAt)
+                .IsRequired()
+                .HasColumnName("created_at");
+
+            builder.Property(p => p.UpdatedAt)
+               .IsRequired()
+               .HasColumnName("updated_at");
+
+            builder.HasMany(p => p.DepartmentPositions)
+                .WithOne()
+                .HasForeignKey(p => p.PositionId);
         }
     }
 }
