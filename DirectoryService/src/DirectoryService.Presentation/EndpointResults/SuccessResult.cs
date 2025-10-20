@@ -2,7 +2,7 @@
 using Shared;
 using System.Net;
 
-namespace DirectoryService.Presentation.EndpointResult
+namespace DirectoryService.Presentation.EndpointResults
 {
     public sealed class SuccessResult<TValue> : IResult
     {

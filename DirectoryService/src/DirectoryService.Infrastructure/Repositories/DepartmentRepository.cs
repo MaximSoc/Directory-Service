@@ -63,6 +63,7 @@ namespace DirectoryService.Infrastructure.Repositories
         public async Task<Result<Department, Errors>> GetById(Guid? departmentId, CancellationToken cancellationToken)
         {
             var department = await _dbContext.Departments.
+                Include(d => d.DepartmentLocations).
                 FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
 
             if (department == null)
@@ -81,6 +82,20 @@ namespace DirectoryService.Infrastructure.Repositories
                 .CountAsync(cancellationToken);
 
             return existingCount == departmentIds.Count;
+        }
+
+        public async Task<UnitResult<Errors>> SaveChanges(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                return UnitResult.Success<Errors>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Saving not completed");
+                return UnitResult.Failure<Errors>(GeneralErrors.Failure());
+            }
         }
     }
 }

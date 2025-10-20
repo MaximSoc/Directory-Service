@@ -3,7 +3,7 @@ using DirectoryService.Application;
 using DirectoryService.Application.Departments;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
-using DirectoryService.Presentation.EndpointResult;
+using DirectoryService.Presentation.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.Controllers
@@ -19,6 +19,19 @@ namespace DirectoryService.Presentation.Controllers
             CancellationToken cancellationToken)
         {
             var command = new CreateDepartmentCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result;
+        }
+
+        [HttpPut("{departmentId}/locations")]
+        public async Task<EndpointResult> UpdateLocations(
+            [FromServices] UpdateDepartmentLocationsHandler handler,
+            [FromBody] UpdateDepartmentLocationsRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new UpdateDepartmentLocationsCommand(request);
 
             var result = await handler.Handle(command, cancellationToken);
 

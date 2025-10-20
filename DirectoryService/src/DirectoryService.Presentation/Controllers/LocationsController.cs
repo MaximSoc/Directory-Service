@@ -2,7 +2,7 @@
 using DirectoryService.Application;
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts.Locations;
-using DirectoryService.Presentation.EndpointResult;
+using DirectoryService.Presentation.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.Controllers

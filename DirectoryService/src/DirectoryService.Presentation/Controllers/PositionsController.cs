@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Application.Positions;
 using DirectoryService.Contracts.Positions;
-using DirectoryService.Presentation.EndpointResult;
+using DirectoryService.Presentation.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.Controllers
