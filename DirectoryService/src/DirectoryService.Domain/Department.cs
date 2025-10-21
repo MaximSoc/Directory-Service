@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,7 +15,7 @@ namespace DirectoryService.Domain
     {
         private readonly List<Department> _childrenDepartments = [];
 
-        private readonly List<DepartmentLocation> _departmentLocations = [];
+        private List<DepartmentLocation> _departmentLocations = [];
 
         private readonly List<DepartmentPosition> _departmentPositions = [];
 
@@ -113,6 +114,15 @@ namespace DirectoryService.Domain
             var path = parent.Path.CreateChild(identifier);
 
             return new Department(departmentId, name, identifier, parent.Depth + 1, path, departmentLocationsList, parent.ParentId);
+        }
+
+        public UnitResult<Error> UpdateLocations(IEnumerable<DepartmentLocation> newLocations)
+        {
+            _departmentLocations = newLocations.ToList();
+
+            UpdatedAt = DateTime.UtcNow;
+
+            return UnitResult.Success<Error>();
         }
     }
 }

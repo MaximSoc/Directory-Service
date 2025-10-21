@@ -1,7 +1,7 @@
 ﻿
 using Shared;
 
-namespace DirectoryService.Presentation.EndpointResult
+namespace DirectoryService.Presentation.EndpointResults
 {
     public sealed class ErrorResult : IResult
     {

@@ -63,6 +63,8 @@ builder.Services.AddScoped<IDepartmentsRepository, DepartmentRepository>();
 
 builder.Services.AddScoped<CreateDepartmentHandler>();
 
+builder.Services.AddScoped<UpdateDepartmentLocationsHandler>();
+
 builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();
