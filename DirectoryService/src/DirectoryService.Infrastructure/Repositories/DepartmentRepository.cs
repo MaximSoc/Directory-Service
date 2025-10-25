@@ -72,6 +72,39 @@ namespace DirectoryService.Infrastructure.Repositories
             return department;
         }
 
+        public async Task<Result<Department, Errors>> GetByIdWithLock(Guid? departmentId, CancellationToken cancellationToken)
+        {
+            var @department = await _dbContext.Departments
+                .FromSql($@"SELECT * FROM departments WHERE ""Id"" = {departmentId} FOR UPDATE")
+                .FirstOrDefaultAsync();
+
+            if (@department == null)
+                return GeneralErrors.NotFound(departmentId).ToErrors();
+
+            return @department;
+        }
+
+        public async Task<UnitResult<Errors>> LockChildrens(string path, CancellationToken cancellationToken)
+        {
+            await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+                $"SELECT * FROM departments WHERE path <@ {path}::ltree AND path != {path}::ltree FOR UPDATE");
+
+            return UnitResult.Success<Errors>();
+        }
+
+        public async Task<UnitResult<Errors>> UpdateChildrensPathAndDepth(string oldPath, string newPath, int depthDelta, CancellationToken cancellationToken)
+        {
+            var updatedDate = DateTime.UtcNow;
+            await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+                $"""
+                UPDATE departments SET path = {newPath}::ltree || subpath(path, nlevel({oldPath}::ltree)), depth = depth + {depthDelta},
+                updated_at = {updatedDate}
+                WHERE path <@ {oldPath}::ltree AND path != {oldPath}::ltree
+                """, cancellationToken);
+
+            return UnitResult.Success<Errors>();
+        }
+
         public async Task<Result<bool, Errors>> AllExistAsync(IReadOnlyCollection<Guid> departmentIds, CancellationToken cancellationToken)
         {
             if (departmentIds.Count == 0)

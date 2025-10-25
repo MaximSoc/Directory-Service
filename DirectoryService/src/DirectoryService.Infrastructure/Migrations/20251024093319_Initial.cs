@@ -11,6 +11,9 @@ namespace DirectoryService.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:ltree", ",,");
+
             migrationBuilder.CreateTable(
                 name: "departments",
                 columns: table => new
@@ -19,7 +22,7 @@ namespace DirectoryService.Infrastructure.Migrations
                     name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     identifier = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
-                    path = table.Column<string>(type: "text", nullable: false),
+                    path = table.Column<string>(type: "ltree", nullable: false),
                     depth = table.Column<int>(type: "integer", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -143,6 +146,12 @@ namespace DirectoryService.Infrastructure.Migrations
                 name: "IX_department_positions_position_id",
                 table: "department_positions",
                 column: "position_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_departments_path",
+                table: "departments",
+                column: "path")
+                .Annotation("Npgsql:IndexMethod", "gist");
 
             migrationBuilder.CreateIndex(
                 name: "IX_departments_ParentId",

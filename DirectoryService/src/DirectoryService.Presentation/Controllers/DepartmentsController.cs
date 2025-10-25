@@ -37,5 +37,18 @@ namespace DirectoryService.Presentation.Controllers
 
             return result;
         }
+
+        [HttpPut("{departmentId}/parent")]
+        public async Task<EndpointResult> MoveDepartment(
+            [FromServices] MoveDepartmentHandler handler,
+            [FromBody] MoveDepartmentRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new MoveDepartmentCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result;
+        }
     }
 }

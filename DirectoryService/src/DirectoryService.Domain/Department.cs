@@ -113,12 +113,42 @@ namespace DirectoryService.Domain
 
             var path = parent.Path.CreateChild(identifier);
 
-            return new Department(departmentId, name, identifier, parent.Depth + 1, path, departmentLocationsList, parent.ParentId);
+            return new Department(departmentId, name, identifier, parent.Depth + 1, path, departmentLocationsList, parent.Id);
         }
 
         public UnitResult<Error> UpdateLocations(IEnumerable<DepartmentLocation> newLocations)
         {
             _departmentLocations = newLocations.ToList();
+
+            UpdatedAt = DateTime.UtcNow;
+
+            return UnitResult.Success<Error>();
+        }
+
+        public UnitResult<Error> UpdateParent(Department? parent)
+        {
+            if (this == parent)
+            {
+                return Error.Conflict("value.is.conflict", "It is forbidden to appoint yourself as a parent");
+            }
+
+            if (ChildrenDepartments.Contains(parent))
+            {
+                return Error.Conflict("value.is.conflict", "It is forbidden to appoint children as a parent");
+            }
+            var newPath = parent is null
+                ? DepartmentPath.CreateParent(Identifier)
+                : parent.Path.CreateChild(Identifier);
+
+            Path = newPath;
+
+            var newDepth = parent is null
+                ? 0
+                : parent.Depth + 1;
+
+            Depth = newDepth;
+
+            ParentId = parent?.Id;
 
             UpdatedAt = DateTime.UtcNow;
 

@@ -31,8 +31,13 @@ namespace DirectoryService.Infrastructure.Configurations
 
             builder.Property(d => d.Path)
                 .HasConversion(d => d.Value, d => new Domain.ValueObjects.DepartmentVO.DepartmentPath(d))
+                .HasColumnType("ltree")
                 .IsRequired()
                 .HasColumnName("path");
+
+            builder.HasIndex(d => d.Path)
+                .HasMethod("gist")
+                .HasDatabaseName("idx_departments_path");
 
             builder.Property(d => d.ParentId)
                 .IsRequired(false);
