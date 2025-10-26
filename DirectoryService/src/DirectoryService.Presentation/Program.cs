@@ -3,6 +3,7 @@ using DirectoryService.Application.Database;
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
+using DirectoryService.Application.Shared;
 using DirectoryService.Application.Validation;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.Repositories;
@@ -65,9 +66,13 @@ builder.Services.AddScoped<CreateDepartmentHandler>();
 
 builder.Services.AddScoped<UpdateDepartmentLocationsHandler>();
 
+builder.Services.AddScoped<MoveDepartmentHandler>();
+
 builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();
+
+builder.Services.AddScoped<ITransactionManager, TransactionManager>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 

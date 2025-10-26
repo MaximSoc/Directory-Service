@@ -16,8 +16,6 @@ namespace DirectoryService.Domain
 
         public DepartmentPosition(Guid departmentId, Guid positionId)
         {
-            Id = Guid.NewGuid();
-
             DepartmentId = departmentId;
 
             PositionId = positionId;

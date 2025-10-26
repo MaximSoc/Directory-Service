@@ -10,7 +10,7 @@ namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 {
     public record DepartmentPath
     {
-        private const char Separator = '/';
+        private const char Separator = '.';
 
         public string Value { get; }
 
