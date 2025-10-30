@@ -77,36 +77,6 @@ namespace DirectoryService.Application.Locations
                 """,
                 parameters);
 
-
-            //var departmentIds = request.DepartmentIds;
-            //if (departmentIds != null && departmentIds.Count != 0)
-            //{
-            //    locationsQuery = locationsQuery.Where(l => l.DepartmentLocations.Any(dl => departmentIds.Contains(dl.DepartmentId)));
-            //}
-
-            //if (!string.IsNullOrWhiteSpace(request.Search))
-            //{
-            //    locationsQuery = locationsQuery.Where(l => EF.Functions.Like(l.Name.Value, $"%{request.Search}%"));
-            //}
-
-            //var locations = await locationsQuery
-            //    .Select(l => new LocationDto
-            //    {
-            //        Id = l.Id,
-            //        Name = l.Name.Value,
-            //        Country = l.Address.Country,
-            //        Region = l.Address.Region,
-            //        City = l.Address.City,
-            //        PostalCode = l.Address.PostalCode,
-            //        Street = l.Address.Street,
-            //        ApartamentNumber = l.Address.ApartamentNumber,
-            //        Timezone = l.Timezone.Value,
-            //        IsActive = l.IsActive,
-            //        CreatedAt = l.CreatedAt,
-            //        UpdatedAt = l.UpdatedAt
-            //    })
-            //    .ToListAsync();
-
             return new GetLocationsByDepartmentResponse
             {
                 Locations = locations.ToList(),
