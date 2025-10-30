@@ -23,5 +23,30 @@ namespace DirectoryService.Presentation.Controllers
 
             return result;
         }
+
+        [HttpGet]
+        public async Task<ActionResult<GetLocationsByDepartmentResponse>> GetLocationsByDepartment (
+            [FromServices] GetLocationsByDepartmentHandler handler,
+            CancellationToken cancellationToken,
+            [FromQuery] List<Guid>? departmentIds,
+            [FromQuery] string? search,
+            [FromQuery] bool? isActive,
+            [FromQuery] int page =1,
+            [FromQuery] int pageSize = 20
+            )
+        {
+            var request = new GetLocationsByDepartmentRequest
+            {
+                DepartmentIds = departmentIds,
+                Search = search,
+                IsActive = isActive,
+                Page = page,
+                PageSize = pageSize
+            };
+
+            var locations = await handler.Handle(request, cancellationToken);
+
+            return Ok(locations);
+        }
     }
 }
