@@ -1,10 +1,11 @@
-﻿using DirectoryService.Domain;
+﻿using DirectoryService.Application.Database;
+using DirectoryService.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure
 {
-    public class DirectoryServiceDbContext : DbContext
+    public class DirectoryServiceDbContext : DbContext, IReadDbContext
     {
         private readonly string _connectionString;
 
@@ -35,6 +36,8 @@ namespace DirectoryService.Infrastructure
         public DbSet<Location> Locations => Set<Location>();
 
         public DbSet<Position> Positions => Set<Position>();
+
+        public IQueryable<Location> LocationsRead => Set<Location>().AsQueryable().AsNoTracking();
 
         private ILoggerFactory CreateLoggerFactory() =>
             LoggerFactory.Create(builder => { builder.AddConsole(); });

@@ -6,6 +6,7 @@ using DirectoryService.Application.Positions;
 using DirectoryService.Application.Shared;
 using DirectoryService.Application.Validation;
 using DirectoryService.Infrastructure;
+using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Repositories;
 using DirectoryService.Presentation.Middlewares;
 using FluentValidation;
@@ -56,9 +57,16 @@ builder.Services.AddSerilog();
 builder.Services.AddScoped<DirectoryServiceDbContext>(_ => 
 new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
 
+builder.Services.AddScoped<IReadDbContext, DirectoryServiceDbContext>(_ =>
+new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
+
+builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+
 builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
 
 builder.Services.AddScoped<CreateLocationHandler>();
+
+builder.Services.AddScoped<GetLocationsByDepartmentHandler>();
 
 builder.Services.AddScoped<IDepartmentsRepository, DepartmentRepository>();
 

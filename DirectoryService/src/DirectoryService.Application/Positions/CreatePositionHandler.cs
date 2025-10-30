@@ -31,7 +31,7 @@ namespace DirectoryService.Application.Positions
                 .MustBeValueObject(DepartmentName.Create);
 
             RuleFor(x => x.Request.Description.Description)
-                .MustBeValueObject(DepartmentIdentifier.Create)
+                .MustBeValueObject(PositionDescription.Create)
                 .When(x => x.Request.Description != null);
 
             RuleFor(x => x.Request.DepartmentsIds)
