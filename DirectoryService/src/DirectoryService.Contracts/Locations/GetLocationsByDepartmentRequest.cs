@@ -8,7 +8,7 @@ namespace DirectoryService.Contracts.Locations
 {
     public record GetLocationsByDepartmentRequest
     {
-        public List<Guid>? DepartmentIds { get; init; }
+        public List<Guid> DepartmentIds { get; init; } = [];
         public string? Search { get; init; }
         public bool? IsActive { get; init; }
         public int Page { get; init; } = 1;

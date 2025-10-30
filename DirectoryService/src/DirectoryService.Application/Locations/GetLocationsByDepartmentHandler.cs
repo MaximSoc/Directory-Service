@@ -17,8 +17,8 @@ namespace DirectoryService.Application.Locations
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly ILogger<GetLocationsByDepartmentHandler> _logger;
-        public GetLocationsByDepartmentHandler(IDbConnectionFactory dbConnectionFactory,
-            ILogger<GetLocationsByDepartmentHandler> logger)
+
+        public GetLocationsByDepartmentHandler(IDbConnectionFactory dbConnectionFactory, ILogger<GetLocationsByDepartmentHandler> logger)
         {
             _dbConnectionFactory = dbConnectionFactory;
             _logger = logger;

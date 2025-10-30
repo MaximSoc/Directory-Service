@@ -27,27 +27,10 @@ namespace DirectoryService.Presentation.Controllers
         [HttpGet]
         public async Task<ActionResult<GetLocationsByDepartmentResponse>> GetLocationsByDepartment (
             [FromServices] GetLocationsByDepartmentHandler handler,
-            CancellationToken cancellationToken,
-            [FromQuery] List<Guid>? departmentIds,
-            [FromQuery] string? search,
-            [FromQuery] bool? isActive,
-            [FromQuery] string? sortBy,
-            [FromQuery] string? sortDirection,
-            [FromQuery] int page =1,
-            [FromQuery] int pageSize = 20
+            [FromQuery] GetLocationsByDepartmentRequest request,
+            CancellationToken cancellationToken
             )
         {
-            var request = new GetLocationsByDepartmentRequest
-            {
-                DepartmentIds = departmentIds,
-                Search = search,
-                IsActive = isActive,
-                Page = page,
-                PageSize = pageSize,
-                SortBy = sortBy,
-                SortDirection = sortDirection
-            };
-
             var locations = await handler.Handle(request, cancellationToken);
 
             return Ok(locations);
