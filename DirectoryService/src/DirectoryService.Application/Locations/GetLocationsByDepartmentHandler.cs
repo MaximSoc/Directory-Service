@@ -56,6 +56,17 @@ namespace DirectoryService.Application.Locations
 
             var whereClause = conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : "";
 
+            var direction = request.SortDirection?.ToLower() == "asc" ? "ASC" : "DESC";
+
+            var orderByField = request.SortBy?.ToLower() switch
+            {
+                "name" => "l.name",
+                "date" => "l.\"CreatedAt\"",
+                _ => "l.name"
+            };
+
+            var orderByClause = $"ORDER BY {orderByField} {direction}";
+
             var locations = await connection.QueryAsync<LocationDto>($"""
                 SELECT l."Id",
                 l.name,
@@ -72,7 +83,7 @@ namespace DirectoryService.Application.Locations
                 FROM locations l
                 JOIN department_locations dl ON l."Id" = dl.location_id
                 {whereClause}
-                ORDER BY l.name, l."CreatedAt"
+                {orderByClause}
                 LIMIT @pageSize OFFSET @page
                 """,
                 parameters);

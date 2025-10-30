@@ -31,6 +31,8 @@ namespace DirectoryService.Presentation.Controllers
             [FromQuery] List<Guid>? departmentIds,
             [FromQuery] string? search,
             [FromQuery] bool? isActive,
+            [FromQuery] string? sortBy,
+            [FromQuery] string? sortDirection,
             [FromQuery] int page =1,
             [FromQuery] int pageSize = 20
             )
@@ -41,7 +43,9 @@ namespace DirectoryService.Presentation.Controllers
                 Search = search,
                 IsActive = isActive,
                 Page = page,
-                PageSize = pageSize
+                PageSize = pageSize,
+                SortBy = sortBy,
+                SortDirection = sortDirection
             };
 
             var locations = await handler.Handle(request, cancellationToken);
