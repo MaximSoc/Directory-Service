@@ -90,7 +90,7 @@ namespace DirectoryService.Application.Locations
 
             return new GetLocationsByDepartmentResponse
             {
-                Locations = locations.ToList(),
+                Locations = locations.ToList()
             };
         }
     }

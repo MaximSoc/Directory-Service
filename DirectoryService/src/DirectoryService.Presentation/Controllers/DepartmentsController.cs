@@ -50,5 +50,15 @@ namespace DirectoryService.Presentation.Controllers
 
             return result;
         }
+
+        [HttpGet("/top-positions")]
+        public async Task<ActionResult<GetDepartmentsWithTopPositionsResponse>> GetTopPositions(
+            [FromServices] GetDepartmentsWithTopPositionsHandler handler,
+            CancellationToken cancellationToken)
+        {
+            var result = await handler.Handle(cancellationToken);
+
+            return result;
+        }
     }
 }
