@@ -27,7 +27,8 @@ namespace DirectoryService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -54,7 +55,8 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnName("name");
 
                     b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
 
                     b.Property<string>("Path")
                         .IsRequired()
@@ -130,13 +132,16 @@ namespace DirectoryService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -150,7 +155,8 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnName("timezone");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id")
                         .HasName("location_id");
@@ -166,7 +172,8 @@ namespace DirectoryService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -245,7 +252,7 @@ namespace DirectoryService.Infrastructure.Migrations
                             b1.Property<string>("ApartamentNumber")
                                 .IsRequired()
                                 .HasColumnType("text")
-                                .HasColumnName("apartamentNumber");
+                                .HasColumnName("apartament_number");
 
                             b1.Property<string>("City")
                                 .IsRequired()
@@ -260,7 +267,7 @@ namespace DirectoryService.Infrastructure.Migrations
                             b1.Property<string>("PostalCode")
                                 .IsRequired()
                                 .HasColumnType("text")
-                                .HasColumnName("postalCode");
+                                .HasColumnName("postal_code");
 
                             b1.Property<string>("Region")
                                 .IsRequired()

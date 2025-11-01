@@ -15,6 +15,10 @@ namespace DirectoryService.Infrastructure.Configurations
         {
             builder.ToTable("positions");
 
+            builder.Property(p => p.Id)
+                .IsRequired()
+                .HasColumnName("id");
+
             builder.HasKey(p => p.Id).HasName("position_id");
 
             builder.Property(p => p.Name)

@@ -16,6 +16,10 @@ namespace DirectoryService.Infrastructure.Configurations
         {
             builder.ToTable("locations");
 
+            builder.Property(l => l.Id)
+                .IsRequired()
+                .HasColumnName("id");
+
             builder.HasKey(l => l.Id).HasName("location_id");
 
             builder.Property(l => l.Name)
@@ -33,9 +37,9 @@ namespace DirectoryService.Infrastructure.Configurations
                 address.Property(t => t.Country).IsRequired().HasColumnName("country");
                 address.Property(t => t.City).IsRequired().HasColumnName("city");
                 address.Property(t => t.Region).IsRequired().HasColumnName("region");
-                address.Property(t => t.PostalCode).IsRequired().HasColumnName("postalCode");
+                address.Property(t => t.PostalCode).IsRequired().HasColumnName("postal_code");
                 address.Property(t => t.Street).IsRequired().HasColumnName("street");
-                address.Property(t => t.ApartamentNumber).IsRequired().HasColumnName("apartamentNumber");
+                address.Property(t => t.ApartamentNumber).IsRequired().HasColumnName("apartament_number");
 
                 address.HasIndex(t => new { t.Country, t.City, t.Region, t.PostalCode, t.Street, t.ApartamentNumber })
                        .IsUnique()
@@ -46,6 +50,18 @@ namespace DirectoryService.Infrastructure.Configurations
                 .HasConversion(l => l.Value, l => new Domain.ValueObjects.LocationVO.LocationTimeZone(l))
                 .IsRequired()
                 .HasColumnName("timezone");
+
+            builder.Property(l => l.IsActive)
+                .IsRequired()
+                .HasColumnName("is_active");
+
+            builder.Property(l => l.CreatedAt)
+                .IsRequired()
+                .HasColumnName("created_at");
+
+            builder.Property(l => l.UpdatedAt)
+                .IsRequired()
+                .HasColumnName("updated_at");
 
             builder.HasMany(l => l.DepartmentLocations)
                 .WithOne()

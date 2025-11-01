@@ -75,7 +75,7 @@ namespace DirectoryService.Infrastructure.Repositories
         public async Task<Result<Department, Errors>> GetByIdWithLock(Guid? departmentId, CancellationToken cancellationToken)
         {
             var @department = await _dbContext.Departments
-                .FromSql($@"SELECT * FROM departments WHERE ""Id"" = {departmentId} FOR UPDATE")
+                .FromSql($@"SELECT * FROM departments WHERE id = {departmentId} FOR UPDATE")
                 .FirstOrDefaultAsync();
 
             if (@department == null)

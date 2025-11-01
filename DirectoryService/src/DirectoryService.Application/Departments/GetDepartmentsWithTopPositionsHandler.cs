@@ -26,22 +26,22 @@ namespace DirectoryService.Application.Departments
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
             var departmentsWithTopPositions = await connection.QueryAsync<DepartmentDto>("""
-                SELECT DISTINCT d."Id",
+                SELECT DISTINCT d.id,
                 d.name,
                 d.identifier,
-                d."ParentId",
+                d.parent_id AS parentId,
                 d.path,
                 d.depth,
-                d.is_active AS "IsActive",
-                d.created_at AS "CreatedAt",
-                d.updated_at AS "UpdatedAt",
-                dp_counts.positions_count AS "NumberOfPositions"
+                d.is_active AS isActive,
+                d.created_at AS createdAt,
+                d.updated_at AS updatedAt,
+                dp_counts.positions_count AS numberOfPositions
                 FROM departments d
                 JOIN (
                 SELECT department_id, COUNT(*) AS positions_count
                 FROM department_positions
                 GROUP BY department_id
-                ) dp_counts ON d."Id" = dp_counts.department_id
+                ) dp_counts ON d.id = dp_counts.department_id
                 ORDER BY dp_counts.positions_count DESC
                 LIMIT 5
                 """);
