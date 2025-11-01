@@ -18,10 +18,10 @@ namespace DirectoryService.Infrastructure.Migrations
                 name: "departments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     identifier = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    ParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    parent_id = table.Column<Guid>(type: "uuid", nullable: true),
                     path = table.Column<string>(type: "ltree", nullable: false),
                     depth = table.Column<int>(type: "integer", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
@@ -30,12 +30,12 @@ namespace DirectoryService.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("department_id", x => x.Id);
+                    table.PrimaryKey("department_id", x => x.id);
                     table.ForeignKey(
-                        name: "FK_departments_departments_ParentId",
-                        column: x => x.ParentId,
+                        name: "FK_departments_departments_parent_id",
+                        column: x => x.parent_id,
                         principalTable: "departments",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -43,29 +43,29 @@ namespace DirectoryService.Infrastructure.Migrations
                 name: "locations",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     country = table.Column<string>(type: "text", nullable: false),
                     region = table.Column<string>(type: "text", nullable: false),
                     city = table.Column<string>(type: "text", nullable: false),
-                    postalCode = table.Column<string>(type: "text", nullable: false),
+                    postal_code = table.Column<string>(type: "text", nullable: false),
                     street = table.Column<string>(type: "text", nullable: false),
-                    apartamentNumber = table.Column<string>(type: "text", nullable: false),
+                    apartament_number = table.Column<string>(type: "text", nullable: false),
                     timezone = table.Column<string>(type: "text", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("location_id", x => x.Id);
+                    table.PrimaryKey("location_id", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "positions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
@@ -74,7 +74,7 @@ namespace DirectoryService.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("position_id", x => x.Id);
+                    table.PrimaryKey("position_id", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -92,13 +92,13 @@ namespace DirectoryService.Infrastructure.Migrations
                         name: "FK_department_locations_departments_department_id",
                         column: x => x.department_id,
                         principalTable: "departments",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_department_locations_locations_location_id",
                         column: x => x.location_id,
                         principalTable: "locations",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -117,13 +117,13 @@ namespace DirectoryService.Infrastructure.Migrations
                         name: "FK_department_positions_departments_department_id",
                         column: x => x.department_id,
                         principalTable: "departments",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_department_positions_positions_position_id",
                         column: x => x.position_id,
                         principalTable: "positions",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -154,14 +154,14 @@ namespace DirectoryService.Infrastructure.Migrations
                 .Annotation("Npgsql:IndexMethod", "gist");
 
             migrationBuilder.CreateIndex(
-                name: "IX_departments_ParentId",
+                name: "IX_departments_parent_id",
                 table: "departments",
-                column: "ParentId");
+                column: "parent_id");
 
             migrationBuilder.CreateIndex(
                 name: "ux_location_address",
                 table: "locations",
-                columns: new[] { "country", "city", "region", "postalCode", "street", "apartamentNumber" },
+                columns: new[] { "country", "city", "region", "postal_code", "street", "apartament_number" },
                 unique: true);
 
             migrationBuilder.CreateIndex(

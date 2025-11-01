@@ -15,6 +15,10 @@ namespace DirectoryService.Infrastructure.Configurations
         {
             builder.ToTable("departments");
 
+            builder.Property(d => d.Id)
+                .IsRequired()
+                .HasColumnName("id");
+
             builder.HasKey(d => d.Id).HasName("department_id");
 
             builder.Property(d => d.Name)
@@ -40,7 +44,8 @@ namespace DirectoryService.Infrastructure.Configurations
                 .HasDatabaseName("idx_departments_path");
 
             builder.Property(d => d.ParentId)
-                .IsRequired(false);
+                .IsRequired(false)
+                .HasColumnName("parent_id");
 
             builder.Property(d => d.Depth)
                 .IsRequired()

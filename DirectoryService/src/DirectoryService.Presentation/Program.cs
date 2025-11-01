@@ -76,6 +76,8 @@ builder.Services.AddScoped<UpdateDepartmentLocationsHandler>();
 
 builder.Services.AddScoped<MoveDepartmentHandler>();
 
+builder.Services.AddScoped<GetDepartmentsWithTopPositionsHandler>();
+
 builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();

@@ -28,7 +28,7 @@ namespace DirectoryService.Application.Positions
                 .WithError(GeneralErrors.ValueIsRequired("request"));
 
             RuleFor(x => x.Request.Name.Name)
-                .MustBeValueObject(DepartmentName.Create);
+                .MustBeValueObject(PositionName.Create);
 
             RuleFor(x => x.Request.Description.Description)
                 .MustBeValueObject(PositionDescription.Create)

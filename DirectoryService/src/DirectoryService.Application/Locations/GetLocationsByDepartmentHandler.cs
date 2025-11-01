@@ -47,7 +47,7 @@ namespace DirectoryService.Application.Locations
 
             if (request.IsActive != null)
             {
-                conditions.Add("""l."IsActive" = @isActive""");
+                conditions.Add("""l."is_active" = @isActive""");
                 parameters.Add("isActive", request.IsActive, DbType.Boolean);
             }
             
@@ -61,27 +61,27 @@ namespace DirectoryService.Application.Locations
             var orderByField = request.SortBy?.ToLower() switch
             {
                 "name" => "l.name",
-                "date" => "l.\"CreatedAt\"",
+                "date" => "l.created_at",
                 _ => "l.name"
             };
 
             var orderByClause = $"ORDER BY {orderByField} {direction}";
 
             var locations = await connection.QueryAsync<LocationDto>($"""
-                SELECT l."Id",
+                SELECT l.id,
                 l.name,
                 l.country,
                 l.region,
                 l.city,
-                l."postalCode",
+                l.postal_code AS postalCode,
                 l.street,
-                l."apartamentNumber",
+                l.apartament_number AS apartamentNumber,
                 l.timezone,
-                l."IsActive",
-                l."CreatedAt",
-                l."UpdatedAt"
+                l.is_active AS isActive,
+                l.created_at AS createdAt,
+                l.updated_at AS updatedAt
                 FROM locations l
-                JOIN department_locations dl ON l."Id" = dl.location_id
+                JOIN department_locations dl ON l.id = dl.location_id
                 {whereClause}
                 {orderByClause}
                 LIMIT @pageSize OFFSET @page
@@ -90,7 +90,7 @@ namespace DirectoryService.Application.Locations
 
             return new GetLocationsByDepartmentResponse
             {
-                Locations = locations.ToList(),
+                Locations = locations.ToList()
             };
         }
     }
