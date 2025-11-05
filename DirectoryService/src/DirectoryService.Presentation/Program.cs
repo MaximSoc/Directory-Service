@@ -78,6 +78,10 @@ builder.Services.AddScoped<MoveDepartmentHandler>();
 
 builder.Services.AddScoped<GetDepartmentsWithTopPositionsHandler>();
 
+builder.Services.AddScoped<GetParentWithChildrensHandler>();
+
+builder.Services.AddScoped<GetChildrenByParentHandler>();
+
 builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();
