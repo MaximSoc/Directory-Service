@@ -25,7 +25,7 @@ namespace DirectoryService.Application.Departments
         {
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
-            var departmentsWithTopPositions = await connection.QueryAsync<DepartmentDto>("""
+            var departmentsWithTopPositions = await connection.QueryAsync<DepartmentWithNumberOfPositionsDto>("""
                 SELECT DISTINCT d.id,
                 d.name,
                 d.identifier,

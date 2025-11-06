@@ -9,6 +9,6 @@ namespace DirectoryService.Contracts.Departments
 {
     public record GetDepartmentsWithTopPositionsResponse
     {
-        public List<DepartmentDto> DepartmentsWithTopPositions { get; init; } = null!;
+        public List<DepartmentWithNumberOfPositionsDto> DepartmentsWithTopPositions { get; init; } = null!;
     }
 }

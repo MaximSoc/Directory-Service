@@ -1,8 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application;
 using DirectoryService.Application.Departments;
+using DirectoryService.Application.Locations;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
+using DirectoryService.Contracts.Locations;
 using DirectoryService.Presentation.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,6 +59,34 @@ namespace DirectoryService.Presentation.Controllers
             CancellationToken cancellationToken)
         {
             var result = await handler.Handle(cancellationToken);
+
+            return result;
+        }
+
+        [HttpGet("/roots")]
+        public async Task<ActionResult<GetParentWithChildrensResponse>> GetParentWithChildrens(
+            [FromServices] GetParentWithChildrensHandler handler,
+            [FromQuery] GetParentWithChildrensRequest request,
+            CancellationToken cancellationToken
+            )
+        {
+            var command = new GetParentWithChildrensCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result;
+        }
+
+        [HttpGet("/{parentId}/children")]
+        public async Task<ActionResult<GetChildrenByParentResponse>> GetChildrenByParent(
+            [FromServices] GetChildrenByParentHandler handler,
+            [FromQuery] GetChildrenByParentRequest request,
+            CancellationToken cancellationToken
+            )
+        {
+            var command = new GetChildrenByParentCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
 
             return result;
         }

@@ -25,7 +25,5 @@ namespace DirectoryService.Contracts.Departments
         public DateTime CreatedAt { get; init; }
 
         public DateTime UpdatedAt { get; init; }
-
-        public int NumberOfPositions { get; init; }
     }
 }
