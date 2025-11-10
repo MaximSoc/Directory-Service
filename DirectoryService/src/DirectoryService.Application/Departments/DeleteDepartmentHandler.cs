@@ -72,83 +72,74 @@ namespace DirectoryService.Application.Departments
 
             using var transaction = transactionResult.Value;
 
-            try
-            {
-                var departmentResult = await _departmentsRepository.GetById(command.Request.DepartmentId, cancellationToken);
-                if (departmentResult.IsFailure)
-                {
-                    transaction.Rollback();
-                    return departmentResult.Error;
-                }
-                    
-
-                var department = departmentResult.Value;
-                if (department.IsActive == false)
-                {
-                    _logger.LogInformation("Department is not active");
-                    transaction.Rollback();
-                    return GeneralErrors.Failure("Department is not active").ToErrors();
-                }
-
-                var deleteLocationsResult = await _locationsRepository.SoftDelete(department.Id, cancellationToken);
-                if (deleteLocationsResult.IsFailure)
-                {
-                    _logger.LogInformation("Locations soft deleted failed");
-                    transaction.Rollback();
-                    return deleteLocationsResult.Error.ToErrors();
-                }
-
-                var deletePositionsResult = await _positionsRepository.SoftDelete(department.Id, cancellationToken);
-                if (deletePositionsResult.IsFailure)
-                {
-                    _logger.LogInformation("Positions soft deleted failed");
-                    transaction.Rollback();
-                    return deletePositionsResult.Error.ToErrors();
-                }
-
-                var oldPath = department.Path.Value;
-
-                var result = _departmentsRepository.SoftDelete(department, cancellationToken);
-
-                if (result.IsFailure)
-                {
-                    _logger.LogInformation("Department soft deleted failed: {DepartmentId}", department.Id);
-                    transaction.Rollback();
-                    return result.Error;
-                }
-
-                var saveChanges = await _departmentsRepository.SaveChanges(cancellationToken);
-                if (saveChanges.IsFailure)
-                {
-                    transaction.Rollback();
-                    return saveChanges.Error;
-                }
-
-                var newPath = department.Path.Value;
-
-                var updateChildrensPathAndDepth = await _departmentsRepository.UpdateChildrensPathAndDepth(
-                    oldPath,
-                    newPath,
-                    0,
-                    cancellationToken);
-
-                if (updateChildrensPathAndDepth.IsFailure)
-                {
-                    transaction.Rollback();
-                    return updateChildrensPathAndDepth.Error;
-                }
-
-                transaction.Commit();
-
-                _logger.LogInformation("Department soft deleted succesfully: {DepartmentId}", department.Id);
-                return result.Value;
-            }
-
-            catch
+            var departmentResult = await _departmentsRepository.GetById(command.Request.DepartmentId, cancellationToken);
+            if (departmentResult.IsFailure)
             {
                 transaction.Rollback();
-                throw;
+                return departmentResult.Error;
             }
+
+
+            var department = departmentResult.Value;
+            if (department.IsActive == false)
+            {
+                _logger.LogInformation("Department is not active");
+                transaction.Rollback();
+                return GeneralErrors.Failure("Department is not active").ToErrors();
+            }
+
+            var deleteLocationsResult = await _locationsRepository.SoftDelete(department.Id, cancellationToken);
+            if (deleteLocationsResult.IsFailure)
+            {
+                _logger.LogInformation("Locations soft deleted failed");
+                transaction.Rollback();
+                return deleteLocationsResult.Error.ToErrors();
+            }
+
+            var deletePositionsResult = await _positionsRepository.SoftDelete(department.Id, cancellationToken);
+            if (deletePositionsResult.IsFailure)
+            {
+                _logger.LogInformation("Positions soft deleted failed");
+                transaction.Rollback();
+                return deletePositionsResult.Error.ToErrors();
+            }
+
+            var oldPath = department.Path.Value;
+
+            var result = _departmentsRepository.SoftDelete(department, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                _logger.LogInformation("Department soft deleted failed: {DepartmentId}", department.Id);
+                transaction.Rollback();
+                return result.Error;
+            }
+
+            var saveChanges = await _departmentsRepository.SaveChanges(cancellationToken);
+            if (saveChanges.IsFailure)
+            {
+                transaction.Rollback();
+                return saveChanges.Error;
+            }
+
+            var newPath = department.Path.Value;
+
+            var updateChildrensPathAndDepth = await _departmentsRepository.UpdateChildrensPathAndDepth(
+                oldPath,
+                newPath,
+                0,
+                cancellationToken);
+
+            if (updateChildrensPathAndDepth.IsFailure)
+            {
+                transaction.Rollback();
+                return updateChildrensPathAndDepth.Error;
+            }
+
+            transaction.Commit();
+
+            _logger.LogInformation("Department soft deleted succesfully: {DepartmentId}", department.Id);
+            return result.Value;
         }
     }
 }
