@@ -13,5 +13,6 @@ namespace DirectoryService.Application.Database
     {
         Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken);
         Task<Result<bool, Errors>> AllExistAsync(IReadOnlyCollection<Guid> locationIds, CancellationToken cancellationToken);
+        Task<UnitResult<Error>> SoftDelete(Guid departmentId, CancellationToken cancellationToken);
     }
 }

@@ -17,11 +17,16 @@ namespace DirectoryService.Infrastructure.Repositories
     {
         private readonly DirectoryServiceDbContext _dbContext;
         private readonly ILogger<DepartmentRepository> _logger;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public DepartmentRepository(DirectoryServiceDbContext dbContext, ILogger<DepartmentRepository> logger)
+        public DepartmentRepository(
+            DirectoryServiceDbContext dbContext,
+            ILogger<DepartmentRepository> logger,
+            IDbConnectionFactory connectionFactory)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _connectionFactory = connectionFactory;
         }
 
         public async Task<Result<Guid, Errors>> Add(Department department, CancellationToken cancellationToken = default)
@@ -62,9 +67,10 @@ namespace DirectoryService.Infrastructure.Repositories
 
         public async Task<Result<Department, Errors>> GetById(Guid? departmentId, CancellationToken cancellationToken)
         {
-            var department = await _dbContext.Departments.
-                Include(d => d.DepartmentLocations).
-                FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
+            var department = await _dbContext.Departments
+                .Include(d => d.DepartmentLocations)
+                .Include(d => d.DepartmentPositions)
+                .FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
 
             if (department == null)
                 return GeneralErrors.NotFound(departmentId).ToErrors();
@@ -128,6 +134,20 @@ namespace DirectoryService.Infrastructure.Repositories
             {
                 _logger.LogError(ex, "Saving not completed");
                 return UnitResult.Failure<Errors>(GeneralErrors.Failure());
+            }
+        }
+
+        public Result<Guid, Errors> SoftDelete(Department department, CancellationToken cancellationToken)
+        {
+            try
+            {
+                _dbContext.Departments.Remove(department);
+                return department.Id;
+            }
+             catch(Exception ex)
+            {
+                _logger.LogError(ex, "Soft deleted failure");
+                return GeneralErrors.Failure("Soft deleted failure").ToErrors();
             }
         }
     }

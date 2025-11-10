@@ -18,11 +18,16 @@ namespace DirectoryService.Infrastructure.Repositories
     {
         private readonly DirectoryServiceDbContext _dbContext;
         private readonly ILogger<PositionRepository> _logger;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public PositionRepository(DirectoryServiceDbContext dbContext, ILogger<PositionRepository> logger)
+        public PositionRepository(
+            DirectoryServiceDbContext dbContext,
+            ILogger<PositionRepository> logger,
+            IDbConnectionFactory connectionFactory)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _connectionFactory = connectionFactory;
         }
 
         public async Task<Result<Guid, Errors>> Add(Position position, CancellationToken cancellationToken = default)
@@ -69,6 +74,30 @@ namespace DirectoryService.Infrastructure.Repositories
                 return false;
 
             return true;
+        }
+
+        public async Task<UnitResult<Error>> SoftDelete(Guid departmentId, CancellationToken cancellationToken)
+        {
+            await _dbContext.Database.ExecuteSqlAsync(
+                $"""
+                UPDATE positions p
+                SET is_active = false,
+                deleted_at = NOW() AT TIME ZONE 'UTC'
+                FROM department_positions dp
+                WHERE p.id = dp.position_id
+                AND dp.department_id = {departmentId}
+                AND NOT EXISTS (
+                SELECT 1
+                FROM department_positions dp2
+                JOIN departments d ON d.id = dp2.department_id
+                WHERE dp2.position_id = p.id
+                AND d.is_active = true
+                AND dp2.department_id <> {departmentId}
+                )
+                """,
+                cancellationToken);
+
+            return UnitResult.Success<Error>();
         }
     }
 }

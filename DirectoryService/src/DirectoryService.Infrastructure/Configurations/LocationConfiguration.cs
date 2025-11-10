@@ -63,9 +63,14 @@ namespace DirectoryService.Infrastructure.Configurations
                 .IsRequired()
                 .HasColumnName("updated_at");
 
+            builder.Property(l => l.DeletedAt)
+                .IsRequired(false)
+                .HasColumnName("deleted_at");
+
             builder.HasMany(l => l.DepartmentLocations)
                 .WithOne()
-                .HasForeignKey(l => l.LocationId);
+                .HasForeignKey(l => l.LocationId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

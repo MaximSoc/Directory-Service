@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Database;
 using DirectoryService.Domain;
+using DirectoryService.Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -23,6 +24,8 @@ namespace DirectoryService.Infrastructure
             optionsBuilder.EnableSensitiveDataLogging();
 
             optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
+
+            optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
