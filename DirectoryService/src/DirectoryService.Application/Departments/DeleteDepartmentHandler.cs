@@ -140,6 +140,7 @@ namespace DirectoryService.Application.Departments
 
                 transaction.Commit();
 
+                _logger.LogInformation("Department soft deleted succesfully: {DepartmentId}", department.Id);
                 return result.Value;
             }
 
