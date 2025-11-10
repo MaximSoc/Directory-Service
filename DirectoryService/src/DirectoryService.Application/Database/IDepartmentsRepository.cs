@@ -18,5 +18,6 @@ namespace DirectoryService.Application.Database
         Task<Result<Department, Errors>> GetByIdWithLock(Guid? departmentId, CancellationToken cancellationToken);
         Task<UnitResult<Errors>> LockChildrens(string path, CancellationToken cancellationToken);
         Task<UnitResult<Errors>> UpdateChildrensPathAndDepth(string oldPath, string newPath, int depthDelta, CancellationToken cancellationToken);
+        Result<Guid, Errors> SoftDelete(Department department, CancellationToken cancellationToken);
     }
 }

@@ -6,12 +6,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
 using Shared;
 
 namespace DirectoryService.Domain
 {
-    public sealed class Department
+    public sealed class Department : ISoftDeletable
     {
         private readonly List<Department> _childrenDepartments = [];
 
@@ -71,6 +72,8 @@ namespace DirectoryService.Domain
         public DateTime CreatedAt { get; private set; }
 
         public DateTime UpdatedAt { get; private set; }
+
+        public DateTime? DeletedAt { get; private set; } = null;
 
         public IReadOnlyList<Department> ChildrenDepartments => _childrenDepartments;
 
@@ -153,6 +156,26 @@ namespace DirectoryService.Domain
             UpdatedAt = DateTime.UtcNow;
 
             return UnitResult.Success<Error>();
+        }
+
+        public void Delete()
+        {
+            IsActive = false;
+
+            DeletedAt = DateTime.UtcNow;
+
+            var parts = Path.Value.Split('.');
+            parts[Depth] = "deleted-" + parts[Depth];
+            var newPath = string.Join(".", parts);
+
+            Path = DepartmentPath.Create(newPath).Value;
+        }
+
+        public void Restore()
+        {
+            IsActive = true;
+
+            DeletedAt = DateTime.MinValue;
         }
     }
 }

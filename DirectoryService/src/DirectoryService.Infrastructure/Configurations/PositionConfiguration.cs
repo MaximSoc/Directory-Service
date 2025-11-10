@@ -45,6 +45,10 @@ namespace DirectoryService.Infrastructure.Configurations
                .IsRequired()
                .HasColumnName("updated_at");
 
+            builder.Property(p => p.DeletedAt)
+                .IsRequired(false)
+                .HasColumnName("deleted_at");
+
             builder.HasMany(p => p.DepartmentPositions)
                 .WithOne()
                 .HasForeignKey(p => p.PositionId);

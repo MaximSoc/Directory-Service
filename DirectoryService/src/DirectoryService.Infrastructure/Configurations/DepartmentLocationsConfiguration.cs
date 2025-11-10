@@ -28,6 +28,10 @@ namespace DirectoryService.Infrastructure.Configurations
             builder.Property(x => x.LocationId)
                 .IsRequired()
                 .HasColumnName("location_id");
+
+            builder.Property(x => x.IsActive)
+                .IsRequired()
+                .HasColumnName("is_active");
         }
     }
 }

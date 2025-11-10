@@ -7,6 +7,7 @@ using DirectoryService.Application.Shared;
 using DirectoryService.Application.Validation;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.Database;
+using DirectoryService.Infrastructure.Interceptors;
 using DirectoryService.Infrastructure.Repositories;
 using DirectoryService.Presentation.Middlewares;
 using FluentValidation;
@@ -82,11 +83,15 @@ builder.Services.AddScoped<GetParentWithChildrensHandler>();
 
 builder.Services.AddScoped<GetChildrenByParentHandler>();
 
+builder.Services.AddScoped<DeleteDepartmentHandler>();
+
 builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();
 
 builder.Services.AddScoped<ITransactionManager, TransactionManager>();
+
+builder.Services.AddSingleton<SoftDeleteInterceptor>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 

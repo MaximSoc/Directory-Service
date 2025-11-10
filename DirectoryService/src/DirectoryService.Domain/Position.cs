@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.PositionVO;
 
 namespace DirectoryService.Domain
 {
-    public class Position
+    public class Position : ISoftDeletable
     {
         private List<DepartmentPosition> _departmentPositions = [];
 
@@ -27,6 +28,8 @@ namespace DirectoryService.Domain
 
             CreatedAt = DateTime.UtcNow;
 
+            UpdatedAt = DateTime.UtcNow;
+
             IsActive = true;
 
             _departmentPositions = departmentPositions.ToList();
@@ -43,6 +46,22 @@ namespace DirectoryService.Domain
 
         public DateTime UpdatedAt { get; private set; }
 
+        public DateTime? DeletedAt { get; private set; } = null;
+
         public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
+
+        public void Delete()
+        {
+            IsActive = false;
+
+            DeletedAt = DateTime.UtcNow;
+        }
+
+        public void Restore()
+        {
+            IsActive = true;
+
+            DeletedAt = DateTime.MinValue;
+        }
     }
 }

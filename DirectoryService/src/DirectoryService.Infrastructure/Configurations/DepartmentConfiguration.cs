@@ -63,6 +63,10 @@ namespace DirectoryService.Infrastructure.Configurations
                 .IsRequired()
                 .HasColumnName("updated_at");
 
+            builder.Property(d => d.DeletedAt)
+                .IsRequired(false)
+                .HasColumnName("deleted_at");
+
             builder.HasMany(d => d.ChildrenDepartments)
                 .WithOne()
                 .IsRequired(false)
@@ -71,11 +75,13 @@ namespace DirectoryService.Infrastructure.Configurations
 
             builder.HasMany(d => d.DepartmentLocations)
                 .WithOne()
-                .HasForeignKey(d => d.DepartmentId);
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(d => d.DepartmentPositions)
                 .WithOne()
-                .HasForeignKey(d => d.DepartmentId);
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

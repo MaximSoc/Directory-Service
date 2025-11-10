@@ -90,5 +90,19 @@ namespace DirectoryService.Presentation.Controllers
 
             return result;
         }
+
+        [HttpDelete("/{departmentId}")] 
+        public async Task<EndpointResult<Guid>> DeleteDepartment(
+            [FromQuery] Guid departmentId,
+            [FromServices] DeleteDepartmentHandler handler,
+            CancellationToken cancellationToken)
+        {
+            var request = new DeleteDepartmentRequest(departmentId);
+            var command = new DeleteDepartmentCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result;
+        }
     }
 }

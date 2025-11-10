@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.LocationVO;
 using LocationTimeZone = DirectoryService.Domain.ValueObjects.LocationVO.LocationTimeZone;
 
 namespace DirectoryService.Domain
 {
-    public class Location
+    public class Location : ISoftDeletable
     {
         private List<DepartmentLocation> _departmentLocations = [];
 
@@ -35,6 +36,8 @@ namespace DirectoryService.Domain
 
             CreatedAt = DateTime.UtcNow;
 
+            UpdatedAt = DateTime.UtcNow;
+
             IsActive = true;
         }
 
@@ -52,6 +55,22 @@ namespace DirectoryService.Domain
 
         public DateTime UpdatedAt { get; private set; }
 
+        public DateTime? DeletedAt { get; private set; } = null;
+
         public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
+
+        public void Delete()
+        {
+            IsActive = false;
+
+            DeletedAt = DateTime.UtcNow;
+        }
+
+        public void Restore()
+        {
+            IsActive = true;
+
+            DeletedAt = DateTime.MinValue;
+        }
     }
 }
