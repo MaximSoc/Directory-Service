@@ -19,5 +19,8 @@ namespace DirectoryService.Application.Database
         Task<UnitResult<Errors>> LockChildrens(string path, CancellationToken cancellationToken);
         Task<UnitResult<Errors>> UpdateChildrensPathAndDepth(string oldPath, string newPath, int depthDelta, CancellationToken cancellationToken);
         Result<Guid, Errors> SoftDelete(Department department, CancellationToken cancellationToken);
+        Task<UnitResult<Errors>> RemoveInactiveByDate(DateTime date, CancellationToken cancellationToken);
+        Task<Result<List<Department>, Errors>> GetInactiveByDate(DateTime date, CancellationToken cancellationToken);
+        Task<Result<List<Department>, Errors>> GetByIds(IEnumerable<Guid?> departmentIds, CancellationToken cancellationToken);
     }
 }

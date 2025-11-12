@@ -6,6 +6,7 @@ using DirectoryService.Application.Positions;
 using DirectoryService.Application.Shared;
 using DirectoryService.Application.Validation;
 using DirectoryService.Infrastructure;
+using DirectoryService.Infrastructure.BackgroundServices;
 using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Interceptors;
 using DirectoryService.Infrastructure.Repositories;
@@ -85,6 +86,8 @@ builder.Services.AddScoped<GetChildrenByParentHandler>();
 
 builder.Services.AddScoped<DeleteDepartmentHandler>();
 
+builder.Services.AddScoped<DeleteInactiveDepartmentsHandler>();
+
 builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();
@@ -94,6 +97,8 @@ builder.Services.AddScoped<ITransactionManager, TransactionManager>();
 builder.Services.AddSingleton<SoftDeleteInterceptor>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
+
+builder.Services.AddHostedService<DepartmentCleanerBackgroundService>();
 
 var app = builder.Build();
 
