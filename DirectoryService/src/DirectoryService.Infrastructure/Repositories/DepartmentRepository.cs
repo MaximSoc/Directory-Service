@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DirectoryService.Infrastructure.Repositories
 {
@@ -76,6 +77,17 @@ namespace DirectoryService.Infrastructure.Repositories
                 return GeneralErrors.NotFound(departmentId).ToErrors();
 
             return department;
+        }
+
+        public async Task<Result<List<Department>, Errors>> GetByIds(IEnumerable<Guid?> departmentIds, CancellationToken cancellationToken)
+        {
+            var departments = await _dbContext.Departments
+                .Include(d => d.DepartmentLocations)
+                .Include(d => d.DepartmentPositions)
+                .Where(d => departmentIds.Contains(d.Id))
+                .ToListAsync(cancellationToken);
+
+            return departments;
         }
 
         public async Task<Result<Department, Errors>> GetByIdWithLock(Guid? departmentId, CancellationToken cancellationToken)
@@ -149,6 +161,37 @@ namespace DirectoryService.Infrastructure.Repositories
                 _logger.LogError(ex, "Soft deleted failure");
                 return GeneralErrors.Failure("Soft deleted failure").ToErrors();
             }
+        }
+
+        public async Task<UnitResult<Errors>> RemoveInactiveByDate(DateTime date, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _dbContext.Database.ExecuteSqlAsync(
+                    $"""
+                    DELETE FROM departments d
+                    WHERE d.deleted_at <= {date}
+                    AND d.is_active = false
+                    """, cancellationToken);
+
+                return UnitResult.Success<Errors>();
+            }
+            catch
+            {
+                return UnitResult.Failure<Errors>(GeneralErrors.Failure("Remove inactive department failure"));
+            }
+        }
+
+        public async Task<Result<List<Department>, Errors>> GetInactiveByDate(DateTime date, CancellationToken cancellationToken)
+        {
+            var departments = await _dbContext.Departments
+                .Include(d => d.DepartmentLocations)
+                .Include(d => d.DepartmentPositions)
+                .Include(d => d.ChildrenDepartments)
+                .Where(d => d.IsActive == false && d.DeletedAt <= date)
+                .ToListAsync(cancellationToken);
+
+            return departments;
         }
     }
 }

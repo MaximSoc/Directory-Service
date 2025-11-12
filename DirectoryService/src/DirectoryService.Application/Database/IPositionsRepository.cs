@@ -15,5 +15,6 @@ namespace DirectoryService.Application.Database
         Task<Result<Guid, Errors>> Add(Position position, CancellationToken cancellationToken);
         Task<Result<bool, Errors>> PositionExistAsync(PositionName positionName, CancellationToken cancellationToken);
         Task<UnitResult<Error>> SoftDelete(Guid departmentId, CancellationToken cancellationToken);
+        Task<UnitResult<Errors>> RemoveInactive(CancellationToken cancellationToken);
     }
 }

@@ -99,5 +99,28 @@ namespace DirectoryService.Infrastructure.Repositories
 
             return UnitResult.Success<Error>();
         }
+
+        public async Task<UnitResult<Errors>> RemoveInactive(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _dbContext.Database.ExecuteSqlAsync(
+                    $"""
+                    DELETE FROM positions p
+                    WHERE p.is_active = false
+                    AND NOT EXISTS (
+                    SELECT 1
+                    FROM department_positions dp
+                    WHERE dp.position_id = p.id
+                    )
+                    """);
+
+                return UnitResult.Success<Errors>();
+            }
+            catch
+            {
+                return UnitResult.Failure<Errors>(GeneralErrors.Failure());
+            }
+        }
     }
 }
