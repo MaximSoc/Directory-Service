@@ -95,10 +95,6 @@ builder.Services.AddHostedService<DepartmentCleanerBackgroundService>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-    //c.AddServer(new OpenApiServer
-    //{
-    //    Url = "http://localhost:8080"
-    //});
 });
 
 var app = builder.Build();
