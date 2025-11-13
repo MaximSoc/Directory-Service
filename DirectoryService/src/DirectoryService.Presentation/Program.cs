@@ -12,6 +12,7 @@ using DirectoryService.Infrastructure.Interceptors;
 using DirectoryService.Infrastructure.Repositories;
 using DirectoryService.Presentation.Middlewares;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Shared;
@@ -29,29 +30,20 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi(options =>
-{
-    options.AddSchemaTransformer((schema, context, _) =>
-    {
-        if (context.JsonTypeInfo.Type == typeof(Envelope<Errors>))
-        {
-            if (schema.Properties.TryGetValue("errors", out var errorsProp))
-            {
-                errorsProp.Items.Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.Schema,
-                    Id = "Error"
-                };
-            }
-        }
-
-        return Task.CompletedTask;
-    });
-});
 
 builder.Services.AddHttpLogging(o =>
 {
     o.CombineLogs = true;
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 builder.Services.AddSerilog();
@@ -100,19 +92,38 @@ builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
 builder.Services.AddHostedService<DepartmentCleanerBackgroundService>();
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+    //c.AddServer(new OpenApiServer
+    //{
+    //    Url = "http://localhost:8080"
+    //});
+});
+
 var app = builder.Build();
+
+await using var scope = app.Services.CreateAsyncScope();
+
+var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
+
+await dbContext.Database.MigrateAsync();
 
 app.UseExceptionMiddleware();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1"));
-}
+app.UseRouting();
+
+app.UseCors();
 
 app.UseHttpLogging();
 
 app.UseSerilogRequestLogging();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"));
+}
 
 app.MapControllers();
 
