@@ -13,9 +13,11 @@ using DirectoryService.Infrastructure.Repositories;
 using DirectoryService.Presentation.Middlewares;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Shared;
+using static CSharpFunctionalExtensions.Result;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +97,21 @@ builder.Services.AddHostedService<DepartmentCleanerBackgroundService>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+});
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    string connection = builder.Configuration.GetConnectionString("Redis")
+    ?? throw new ArgumentNullException(nameof(connection));
+
+    options.Configuration = connection;
+});
+
+builder.Services.AddHybridCache(options =>
+options.DefaultEntryOptions = new HybridCacheEntryOptions
+{
+    Expiration = TimeSpan.FromMinutes(5),
+    LocalCacheExpiration = TimeSpan.FromMinutes(5),
 });
 
 var app = builder.Build();

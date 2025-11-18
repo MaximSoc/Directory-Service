@@ -5,6 +5,7 @@ using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Shared;
 using System;
@@ -52,16 +53,19 @@ namespace DirectoryService.Application.Departments
         private readonly ILocationsRepository _locationsRepository;
         private readonly ILogger _logger;
         private readonly IValidator<UpdateDepartmentLocationsCommand> _validator;
+        private readonly HybridCache _cache;
 
         public UpdateDepartmentLocationsHandler(IDepartmentsRepository departmentsRepository,
             ILogger<UpdateDepartmentLocationsHandler> logger,
             IValidator<UpdateDepartmentLocationsCommand> validator,
-            ILocationsRepository locationsRepository)
+            ILocationsRepository locationsRepository,
+            HybridCache cache)
         {
             _departmentsRepository = departmentsRepository;
             _logger = logger;
             _validator = validator;
             _locationsRepository = locationsRepository;
+            _cache = cache;
         }
 
         public async Task<UnitResult<Errors>> Handle(UpdateDepartmentLocationsCommand command, CancellationToken cancellationToken)
@@ -96,6 +100,8 @@ namespace DirectoryService.Application.Departments
             var updateResult = department.UpdateLocations(departmentLocations);
             if (updateResult.IsFailure)
                 return updateResult.Error.ToErrors();
+
+            await _cache.RemoveByTagAsync($"departmentsCache_tag", cancellationToken);
 
             return await _departmentsRepository.SaveChanges(cancellationToken);
         }
