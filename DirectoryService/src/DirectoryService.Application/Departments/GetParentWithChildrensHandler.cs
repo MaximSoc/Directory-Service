@@ -3,6 +3,7 @@ using DirectoryService.Application.Database;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,12 @@ namespace DirectoryService.Application.Departments
     public class GetParentWithChildrensHandler
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly HybridCache _cache;
 
-        public GetParentWithChildrensHandler(IDbConnectionFactory dbConnectionFactory)
+        public GetParentWithChildrensHandler(IDbConnectionFactory dbConnectionFactory, HybridCache cache)
         {
             _dbConnectionFactory = dbConnectionFactory;
+            _cache = cache;
         }
         public async Task<GetParentWithChildrensResponse?> Handle(GetParentWithChildrensCommand command, CancellationToken cancellationToken)
         {
@@ -30,50 +33,61 @@ namespace DirectoryService.Application.Departments
 
             var prefetch = command.Request.Prefetch;
 
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+            var cacheKey = $"department_with_children_page={page}_size={size}_prefetch={prefetch}";
 
-            var departmentsWithHasMoreChildren = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
-                $"""
-                WITH roots AS
-                (SELECT d.id,
-                d.name,
-                d.identifier,
-                d.parent_id AS parentId,
-                d.path,
-                d.depth,
-                d.is_active AS isActive,
-                d.created_at AS createdAt,
-                d.updated_at AS updatedAt
-                FROM departments d
-                WHERE d.parent_id IS NULL
-                LIMIT {size} OFFSET {page})
+            var departmentsWithHasMoreChildren = await _cache.GetOrCreateAsync<GetParentWithChildrensResponse?>(
+                cacheKey,
+                async ct =>
+                {
+                    using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
-                SELECT *, (EXISTS (SELECT 1 FROM departments WHERE parent_id = roots.id OFFSET {prefetch} LIMIT 1))
-                AS hasMoreChildren
-                FROM roots
+                    var departmentsWithHasMoreChildren = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
+                        $"""
+                        WITH roots AS
+                        (SELECT d.id,
+                        d.name,
+                        d.identifier,
+                        d.parent_id AS parentId,
+                        d.path,
+                        d.depth,
+                        d.is_active AS isActive,
+                        d.created_at AS createdAt,
+                        d.updated_at AS updatedAt
+                        FROM departments d
+                        WHERE d.parent_id IS NULL
+                        LIMIT {size} OFFSET {page})
 
-                UNION ALL
+                        SELECT *, (EXISTS (SELECT 1 FROM departments WHERE parent_id = roots.id OFFSET {prefetch} LIMIT 1))
+                        AS hasMoreChildren
+                        FROM roots
 
-                SELECT c.*, (EXISTS (SELECT 1 FROM departments WHERE parent_id = c.id))
-                AS hasMoreChildren FROM roots r
-                CROSS JOIN LATERAL (SELECT d.id,
-                d.name,
-                d.identifier,
-                d.parent_id AS parentId,
-                d.path,
-                d.depth,
-                d.is_active AS isActive,
-                d.created_at AS createdAt,
-                d.updated_at AS updatedAt
-                FROM departments d
-                WHERE parent_id = r.id
-                LIMIT {prefetch}) c
-                """);
+                        UNION ALL
 
-            return new GetParentWithChildrensResponse
-            {
-                DepartmentsWithHasMoreChildren = departmentsWithHasMoreChildren.ToList()
-            };
+                        SELECT c.*, (EXISTS (SELECT 1 FROM departments WHERE parent_id = c.id))
+                        AS hasMoreChildren FROM roots r
+                        CROSS JOIN LATERAL (SELECT d.id,
+                        d.name,
+                        d.identifier,
+                        d.parent_id AS parentId,
+                        d.path,
+                        d.depth,
+                        d.is_active AS isActive,
+                        d.created_at AS createdAt,
+                        d.updated_at AS updatedAt
+                        FROM departments d
+                        WHERE parent_id = r.id
+                        LIMIT {prefetch}) c
+                        """);
+
+                    return new GetParentWithChildrensResponse
+                    {
+                        DepartmentsWithHasMoreChildren = departmentsWithHasMoreChildren.ToList()
+                    };
+                },
+                tags: new[] {$"departmentsCache_tag" },
+                cancellationToken: cancellationToken);
+
+            return departmentsWithHasMoreChildren;
         }
     }
 }

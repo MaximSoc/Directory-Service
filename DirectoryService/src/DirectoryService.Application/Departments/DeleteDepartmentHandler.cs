@@ -5,6 +5,7 @@ using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Shared;
 using System;
@@ -39,6 +40,7 @@ namespace DirectoryService.Application.Departments
         private readonly ILogger _logger;
         private readonly IValidator<DeleteDepartmentCommand> _validator;
         private readonly ITransactionManager _transactionManager;
+        private readonly HybridCache _cache;
 
         public DeleteDepartmentHandler(
             IDepartmentsRepository departmentsRepository,
@@ -46,7 +48,8 @@ namespace DirectoryService.Application.Departments
             IPositionsRepository positionsRepository,
             ILogger<DeleteDepartmentHandler> logger,
             IValidator<DeleteDepartmentCommand> validator,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            HybridCache cache)
         {
             _departmentsRepository = departmentsRepository;
             _locationsRepository = locationsRepository;
@@ -54,6 +57,7 @@ namespace DirectoryService.Application.Departments
             _logger = logger;
             _validator = validator;
             _transactionManager = transactionManager;
+            _cache = cache;
         }
 
         public async Task<Result<Guid, Errors>> Handle(DeleteDepartmentCommand command, CancellationToken cancellationToken)
@@ -139,6 +143,9 @@ namespace DirectoryService.Application.Departments
             transaction.Commit();
 
             _logger.LogInformation("Department soft deleted succesfully: {DepartmentId}", department.Id);
+
+            await _cache.RemoveByTagAsync($"departmentsCache_tag", cancellationToken);
+
             return result.Value;
         }
     }
