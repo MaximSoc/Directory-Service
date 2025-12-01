@@ -485,3 +485,9 @@ $RECYCLE.BIN/
 
 # Environment variables
 .env
+
+# NuGet
+!NuGet.Config
+nuget.config
+packages/
+*.nupkg
