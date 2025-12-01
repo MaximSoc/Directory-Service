@@ -1,10 +1,7 @@
-﻿using Dapper;
-using DirectoryService.Application.Database;
-using DirectoryService.Application.Validation;
+﻿using Core.Database;
+using Dapper;
 using DirectoryService.Contracts.Departments;
-using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
-using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace SharedKernel
 {
     public record Envelope
     {
@@ -13,7 +13,7 @@ namespace Shared
 
         public Errors? ErrorList { get; }
 
-        public bool IsError => ErrorList != null || (ErrorList != null && ErrorList.Any());
+        public bool IsError => ErrorList != null || ErrorList != null && ErrorList.Any();
 
         public DateTime TimeGenerated { get; }
 
@@ -36,7 +36,7 @@ namespace Shared
 
         public Errors? ErrorList { get; }
 
-        public bool IsError => ErrorList != null || (ErrorList != null && ErrorList.Any());
+        public bool IsError => ErrorList != null || ErrorList != null && ErrorList.Any();
 
         public DateTime TimeGenerated { get; }
 

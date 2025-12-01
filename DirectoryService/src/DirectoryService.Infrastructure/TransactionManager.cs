@@ -1,8 +1,8 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Shared;
+﻿using Core.Shared;
+using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
-using Shared;
+using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Data;

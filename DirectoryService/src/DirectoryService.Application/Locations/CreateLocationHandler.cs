@@ -7,12 +7,12 @@ using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.LocationVO;
-using Shared;
 using Microsoft.Extensions.Logging;
 using FluentValidation;
-using DirectoryService.Application.Validation;
 using System.Security.Cryptography.X509Certificates;
 using DirectoryService.Contracts.Locations;
+using Core.Validation;
+using SharedKernel;
 
 namespace DirectoryService.Application.Locations
 {

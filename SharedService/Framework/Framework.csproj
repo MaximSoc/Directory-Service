@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SharedService\SharedKernel.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<PackageId>MaximSoc.Framework</PackageId>
+		<Version>0.0.1</Version>
+		<Authors>MaximSoc</Authors>
+		<Company>MaximSoc</Company>
+		<PackageDescription>Framework</PackageDescription>
+		<RepositoryUrl>https://github.com/MaximSoc/Directory-Service</RepositoryUrl>
+	</PropertyGroup>
+
+</Project>

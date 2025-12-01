@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Core.Database;
+using Dapper;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Departments;
 using Microsoft.Extensions.Caching.Distributed;

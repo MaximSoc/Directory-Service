@@ -1,11 +1,12 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Core.Database;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.PositionVO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Shared;
+using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

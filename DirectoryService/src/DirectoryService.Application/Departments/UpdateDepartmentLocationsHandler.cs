@@ -1,13 +1,13 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Core.Validation;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using Shared;
+using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

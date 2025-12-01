@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
-using Shared;
+using SharedKernel;
 
 namespace DirectoryService.Domain.ValueObjects.PositionVO
 {

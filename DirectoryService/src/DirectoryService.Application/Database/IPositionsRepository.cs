@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.PositionVO;
-using Shared;
+using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

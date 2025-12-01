@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Core.Database;
+using Dapper;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts.Departments;

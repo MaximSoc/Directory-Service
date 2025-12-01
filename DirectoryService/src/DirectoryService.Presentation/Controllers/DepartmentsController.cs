@@ -5,9 +5,8 @@ using DirectoryService.Application.Locations;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Locations;
-using DirectoryService.Presentation.EndpointResults;
+using Framework.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
 
 namespace DirectoryService.Presentation.Controllers
 {

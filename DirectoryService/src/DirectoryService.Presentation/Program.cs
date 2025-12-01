@@ -1,22 +1,22 @@
+using Core.Database;
+using Core.Shared;
+using Core.Validation;
 using DirectoryService.Application;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
-using DirectoryService.Application.Shared;
-using DirectoryService.Application.Validation;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.BackgroundServices;
 using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Interceptors;
 using DirectoryService.Infrastructure.Repositories;
-using DirectoryService.Presentation.Middlewares;
 using FluentValidation;
+using Framework.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Shared;
 using static CSharpFunctionalExtensions.Result;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,7 +50,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSerilog();
 
-builder.Services.AddScoped<DirectoryServiceDbContext>(_ => 
+builder.Services.AddScoped<DirectoryServiceDbContext>(_ =>
 new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
 
 builder.Services.AddScoped<IReadDbContext, DirectoryServiceDbContext>(_ =>
@@ -86,11 +86,11 @@ builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();
 
+builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
+
 builder.Services.AddScoped<ITransactionManager, TransactionManager>();
 
 builder.Services.AddSingleton<SoftDeleteInterceptor>();
-
-builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
 builder.Services.AddHostedService<DepartmentCleanerBackgroundService>();
 
