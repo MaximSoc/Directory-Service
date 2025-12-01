@@ -1,8 +1,8 @@
-﻿
-using Shared;
+﻿using Microsoft.AspNetCore.Http;
+using SharedKernel;
 using System.Net;
 
-namespace DirectoryService.Presentation.EndpointResults
+namespace Framework.EndpointResults
 {
     public sealed class SuccessResult<TValue> : IResult
     {

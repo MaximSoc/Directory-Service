@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Shared;
+using SharedKernel;
 
 namespace DirectoryService.Domain.ValueObjects.DepartmentVO
 {

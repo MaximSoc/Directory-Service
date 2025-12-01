@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DirectoryService.Application.Database
+namespace Core.Database
 {
     public interface IDbConnectionFactory
     {

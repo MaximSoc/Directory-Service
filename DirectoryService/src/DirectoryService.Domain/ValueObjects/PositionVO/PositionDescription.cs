@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Shared;
+using SharedKernel;
 
 namespace DirectoryService.Domain.ValueObjects.PositionVO
 {

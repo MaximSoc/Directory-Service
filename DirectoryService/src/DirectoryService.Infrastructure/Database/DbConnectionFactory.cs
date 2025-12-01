@@ -1,8 +1,9 @@
-﻿using DirectoryService.Application.Database;
+﻿using Core.Database;
+using Dapper;
+using DirectoryService.Application.Database;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;

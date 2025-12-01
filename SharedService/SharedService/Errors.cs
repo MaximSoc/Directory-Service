@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace SharedKernel
 {
     public class Errors : IEnumerable<Error>
     {

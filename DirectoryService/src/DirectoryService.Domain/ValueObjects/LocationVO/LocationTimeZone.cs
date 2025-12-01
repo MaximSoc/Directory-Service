@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NodaTime;
-using Shared;
+using SharedKernel;
 
 namespace DirectoryService.Domain.ValueObjects.LocationVO
 {

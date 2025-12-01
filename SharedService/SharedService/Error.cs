@@ -1,4 +1,4 @@
-﻿namespace Shared
+﻿namespace SharedKernel
 {
     public record Error
     {

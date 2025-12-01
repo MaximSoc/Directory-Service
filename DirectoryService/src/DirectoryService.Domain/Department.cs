@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
-using Shared;
+using SharedKernel;
 
 namespace DirectoryService.Domain
 {

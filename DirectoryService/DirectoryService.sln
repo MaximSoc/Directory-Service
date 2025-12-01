@@ -15,11 +15,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Presentation", "src\DirectoryService.Presentation\DirectoryService.Presentation.csproj", "{3414D8A2-73D4-4C75-B521-822D01E3F46C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{613D719B-D70F-4F83-AE0B-C1F00245FAC3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{91D16BE1-E89C-4DF2-82EA-77CCE78E86A0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.IntegrationTests", "tests\DirectoryService.IntegrationTests\DirectoryService.IntegrationTests.csproj", "{68AED4D5-FA94-482C-886F-AEE7C3BE605F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		nuget.config = nuget.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +52,6 @@ Global
 		{3414D8A2-73D4-4C75-B521-822D01E3F46C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3414D8A2-73D4-4C75-B521-822D01E3F46C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3414D8A2-73D4-4C75-B521-822D01E3F46C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{613D719B-D70F-4F83-AE0B-C1F00245FAC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{613D719B-D70F-4F83-AE0B-C1F00245FAC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{613D719B-D70F-4F83-AE0B-C1F00245FAC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{613D719B-D70F-4F83-AE0B-C1F00245FAC3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{68AED4D5-FA94-482C-886F-AEE7C3BE605F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{68AED4D5-FA94-482C-886F-AEE7C3BE605F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68AED4D5-FA94-482C-886F-AEE7C3BE605F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -65,7 +66,6 @@ Global
 		{139F4FB9-DAD8-48A5-BE58-C5088A266D3D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{D407E321-1429-4C54-9B7E-7B68C8004F6C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3414D8A2-73D4-4C75-B521-822D01E3F46C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{613D719B-D70F-4F83-AE0B-C1F00245FAC3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{68AED4D5-FA94-482C-886F-AEE7C3BE605F} = {91D16BE1-E89C-4DF2-82EA-77CCE78E86A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

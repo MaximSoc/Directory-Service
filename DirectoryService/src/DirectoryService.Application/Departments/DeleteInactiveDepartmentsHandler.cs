@@ -1,10 +1,10 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Core.Shared;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
-using DirectoryService.Application.Shared;
 using DirectoryService.Domain;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Shared;
+using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
