@@ -12,11 +12,12 @@
 
 	<PropertyGroup>
 		<PackageId>MaximSoc.SharedKernel</PackageId>
-		<Version>0.0.1</Version>
+		<Version>0.0.2</Version>
 		<Authors>MaximSoc</Authors>
 		<Company>MaximSoc</Company>
 		<PackageDescription>SharedKernel</PackageDescription>
 		<RepositoryUrl>https://github.com/MaximSoc/Directory-Service</RepositoryUrl>
+		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
 </Project>
