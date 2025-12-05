@@ -22,6 +22,7 @@
 		<Company>MaximSoc</Company>
 		<PackageDescription>Core</PackageDescription>
 		<RepositoryUrl>https://github.com/MaximSoc/Directory-Service</RepositoryUrl>
+		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
 </Project>
