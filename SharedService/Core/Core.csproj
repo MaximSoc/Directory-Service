@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +23,6 @@
 		<Company>MaximSoc</Company>
 		<PackageDescription>Core</PackageDescription>
 		<RepositoryUrl>https://github.com/MaximSoc/Directory-Service</RepositoryUrl>
-		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
 </Project>
