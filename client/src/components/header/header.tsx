@@ -1,0 +1,36 @@
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import Link from "next/link";
+import { routes } from "@/shared/routes";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+
+export default function Header() {
+  return (
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background px-4">
+      {/* Кнопка открытия/закрытия сайдбара */}
+      <SidebarTrigger />
+
+      {/* Вертикальный разделитель */}
+      <Separator orientation="vertical" className="mr-2 h-4" />
+
+      <Link href={routes.home} className="flex items-center gap-2">
+        <Image
+          src="/logo.svg"
+          alt="Logo"
+          width={32}
+          height={32}
+          className="h-8 w-8"
+        />
+        <span className="text-lg font-bold hidden sm:inline-block">
+          Directory Service
+        </span>
+      </Link>
+
+      <Avatar className="h-8 w-8 ml-auto">
+        <AvatarImage src="https://github.com/shadcn.png" alt="@user" />
+        <AvatarFallback>US</AvatarFallback>
+      </Avatar>
+    </header>
+  );
+}
