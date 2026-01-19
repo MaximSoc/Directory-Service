@@ -38,15 +38,7 @@ builder.Services.AddHttpLogging(o =>
     o.CombineLogs = true;
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+builder.Services.AddCors();
 
 builder.Services.AddSerilog();
 
@@ -88,6 +80,8 @@ builder.Services.AddScoped<CreatePositionHandler>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
+builder.Services.AddValidatorsFromAssemblyContaining<CreateLocationHandler>();
+
 builder.Services.AddScoped<ITransactionManager, TransactionManager>();
 
 builder.Services.AddSingleton<SoftDeleteInterceptor>();
@@ -120,13 +114,19 @@ await using var scope = app.Services.CreateAsyncScope();
 
 var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
 
-await dbContext.Database.MigrateAsync();
+// await dbContext.Database.MigrateAsync();
 
 app.UseExceptionMiddleware();
 
 app.UseRouting();
 
-app.UseCors();
+app.UseCors(builder =>
+{
+    builder.WithOrigins("http://localhost:3000")
+    .AllowCredentials()
+    .AllowAnyHeader()
+    .AllowAnyMethod();
+});
 
 app.UseHttpLogging();
 

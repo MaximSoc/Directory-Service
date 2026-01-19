@@ -17,14 +17,21 @@ ARG GITHUB_TOKEN
 
 WORKDIR /src
 
-COPY ["src/DirectoryService.Presentation/DirectoryService.Presentation.csproj", "src/DirectoryService.Presentation/"]
-COPY ["src/DirectoryService.Application/DirectoryService.Application.csproj", "src/DirectoryService.Application/"]
-COPY ["src/DirectoryService.Contracts/DirectoryService.Contracts.csproj", "src/DirectoryService.Contracts/"]
-COPY ["src/DirectoryService.Domain/DirectoryService.Domain.csproj", "src/DirectoryService.Domain/"]
-COPY ["src/DirectoryService.Infrastructure/DirectoryService.Infrastructure.csproj", "src/DirectoryService.Infrastructure/"]
+COPY ["nuget.config", "."]
+COPY ["DirectoryService/src/DirectoryService.Presentation/DirectoryService.Presentation.csproj", "DirectoryService/src/DirectoryService.Presentation/"]
+COPY ["DirectoryService/src/DirectoryService.Application/DirectoryService.Application.csproj", "DirectoryService/src/DirectoryService.Application/"]
+COPY ["DirectoryService/src/DirectoryService.Contracts/DirectoryService.Contracts.csproj", "DirectoryService/src/DirectoryService.Contracts/"]
+COPY ["DirectoryService/src/DirectoryService.Domain/DirectoryService.Domain.csproj", "DirectoryService/src/DirectoryService.Domain/"]
+COPY ["DirectoryService/src/DirectoryService.Infrastructure/DirectoryService.Infrastructure.csproj", "DirectoryService/src/DirectoryService.Infrastructure/"]
 
-COPY ["Directory.Build.props", "./"]
-COPY ["Directory.Packages.props", "./"]
+COPY ["DirectoryService/Directory.Build.props", "DirectoryService/"]
+COPY ["DirectoryService/Directory.Packages.props", "DirectoryService/"]
+
+RUN dotnet nuget update source github \
+    --username $GITHUB_USER \
+    --password $GITHUB_TOKEN \
+    --store-password-in-clear-text \
+    --configfile nuget.config
 
 RUN echo '<?xml version="1.0" encoding="utf-8"?> \
 <configuration> \
@@ -49,9 +56,9 @@ RUN echo '<?xml version="1.0" encoding="utf-8"?> \
   </packageSourceCredentials> \
 </configuration>' > nuget.config
 
-RUN dotnet restore "./src/DirectoryService.Presentation/DirectoryService.Presentation.csproj" --configfile ./nuget.config
+RUN dotnet restore "./DirectoryService/src/DirectoryService.Presentation/DirectoryService.Presentation.csproj" --configfile ./nuget.config
 COPY . .
-WORKDIR "/src/src/DirectoryService.Presentation"
+WORKDIR "/src/DirectoryService/src/DirectoryService.Presentation"
 RUN dotnet build "./DirectoryService.Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

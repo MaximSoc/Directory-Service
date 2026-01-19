@@ -14,7 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@/shared/components/ui/sidebar";
 import { routes } from "@/shared/routes";
 
 // Конфигурация меню с иконками
@@ -47,7 +47,6 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex items-center justify-center py-4">
-        {/* Можно добавить логотип или название, которое будет скрываться при сворачивании */}
         <span className="font-bold text-xl group-data-[collapsible=icon]:hidden">
           Меню
         </span>
