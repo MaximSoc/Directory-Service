@@ -1,8 +1,11 @@
 services:
   directoryservice:
     build:
-      context: .
-      dockerfile: src/DirectoryService.Presentation/Dockerfile
+      context: D:/Projects/Directory-Service
+      dockerfile: DirectoryService/src/DirectoryService.Presentation/Dockerfile
+      args:
+        GITHUB_USER: ${GITHUB_USER}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - "8080:8080"
     depends_on:
