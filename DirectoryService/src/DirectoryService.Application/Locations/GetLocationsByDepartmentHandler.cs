@@ -68,6 +68,15 @@ namespace DirectoryService.Application.Locations
 
             var orderByClause = $"ORDER BY {orderByField} {direction}";
 
+            var totalQuery = $@"
+                SELECT COUNT(*) 
+                FROM locations l 
+                JOIN department_locations dl ON l.id = dl.location_id";
+
+            var totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
+
+            var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
             var locations = await connection.QueryAsync<LocationDto>($"""
                 SELECT l.id,
                 l.name,
@@ -91,7 +100,8 @@ namespace DirectoryService.Application.Locations
 
             return new GetLocationsByDepartmentResponse
             {
-                Locations = locations.ToList()
+                Locations = locations.ToList(),
+                TotalPages = totalPages,
             };
         }
     }

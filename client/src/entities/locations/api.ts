@@ -3,14 +3,24 @@ import { apiClient } from "@/shared/api/axios-instance";
 
 type GetLocationsByDepartmentResponse = {
   locations: Location[];
+  totalPages: number;
+};
+
+export type GetLocationsByDepartmentRequest = {
+  search?: string;
+  page: number;
+  pageSize: number;
 };
 
 export const locationsApi = {
-  getLocations: async (): Promise<Location[]> => {
+  getLocations: async (
+    request: GetLocationsByDepartmentRequest
+  ): Promise<GetLocationsByDepartmentResponse> => {
     const response = await apiClient.get<GetLocationsByDepartmentResponse>(
-      "/locations"
+      "/locations",
+      { params: request }
     );
 
-    return response.data.locations;
+    return response.data;
   },
 };

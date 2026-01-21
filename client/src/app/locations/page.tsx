@@ -1,30 +1,30 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Location } from "@/entities/locations/types";
+import React, { useState } from "react";
 import { locationsApi } from "@/entities/locations/api";
 import { Spinner } from "@/shared/components/ui/spinner";
 import LocationCard from "@/features/locations/location.card";
+import { useQuery } from "@tanstack/react-query";
+import { PaginationCustom } from "@/features/pagination/pagination.custom";
 
 export default function LocationsPage() {
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 1;
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isPending, error } = useQuery({
+    queryFn: () =>
+      locationsApi.getLocations({ page: page, pageSize: pageSize }),
+    queryKey: ["locations", page],
+  });
 
-  useEffect(() => {
-    locationsApi
-      .getLocations()
-      .then((data) => setLocations(data))
-      .finally(() => setIsLoading(false))
-      .catch((error) => setError(error.message));
-  }, []);
+  const totalPages = data?.totalPages || 1;
+  const locations = data?.locations || [];
 
-  if (isLoading) {
+  if (isPending) {
     return <Spinner />;
   }
   if (error) {
-    return <div>Ошибка: {error}</div>;
+    return <div>Ошибка: {error.message}</div>;
   }
 
   return (
@@ -45,6 +45,12 @@ export default function LocationsPage() {
             Список локаций пуст.
           </div>
         )}
+
+        <PaginationCustom
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
     </main>
   );
