@@ -9,5 +9,7 @@ namespace DirectoryService.Contracts.Locations
     public record GetLocationsByDepartmentResponse
     {
         public List<LocationDto> Locations { get; init; } = null!;
+
+        public int TotalPages { get; init; } 
     }
 }
