@@ -56,11 +56,13 @@ builder.Services.AddScoped<CreateLocationHandler>();
 
 builder.Services.AddScoped<GetLocationsByDepartmentHandler>();
 
+builder.Services.AddScoped<UpdateLocationHandler>();
+
 builder.Services.AddScoped<IDepartmentsRepository, DepartmentRepository>();
 
 builder.Services.AddScoped<CreateDepartmentHandler>();
 
-builder.Services.AddScoped<UpdateDepartmentLocationsHandler>();
+builder.Services.AddScoped<UpdateLocationHandler>();
 
 builder.Services.AddScoped<MoveDepartmentHandler>();
 

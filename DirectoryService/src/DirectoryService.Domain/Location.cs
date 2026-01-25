@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.LocationVO;
+using SharedKernel;
 using LocationTimeZone = DirectoryService.Domain.ValueObjects.LocationVO.LocationTimeZone;
 
 namespace DirectoryService.Domain
@@ -58,6 +59,40 @@ namespace DirectoryService.Domain
         public DateTime? DeletedAt { get; private set; } = null;
 
         public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
+
+        public UnitResult<Error> Update(
+            LocationName newName, 
+            LocationAddress newAddress,
+            LocationTimeZone newTimezone)
+        {
+
+            bool isUpdated = false;
+
+            if (newName != Name)
+            {
+                Name = newName;
+                isUpdated = true;
+            }
+
+            if (newAddress != Address)
+            {
+                Address = newAddress;
+                isUpdated = true;
+            }
+
+            if (newTimezone != Timezone)
+            {
+                Timezone = newTimezone;
+                isUpdated = true;
+            }
+
+            if (isUpdated)
+            {
+                UpdatedAt = DateTime.UtcNow;
+            }
+            
+            return UnitResult.Success<Error>();
+        }
 
         public void Delete()
         {

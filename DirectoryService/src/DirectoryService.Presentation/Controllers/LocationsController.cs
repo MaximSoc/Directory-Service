@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application;
+using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts.Locations;
 using Framework.EndpointResults;
@@ -34,6 +35,19 @@ namespace DirectoryService.Presentation.Controllers
             var locations = await handler.Handle(request, cancellationToken);
 
             return Ok(locations);
+        }
+
+        [HttpPut ("{locationId}")]
+        public async Task<EndpointResult> Update(
+            [FromServices] UpdateLocationHandler handler,
+            [FromBody] UpdateLocationRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new UpdateLocationCommand(request);
+
+            var result = await handler.Handle( command, cancellationToken );
+
+            return result;
         }
     }
 }

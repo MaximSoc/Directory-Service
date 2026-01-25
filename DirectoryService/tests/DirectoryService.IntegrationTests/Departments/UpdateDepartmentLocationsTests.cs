@@ -127,11 +127,11 @@ namespace DirectoryService.IntegrationTests.Departments
             Assert.True(result.IsFailure);
         }
 
-        private async Task<T> ExecuteHandler<T>(Func<UpdateDepartmentLocationsHandler, Task<T>> action)
+        private async Task<T> ExecuteHandler<T>(Func<UpdateLocationHandler, Task<T>> action)
         {
             var scope = Services.CreateAsyncScope();
 
-            var sut = scope.ServiceProvider.GetRequiredService<UpdateDepartmentLocationsHandler>();
+            var sut = scope.ServiceProvider.GetRequiredService<UpdateLocationHandler>();
 
             return await action(sut);
         }

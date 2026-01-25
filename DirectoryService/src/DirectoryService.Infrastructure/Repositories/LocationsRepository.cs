@@ -124,5 +124,31 @@ namespace DirectoryService.Infrastructure.Repositories
                 return UnitResult.Failure<Errors>(GeneralErrors.Failure());
             }
         }
+
+        public async Task<Result<Location, Errors>> GetById(Guid? locationId, CancellationToken cancellationToken)
+        {
+            var location = await _dbContext.Locations
+                .Include(d => d.DepartmentLocations)
+                .FirstOrDefaultAsync(d => d.Id == locationId, cancellationToken);
+
+            if (location == null)
+                return GeneralErrors.NotFound(locationId).ToErrors();
+
+            return location;
+        }
+
+        public async Task<UnitResult<Errors>> SaveChanges(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                return UnitResult.Success<Errors>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Saving not completed");
+                return UnitResult.Failure<Errors>(GeneralErrors.Failure());
+            }
+        }
     }
 }
