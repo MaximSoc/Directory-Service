@@ -78,7 +78,7 @@ namespace DirectoryService.Infrastructure.Repositories
             return existingCount == locationIds.Count;
         }
 
-        public async Task<UnitResult<Error>> SoftDelete(Guid departmentId, CancellationToken cancellationToken)
+        public async Task<UnitResult<Error>> SoftDeleteByDepartmentId(Guid departmentId, CancellationToken cancellationToken)
         {
             await _dbContext.Database.ExecuteSqlAsync(
                 $"""
@@ -96,6 +96,20 @@ namespace DirectoryService.Infrastructure.Repositories
                 AND d.is_active = true
                 AND dl2.department_id <> {departmentId}
                 )
+                """,
+                cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+
+        public async Task<UnitResult<Error>> SoftDeleteByLocationId(Guid locationId, CancellationToken cancellationToken)
+        {
+            await _dbContext.Database.ExecuteSqlAsync(
+                $"""
+                UPDATE locations
+                SET is_active = false,
+                deleted_at = NOW() AT TIME ZONE 'UTC'
+                WHERE id = {locationId}
                 """,
                 cancellationToken);
 

@@ -92,7 +92,7 @@ namespace DirectoryService.Application.Departments
                 return GeneralErrors.Failure("Department is not active").ToErrors();
             }
 
-            var deleteLocationsResult = await _locationsRepository.SoftDelete(department.Id, cancellationToken);
+            var deleteLocationsResult = await _locationsRepository.SoftDeleteByDepartmentId(department.Id, cancellationToken);
             if (deleteLocationsResult.IsFailure)
             {
                 _logger.LogInformation("Locations soft deleted failed");
