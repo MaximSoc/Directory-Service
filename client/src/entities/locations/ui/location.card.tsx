@@ -1,5 +1,5 @@
-import StatusBadge from "../status/status.badge";
 import { Location } from "@/entities/locations/types";
+import StatusBadge from "@/features/status/status.badge";
 
 export default function LocationCard({ location }: { location: Location }) {
   return (

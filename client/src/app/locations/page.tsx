@@ -1,24 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { locationsApi } from "@/entities/locations/api";
 import { Spinner } from "@/shared/components/ui/spinner";
-import LocationCard from "@/features/locations/location.card";
-import { useQuery } from "@tanstack/react-query";
 import { PaginationCustom } from "@/features/pagination/pagination.custom";
+import { Button } from "@/shared/components/ui/button";
+import LocationCard from "@/entities/locations/ui/location.card";
+import { CreateLocationDialog } from "@/features/locations/create-location-dialog";
+import { useLocationsList } from "@/features/locations/model/use-locations-list";
 
 export default function LocationsPage() {
   const [page, setPage] = useState(1);
-  const pageSize = 1;
 
-  const { data, isPending, error } = useQuery({
-    queryFn: () =>
-      locationsApi.getLocations({ page: page, pageSize: pageSize }),
-    queryKey: ["locations", page],
+  const [open, setOpen] = useState(false);
+
+  const { locations, isPending, error, totalPages } = useLocationsList({
+    page,
   });
-
-  const totalPages = data?.totalPages || 1;
-  const locations = data?.locations || [];
 
   if (isPending) {
     return <Spinner />;
@@ -34,23 +31,31 @@ export default function LocationsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Локации</h1>
         </header>
 
+        <div className="mb-8 flex justify-start">
+          <Button onClick={() => setOpen(true)}>Создать локацию</Button>
+        </div>
+
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {locations?.map((location) => (
             <LocationCard key={location.id} location={location} />
           ))}
         </div>
 
-        {locations.length === 0 && (
+        {locations?.length === 0 && (
           <div className="mt-10 text-center text-muted-foreground">
             Список локаций пуст.
           </div>
         )}
 
-        <PaginationCustom
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+        {totalPages && (
+          <PaginationCustom
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        )}
+
+        <CreateLocationDialog open={open} onOpenChange={setOpen} />
       </div>
     </main>
   );

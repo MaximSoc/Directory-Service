@@ -6,5 +6,13 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Locations
 {
-    public record CreateLocationRequest(LocationNameDto Name, LocationAddressDto Address, LocationTimezoneDto Timezone);
+    public record CreateLocationRequest(
+        string Name,
+        string Country,
+        string Region,
+        string City,
+        string PostalCode,
+        string Street,
+        string ApartamentNumber,
+        string Timezone);
 }

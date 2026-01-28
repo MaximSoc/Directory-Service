@@ -27,7 +27,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetLocationsByDepartmentResponse>> GetLocationsByDepartment (
+        public async Task<EndpointResult<GetLocationsByDepartmentResponse>> GetLocationsByDepartment (
             [FromServices] GetLocationsByDepartmentHandler handler,
             [FromQuery] GetLocationsByDepartmentRequest request,
             CancellationToken cancellationToken
@@ -35,7 +35,7 @@ namespace DirectoryService.Presentation.Controllers
         {
             var locations = await handler.Handle(request, cancellationToken);
 
-            return Ok(locations);
+            return locations;
         }
 
         [HttpPut ("{locationId}")]

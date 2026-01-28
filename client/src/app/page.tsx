@@ -15,7 +15,7 @@ export default function Home() {
           <span className="text-primary">оргструктуры компании</span>
         </h1>
 
-        <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+        <p className="max-w-2xl leading-normal text-muted-foreground sm:text-xl sm:leading-8">
           Directory Service хранит базовые справочники — подразделения,
           должности и локации — и предоставляет единый CRUD‑интерфейс для всех
           внутренних сервисов (HR, Склад, Заказы).
