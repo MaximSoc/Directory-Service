@@ -73,6 +73,14 @@ export const locationsApi = {
 
     return response.data;
   },
+
+  deleteLocation: async (locationId: string): Promise<Envelope<Location>> => {
+    const response = await apiClient.delete<Envelope<Location>>(
+      `/locations/${locationId}`
+    );
+
+    return response.data;
+  },
 };
 
 export const locationsQueryOptions = {

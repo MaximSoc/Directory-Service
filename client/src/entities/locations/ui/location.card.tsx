@@ -1,4 +1,5 @@
 import { Location } from "@/entities/locations/types";
+import { DeleteLocationDialog } from "@/features/locations/delete-location-dialog";
 import { UpdateLocationDialog } from "@/features/locations/update-location-dialog";
 import StatusBadge from "@/features/status/status.badge";
 import { Button } from "@/shared/components/ui/button";
@@ -13,6 +14,7 @@ import { useState } from "react";
 
 export default function LocationCard({ location }: { location: Location }) {
   const [openUpdate, setOpenUpdate] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   return (
     <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm transition-colors hover:bg-accent/5">
@@ -42,7 +44,10 @@ export default function LocationCard({ location }: { location: Location }) {
                   <Edit className="h-4 w-4" />
                   Редактировать
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer gap-2 text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+                  onClick={() => setOpenDelete(true)}
+                >
                   <Trash2 className="h-4 w-4" />
                   Удалить
                 </DropdownMenuItem>
@@ -75,6 +80,11 @@ export default function LocationCard({ location }: { location: Location }) {
         location={location}
         open={openUpdate}
         onOpenChange={setOpenUpdate}
+      />
+      <DeleteLocationDialog
+        open={openDelete}
+        onOpenChange={setOpenDelete}
+        location={location}
       />
     </div>
   );
