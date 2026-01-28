@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace DirectoryService.Contracts.Locations
 {
     public record UpdateLocationRequest(
-        Guid LocationId,
         string Name,
         string Country,
         string Region,

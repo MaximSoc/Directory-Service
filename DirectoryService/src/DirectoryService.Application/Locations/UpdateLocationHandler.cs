@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Locations
 {
-    public record UpdateLocationCommand(UpdateLocationRequest Request);
+    public record UpdateLocationCommand(Guid LocationId, UpdateLocationRequest Request);
 
     public class UpdateLocationValidator : AbstractValidator<UpdateLocationCommand>
     {
@@ -26,7 +26,7 @@ namespace DirectoryService.Application.Locations
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("request"));
 
-            RuleFor(x => x.Request.LocationId)
+            RuleFor(x => x.LocationId)
                 .Must(id => id != Guid.Empty)
                 .WithError(GeneralErrors.ValueIsInvalid("location id"));
 
@@ -75,7 +75,7 @@ namespace DirectoryService.Application.Locations
                 return validationResult.ToList();
             }
 
-            var locationResult = await _locationsRepository.GetById(command.Request.LocationId, cancellationToken);
+            var locationResult = await _locationsRepository.GetById(command.LocationId, cancellationToken);
             if (locationResult.IsFailure)
                 return locationResult.Error;
 

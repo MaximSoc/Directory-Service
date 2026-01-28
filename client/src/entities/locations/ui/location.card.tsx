@@ -1,7 +1,19 @@
 import { Location } from "@/entities/locations/types";
+import { UpdateLocationDialog } from "@/features/locations/update-location-dialog";
 import StatusBadge from "@/features/status/status.badge";
+import { Button } from "@/shared/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { Edit, Trash2, MoreHorizontal } from "lucide-react";
+import { useState } from "react";
 
 export default function LocationCard({ location }: { location: Location }) {
+  const [openUpdate, setOpenUpdate] = useState(false);
+
   return (
     <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm transition-colors hover:bg-accent/5">
       <div>
@@ -12,7 +24,31 @@ export default function LocationCard({ location }: { location: Location }) {
           >
             {location.name}
           </h3>
-          <StatusBadge isActive={location.isActive} />
+          <div className="flex items-center gap-2">
+            <StatusBadge isActive={location.isActive} />
+            {/* Кнопки действий */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0" size="sm">
+                  <span className="sr-only">Открыть меню</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2"
+                  onClick={() => setOpenUpdate(true)}
+                >
+                  <Edit className="h-4 w-4" />
+                  Редактировать
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer gap-2 text-destructive focus:text-destructive">
+                  <Trash2 className="h-4 w-4" />
+                  Удалить
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         <div className="space-y-1 text-sm text-muted-foreground">
@@ -34,6 +70,12 @@ export default function LocationCard({ location }: { location: Location }) {
           Подробнее
         </button>
       </div>
+
+      <UpdateLocationDialog
+        location={location}
+        open={openUpdate}
+        onOpenChange={setOpenUpdate}
+      />
     </div>
   );
 }

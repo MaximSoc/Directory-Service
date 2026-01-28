@@ -25,6 +25,17 @@ export type CreateLocationRequest = {
   timezone: string;
 };
 
+export type UpdateLocationRequest = {
+  name: string;
+  country: string;
+  region: string;
+  city: string;
+  postalCode: string;
+  street: string;
+  apartamentNumber: string;
+  timezone: string;
+};
+
 export const locationsApi = {
   getLocations: async (
     request: GetLocationsByDepartmentRequest
@@ -46,6 +57,18 @@ export const locationsApi = {
     const response = await apiClient.post<Envelope<Location>>(
       "/locations",
       request
+    );
+
+    return response.data;
+  },
+
+  updateLocation: async ({
+    id,
+    ...data
+  }: { id: string } & UpdateLocationRequest): Promise<Envelope<Location>> => {
+    const response = await apiClient.put<Envelope<Location>>(
+      `/locations/${id}`,
+      data
     );
 
     return response.data;

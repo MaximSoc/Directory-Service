@@ -40,11 +40,12 @@ namespace DirectoryService.Presentation.Controllers
 
         [HttpPut ("{locationId}")]
         public async Task<EndpointResult> Update(
+            [FromRoute] Guid locationId,
             [FromServices] UpdateLocationHandler handler,
             [FromBody] UpdateLocationRequest request,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateLocationCommand(request);
+            var command = new UpdateLocationCommand(locationId, request);
 
             var result = await handler.Handle( command, cancellationToken );
 

@@ -11,7 +11,7 @@ import { useLocationsList } from "@/features/locations/model/use-locations-list"
 export default function LocationsPage() {
   const [page, setPage] = useState(1);
 
-  const [open, setOpen] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
 
   const { locations, isPending, error, totalPages } = useLocationsList({
     page,
@@ -32,7 +32,7 @@ export default function LocationsPage() {
         </header>
 
         <div className="mb-8 flex justify-start">
-          <Button onClick={() => setOpen(true)}>Создать локацию</Button>
+          <Button onClick={() => setOpenCreate(true)}>Создать локацию</Button>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -55,7 +55,7 @@ export default function LocationsPage() {
           />
         )}
 
-        <CreateLocationDialog open={open} onOpenChange={setOpen} />
+        <CreateLocationDialog open={openCreate} onOpenChange={setOpenCreate} />
       </div>
     </main>
   );
