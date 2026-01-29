@@ -1,6 +1,7 @@
 ﻿using Core.Database;
 using Dapper;
 using DirectoryService.Contracts.Departments;
+using DirectoryService.Domain.Shared;
 using Microsoft.Extensions.Caching.Hybrid;
 using System;
 using System.Collections.Generic;
@@ -81,7 +82,7 @@ namespace DirectoryService.Application.Departments
                         DepartmentsWithHasMoreChildren = departmentsWithHasMoreChildren.ToList()
                     };
                 },
-                tags: new[] {$"departmentsCache_tag" },
+                tags: new[] { Constants.DEPARTMENTS_CACHE_TAG },
                 cancellationToken: cancellationToken);
 
             return departmentsWithHasMoreChildren;

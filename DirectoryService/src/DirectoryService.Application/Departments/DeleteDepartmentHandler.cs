@@ -3,6 +3,7 @@ using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Departments;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -144,7 +145,7 @@ namespace DirectoryService.Application.Departments
 
             _logger.LogInformation("Department soft deleted succesfully: {DepartmentId}", department.Id);
 
-            await _cache.RemoveByTagAsync($"departmentsCache_tag", cancellationToken);
+            await _cache.RemoveByTagAsync(Constants.DEPARTMENTS_CACHE_TAG, cancellationToken);
 
             return result.Value;
         }

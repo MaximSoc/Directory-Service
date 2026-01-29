@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.LocationVO;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -83,20 +84,13 @@ namespace DirectoryService.Application.Locations
 
             LocationName locationName = LocationName.Create(command.Request.Name).Value;
 
-            var addressResult = location.Address.Update(
+            LocationAddress locationAddress = LocationAddress.Create(
                 command.Request.Country,
                 command.Request.Region,
                 command.Request.City,
                 command.Request.PostalCode,
                 command.Request.Street,
-                command.Request.ApartamentNumber);
-
-            if (addressResult.IsFailure)
-            {
-                return locationResult.Error;
-            }
-
-            LocationAddress locationAddress = addressResult.Value;
+                command.Request.ApartamentNumber).Value;
 
             LocationTimeZone locationTimezone = LocationTimeZone.Create(command.Request.Timezone).Value;
 
@@ -104,7 +98,7 @@ namespace DirectoryService.Application.Locations
             if (updateResult.IsFailure)
                 return updateResult.Error.ToErrors();
 
-            await _cache.RemoveByTagAsync($"locationsCache_tag", cancellationToken);
+            await _cache.RemoveByTagAsync(Constants.LOCATIONS_CACHE_TAG, cancellationToken);
 
             return await _locationsRepository.SaveChanges(cancellationToken);
         }

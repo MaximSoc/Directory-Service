@@ -2,6 +2,7 @@
 using Dapper;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Departments;
+using DirectoryService.Domain.Shared;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -67,7 +68,7 @@ namespace DirectoryService.Application.Departments
                         DepartmentsWithHasMoreChildren = children.ToList()
                     };
                 },
-                tags: new[] { $"departmentsCache_tag" },
+                tags: new[] { Constants.DEPARTMENTS_CACHE_TAG },
                 cancellationToken: cancellationToken);
 
             return children;

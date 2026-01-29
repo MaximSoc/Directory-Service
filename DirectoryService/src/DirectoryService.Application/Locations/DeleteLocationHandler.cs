@@ -3,6 +3,7 @@ using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Locations;
+using DirectoryService.Domain.Shared;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -103,7 +104,7 @@ namespace DirectoryService.Application.Locations
 
             _logger.LogInformation("Location soft deleted succesfully: {LocationId}", location.Id);
 
-            await _cache.RemoveByTagAsync($"locationsCache_tag", cancellationToken);
+            await _cache.RemoveByTagAsync(Constants.LOCATIONS_CACHE_TAG, cancellationToken);
 
             return location.Id;
         }

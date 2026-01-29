@@ -59,29 +59,5 @@ namespace DirectoryService.Domain.ValueObjects.LocationVO
                 street,
                 apartamentNumber);
         }
-
-        public Result<LocationAddress, Error> Update(
-            string country,
-            string region,
-            string city,
-            string postalCode,
-            string street,
-            string apartamentNumber)
-        {
-            var updateResult = Create(
-                country,
-                region,
-                city,
-                postalCode,
-                street,
-                apartamentNumber);
-
-            if (!updateResult.IsSuccess)
-            {
-                return updateResult.Error;
-            }
-
-            return updateResult.Value;
-        }
     }
 }
