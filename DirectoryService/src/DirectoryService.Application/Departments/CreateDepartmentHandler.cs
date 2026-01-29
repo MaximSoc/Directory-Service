@@ -5,6 +5,7 @@ using DirectoryService.Application.Locations;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.DepartmentVO;
 using DirectoryService.Domain.ValueObjects.LocationVO;
 using FluentValidation;
@@ -134,7 +135,7 @@ namespace DirectoryService.Application.Departments
             {
                 _logger.LogInformation("Department created succesfully: {DepartmentId}", department.Value.Id);
 
-                await _cache.RemoveByTagAsync($"departmentsCache_tag", cancellationToken);
+                await _cache.RemoveByTagAsync(Constants.DEPARTMENTS_CACHE_TAG, cancellationToken);
                 
                 return result.Value;
             }

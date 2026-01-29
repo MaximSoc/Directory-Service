@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -131,7 +132,7 @@ namespace DirectoryService.Application.Departments
 
                 transaction.Commit();
 
-                await _cache.RemoveByTagAsync($"departmentsCache_tag", cancellationToken);
+                await _cache.RemoveByTagAsync(Constants.DEPARTMENTS_CACHE_TAG, cancellationToken);
 
                 return UnitResult.Success<Errors>();
             }

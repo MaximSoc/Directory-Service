@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Locations
 {
-    public record CreateLocationRequest(
+    public record UpdateLocationRequest(
         string Name,
         string Country,
         string Region,

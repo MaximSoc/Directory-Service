@@ -4,6 +4,7 @@ using DirectoryService.Application.Database;
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Locations;
+using DirectoryService.Domain.Shared;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using System;
@@ -62,7 +63,7 @@ namespace DirectoryService.Application.Departments
                         DepartmentsWithTopPositions = departmentsWithTopPositions.ToList()
                     };
                 },
-                tags: new[] { "departmentsCache_tag"},
+                tags: new[] { Constants.DEPARTMENTS_CACHE_TAG },
                 cancellationToken: cancellationToken);
 
             return departmentsWithTopPositions;

@@ -26,10 +26,10 @@ namespace DirectoryService.Application.Locations
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("request"));
 
-            RuleFor(x => x.Request.Name.Name)
+            RuleFor(x => x.Request.Name)
                 .MustBeValueObject(LocationName.Create);
 
-            RuleFor(x => x.Request.Address)
+            RuleFor(x => x.Request)
                 .MustBeValueObject(a => LocationAddress.Create(
                     a.Country,
                     a.Region,
@@ -38,7 +38,7 @@ namespace DirectoryService.Application.Locations
                     a.Street,
                     a.ApartamentNumber));
 
-            RuleFor(x => x.Request.Timezone.Timezone)
+            RuleFor(x => x.Request.Timezone)
                 .MustBeValueObject(LocationTimeZone.Create);
         }
     }
@@ -69,21 +69,18 @@ namespace DirectoryService.Application.Locations
                 return validationResult.ToList();
             }
 
-            var locationNameDto = command.Request.Name;
-            var locationName = LocationName.Create(locationNameDto.Name);
+            var locationName = LocationName.Create(command.Request.Name);
                 
-            var locationAddressDto = command.Request.Address;
             var locationAddress = LocationAddress.Create
-            (locationAddressDto.Country,
-            locationAddressDto.Region,
-            locationAddressDto.City,
-            locationAddressDto.PostalCode,
-            locationAddressDto.Street,
-            locationAddressDto.ApartamentNumber
+            (command.Request.Country,
+            command.Request.Region,
+            command.Request.City,
+            command.Request.PostalCode,
+            command.Request.Street,
+            command.Request.ApartamentNumber
             );
                 
-            var locationTimezoneDto = command.Request.Timezone;
-            var locationTimezone = LocationTimeZone.Create(locationTimezoneDto.Timezone);
+            var locationTimezone = LocationTimeZone.Create(command.Request.Timezone);
 
             var location = new Location(
             locationName.Value,

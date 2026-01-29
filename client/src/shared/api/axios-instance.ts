@@ -1,24 +1,62 @@
 import axios from "axios";
-import { Envelope } from "./envelope";
-import { EnvelopeError } from "./errors";
+import { Envelope, RawEnvelope } from "./envelope";
+import {
+  ApiError,
+  BackendErrorType,
+  EnvelopeError,
+  BACKEND_TYPE_TO_FRONTEND,
+} from "./errors";
 
-export const apiClient = axios.create({ baseURL: "http://localhost:8080/api" });
+export const apiClient = axios.create({
+  baseURL: "http://localhost:8080/api",
+});
 
 apiClient.interceptors.response.use(
   (response) => {
-    const data = response.data as Envelope;
+    const raw = response.data as RawEnvelope<unknown>;
 
-    if (data.isError && data.error) {
+    if (raw && raw.isError && raw.errorList && raw.errorList.length > 0) {
+      const apiError: ApiError = {
+        messages: raw.errorList,
+        type:
+          BACKEND_TYPE_TO_FRONTEND[raw.errorList[0].type as BackendErrorType] ??
+          "failure",
+      };
+      throw new EnvelopeError(apiError);
     }
+
+    const normalized: Envelope<unknown> = {
+      result: raw.result,
+      isError: raw.isError,
+      timeGenerated: raw.timeGenerated,
+      error: raw.errorList
+        ? {
+            messages: raw.errorList,
+            type:
+              BACKEND_TYPE_TO_FRONTEND[
+                raw.errorList[0].type as BackendErrorType
+              ] ?? "failure",
+          }
+        : null,
+    };
+
+    response.data = normalized;
 
     return response;
   },
   (error) => {
     if (axios.isAxiosError(error) && error.response?.data) {
-      const envelope = error.response.data as Envelope;
+      const raw = error.response.data as RawEnvelope<unknown>;
 
-      if (envelope?.isError && envelope.error) {
-        throw new EnvelopeError(envelope.error);
+      if (raw && raw.isError && raw.errorList && raw.errorList.length > 0) {
+        const apiError: ApiError = {
+          messages: raw.errorList,
+          type:
+            BACKEND_TYPE_TO_FRONTEND[
+              raw.errorList[0].type as BackendErrorType
+            ] ?? "failure",
+        };
+        throw new EnvelopeError(apiError);
       }
     }
 

@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application;
+using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
+using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Locations;
 using Framework.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +27,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetLocationsByDepartmentResponse>> GetLocationsByDepartment (
+        public async Task<EndpointResult<GetLocationsByDepartmentResponse>> GetLocationsByDepartment (
             [FromServices] GetLocationsByDepartmentHandler handler,
             [FromQuery] GetLocationsByDepartmentRequest request,
             CancellationToken cancellationToken
@@ -33,7 +35,35 @@ namespace DirectoryService.Presentation.Controllers
         {
             var locations = await handler.Handle(request, cancellationToken);
 
-            return Ok(locations);
+            return locations;
+        }
+
+        [HttpPut ("{locationId}")]
+        public async Task<EndpointResult> Update(
+            [FromRoute] Guid locationId,
+            [FromServices] UpdateLocationHandler handler,
+            [FromBody] UpdateLocationRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new UpdateLocationCommand(locationId, request);
+
+            var result = await handler.Handle( command, cancellationToken );
+
+            return result;
+        }
+
+        [HttpDelete("{locationId}")]
+        public async Task<EndpointResult<Guid>> DeleteLocation(
+            [FromRoute] Guid locationId,
+            [FromServices] DeleteLocationHandler handler,
+            CancellationToken cancellationToken)
+        {
+            var request = new DeleteLocationRequest(locationId);
+            var command = new DeleteLocationCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result;
         }
     }
 }

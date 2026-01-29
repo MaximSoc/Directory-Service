@@ -78,7 +78,7 @@ namespace DirectoryService.Infrastructure.Repositories
             return existingCount == locationIds.Count;
         }
 
-        public async Task<UnitResult<Error>> SoftDelete(Guid departmentId, CancellationToken cancellationToken)
+        public async Task<UnitResult<Error>> SoftDeleteByDepartmentId(Guid departmentId, CancellationToken cancellationToken)
         {
             await _dbContext.Database.ExecuteSqlAsync(
                 $"""
@@ -96,6 +96,20 @@ namespace DirectoryService.Infrastructure.Repositories
                 AND d.is_active = true
                 AND dl2.department_id <> {departmentId}
                 )
+                """,
+                cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+
+        public async Task<UnitResult<Error>> SoftDeleteByLocationId(Guid locationId, CancellationToken cancellationToken)
+        {
+            await _dbContext.Database.ExecuteSqlAsync(
+                $"""
+                UPDATE locations
+                SET is_active = false,
+                deleted_at = NOW() AT TIME ZONE 'UTC'
+                WHERE id = {locationId}
                 """,
                 cancellationToken);
 
@@ -121,6 +135,32 @@ namespace DirectoryService.Infrastructure.Repositories
             }
             catch
             {
+                return UnitResult.Failure<Errors>(GeneralErrors.Failure());
+            }
+        }
+
+        public async Task<Result<Location, Errors>> GetById(Guid? locationId, CancellationToken cancellationToken)
+        {
+            var location = await _dbContext.Locations
+                .Include(d => d.DepartmentLocations)
+                .FirstOrDefaultAsync(d => d.Id == locationId, cancellationToken);
+
+            if (location == null)
+                return GeneralErrors.NotFound(locationId).ToErrors();
+
+            return location;
+        }
+
+        public async Task<UnitResult<Errors>> SaveChanges(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                return UnitResult.Success<Errors>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Saving not completed");
                 return UnitResult.Failure<Errors>(GeneralErrors.Failure());
             }
         }

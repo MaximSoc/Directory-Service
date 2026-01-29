@@ -1,16 +1,18 @@
-﻿using DirectoryService.Application.Database;
-using DirectoryService.Contracts.Locations;
-using Microsoft.EntityFrameworkCore;
+﻿using Core.Database;
+using CSharpFunctionalExtensions;
 using Dapper;
+using DirectoryService.Application.Database;
+using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SharedKernel;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using System.Data;
-using Core.Database;
 
 namespace DirectoryService.Application.Locations
 {
@@ -24,7 +26,7 @@ namespace DirectoryService.Application.Locations
             _dbConnectionFactory = dbConnectionFactory;
             _logger = logger;
         }
-        public async Task<GetLocationsByDepartmentResponse?> Handle(GetLocationsByDepartmentRequest request, CancellationToken cancellationToken)
+        public async Task<Result<GetLocationsByDepartmentResponse, Errors>> Handle(GetLocationsByDepartmentRequest request, CancellationToken cancellationToken)
         {
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
@@ -68,16 +70,59 @@ namespace DirectoryService.Application.Locations
 
             var orderByClause = $"ORDER BY {orderByField} {direction}";
 
-            var totalQuery = $@"
+            var totalQuery = "";
+
+            var totalCount = 0;
+
+            var totalPages = 0;
+
+            IEnumerable<LocationDto> locations = [];
+
+            if (request.DepartmentIds.Count == 0)
+            {
+                totalQuery = $@"
+                SELECT COUNT(*) 
+                FROM locations l";
+
+                totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
+
+                totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                locations = await connection.QueryAsync<LocationDto>($"""
+                SELECT l.id,
+                l.name,
+                l.country,
+                l.region,
+                l.city,
+                l.postal_code AS postalCode,
+                l.street,
+                l.apartament_number AS apartamentNumber,
+                l.timezone,
+                l.is_active AS isActive,
+                l.created_at AS createdAt,
+                l.updated_at AS updatedAt
+                FROM locations l
+                {orderByClause}
+                LIMIT @pageSize OFFSET @page
+                """,
+                parameters);
+
+                return new GetLocationsByDepartmentResponse
+                {
+                    Locations = locations.ToList(),
+                    TotalPages = totalPages,
+                };
+            }
+            totalQuery = $@"
                 SELECT COUNT(*) 
                 FROM locations l 
                 JOIN department_locations dl ON l.id = dl.location_id";
 
-            var totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
+            totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
 
-            var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+            totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
-            var locations = await connection.QueryAsync<LocationDto>($"""
+            locations = await connection.QueryAsync<LocationDto>($"""
                 SELECT l.id,
                 l.name,
                 l.country,
