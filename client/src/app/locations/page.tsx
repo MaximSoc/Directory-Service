@@ -2,24 +2,25 @@
 
 import React, { useState } from "react";
 import { Spinner } from "@/shared/components/ui/spinner";
-import { PaginationCustom } from "@/features/pagination/pagination.custom";
 import { Button } from "@/shared/components/ui/button";
 import LocationCard from "@/entities/locations/ui/location.card";
 import { CreateLocationDialog } from "@/features/locations/create-location-dialog";
 import { useLocationsList } from "@/features/locations/model/use-locations-list";
 
 export default function LocationsPage() {
-  const [page, setPage] = useState(1);
-
   const [openCreate, setOpenCreate] = useState(false);
 
-  const { locations, isPending, error, totalPages } = useLocationsList({
-    page,
-  });
+  const { locations, isPending, error, isFetchingNextPage, cursorRef } =
+    useLocationsList();
 
   if (isPending) {
-    return <Spinner />;
+    return (
+      <div className="container mx-auto py-8 px-4 flex justify-center">
+        <Spinner />
+      </div>
+    );
   }
+
   if (error) {
     return <div>Ошибка: {error.message}</div>;
   }
@@ -47,15 +48,11 @@ export default function LocationsPage() {
           </div>
         )}
 
-        {totalPages && (
-          <PaginationCustom
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-        )}
-
         <CreateLocationDialog open={openCreate} onOpenChange={setOpenCreate} />
+
+        <div ref={cursorRef} className="flex justify-center py-4">
+          {isFetchingNextPage && <Spinner />}
+        </div>
       </div>
     </main>
   );

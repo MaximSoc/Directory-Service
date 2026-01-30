@@ -111,6 +111,7 @@ namespace DirectoryService.Application.Locations
                 {
                     Locations = locations.ToList(),
                     TotalPages = totalPages,
+                    Page = request.Page,
                 };
             }
             totalQuery = $@"
@@ -147,6 +148,7 @@ namespace DirectoryService.Application.Locations
             {
                 Locations = locations.ToList(),
                 TotalPages = totalPages,
+                Page = request.Page,
             };
         }
     }
