@@ -10,6 +10,8 @@ namespace DirectoryService.Contracts.Locations
     {
         public List<LocationDto> Locations { get; init; } = null!;
 
-        public int TotalPages { get; init; } 
+        public int TotalPages { get; init; }
+
+        public int Page { get; init; }
     }
 }
