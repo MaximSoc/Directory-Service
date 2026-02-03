@@ -2,6 +2,7 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { Location } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/envelope";
+import { LocationsFilterState } from "@/features/locations/model/locations-filter-store";
 
 type GetLocationsByDepartmentResponse = {
   locations: Location[];
@@ -13,6 +14,9 @@ export type GetLocationsByDepartmentRequest = {
   search?: string;
   page: number;
   pageSize: number;
+  isActive?: boolean;
+  sortBy?: string;
+  sortDirection?: string;
 };
 
 export type CreateLocationRequest = {
@@ -101,11 +105,11 @@ export const locationsQueryOptions = {
     });
   },
 
-  getLessonsInfiniteOptions: ({ pageSize }: { pageSize: number }) => {
+  getLessonsInfiniteOptions: (filter: LocationsFilterState) => {
     return infiniteQueryOptions({
-      queryKey: [locationsQueryOptions.baseKey],
+      queryKey: [locationsQueryOptions.baseKey, filter],
       queryFn: ({ pageParam }) => {
-        return locationsApi.getLocations({ page: pageParam, pageSize });
+        return locationsApi.getLocations({ ...filter, page: pageParam });
       },
       initialPageParam: 1,
       getNextPageParam: (response) => {

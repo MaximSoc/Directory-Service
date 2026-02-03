@@ -65,6 +65,10 @@ namespace DirectoryService.Application.Locations
             {
                 "name" => "l.name",
                 "date" => "l.created_at",
+                "isactive" => "l.is_active",
+                "country" => "l.country",
+                "region" => "l.region",
+                "city" => "l.city",
                 _ => "l.name"
             };
 
@@ -102,6 +106,7 @@ namespace DirectoryService.Application.Locations
                 l.created_at AS createdAt,
                 l.updated_at AS updatedAt
                 FROM locations l
+                {whereClause}
                 {orderByClause}
                 LIMIT @pageSize OFFSET @page
                 """,
