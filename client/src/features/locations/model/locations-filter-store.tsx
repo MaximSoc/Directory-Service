@@ -2,15 +2,20 @@ import { create } from "zustand";
 import { PAGE_SIZE } from "./use-locations-list";
 import { useShallow } from "zustand/react/shallow";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { SortDirection } from "@/shared/types/custom-types";
 
-export type SortDirection = "asc" | "desc";
-export type SortField = "name" | "city" | "country" | "region" | "isActive";
+export type LocationSortField =
+  | "name"
+  | "city"
+  | "country"
+  | "region"
+  | "isActive";
 
 export type LocationsFilterState = {
-  search?: string;
+  search: string;
   isActive?: boolean;
   pageSize: number;
-  sortBy: SortField;
+  sortBy: LocationSortField;
   sortDirection: SortDirection;
 };
 
@@ -36,7 +41,7 @@ export const useLocationsFilterStore = create<LocationsFilterStore>()(
     (set) => ({
       ...initialState,
       setSearch: (input: LocationsFilterState["search"]) =>
-        set(() => ({ search: input?.trim() || undefined })),
+        set(() => ({ search: input?.trim() || "" })),
       setIsActive: (isActive: LocationsFilterState["isActive"]) =>
         set(() => ({ isActive })),
       setSortBy: (sortBy: LocationsFilterState["sortBy"]) =>

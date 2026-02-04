@@ -72,7 +72,7 @@ namespace DirectoryService.Application.Locations
                 _ => "l.name"
             };
 
-            var orderByClause = $"ORDER BY {orderByField} {direction}";
+            var orderByClause = $"ORDER BY {orderByField} {direction}, l.id ASC";
 
             var totalQuery = "";
 
@@ -86,9 +86,10 @@ namespace DirectoryService.Application.Locations
             {
                 totalQuery = $@"
                 SELECT COUNT(*) 
-                FROM locations l";
+                FROM locations l
+                {whereClause}";
 
-                totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
+                totalCount = await connection.ExecuteScalarAsync<int>(totalQuery, parameters);
 
                 totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
@@ -122,9 +123,11 @@ namespace DirectoryService.Application.Locations
             totalQuery = $@"
                 SELECT COUNT(*) 
                 FROM locations l 
-                JOIN department_locations dl ON l.id = dl.location_id";
+                JOIN department_locations dl ON l.id = dl.location_id
+                {whereClause}"
+                ;
 
-            totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
+            totalCount = await connection.ExecuteScalarAsync<int>(totalQuery, parameters);
 
             totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 

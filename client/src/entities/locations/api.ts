@@ -105,7 +105,7 @@ export const locationsQueryOptions = {
     });
   },
 
-  getLessonsInfiniteOptions: (filter: LocationsFilterState) => {
+  getLocationsInfiniteOptions: (filter: LocationsFilterState) => {
     return infiniteQueryOptions({
       queryKey: [locationsQueryOptions.baseKey, filter],
       queryFn: ({ pageParam }) => {

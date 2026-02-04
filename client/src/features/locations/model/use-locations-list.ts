@@ -2,6 +2,7 @@ import { locationsQueryOptions } from "@/entities/locations/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefCallback, useCallback } from "react";
 import { LocationsFilterState } from "./locations-filter-store";
+import { useDebounce } from "use-debounce";
 
 export const PAGE_SIZE = 3;
 
@@ -12,6 +13,8 @@ export function useLocationsList({
   sortBy,
   sortDirection,
 }: LocationsFilterState) {
+  const [debouncedSearch] = useDebounce(search, 300);
+
   const {
     data,
     isPending,
@@ -20,8 +23,8 @@ export function useLocationsList({
     isFetchingNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    ...locationsQueryOptions.getLessonsInfiniteOptions({
-      search,
+    ...locationsQueryOptions.getLocationsInfiniteOptions({
+      search: debouncedSearch,
       isActive,
       pageSize,
       sortBy,
