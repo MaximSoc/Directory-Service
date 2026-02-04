@@ -65,10 +65,14 @@ namespace DirectoryService.Application.Locations
             {
                 "name" => "l.name",
                 "date" => "l.created_at",
+                "isactive" => "l.is_active",
+                "country" => "l.country",
+                "region" => "l.region",
+                "city" => "l.city",
                 _ => "l.name"
             };
 
-            var orderByClause = $"ORDER BY {orderByField} {direction}";
+            var orderByClause = $"ORDER BY {orderByField} {direction}, l.id ASC";
 
             var totalQuery = "";
 
@@ -82,9 +86,10 @@ namespace DirectoryService.Application.Locations
             {
                 totalQuery = $@"
                 SELECT COUNT(*) 
-                FROM locations l";
+                FROM locations l
+                {whereClause}";
 
-                totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
+                totalCount = await connection.ExecuteScalarAsync<int>(totalQuery, parameters);
 
                 totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
@@ -102,6 +107,7 @@ namespace DirectoryService.Application.Locations
                 l.created_at AS createdAt,
                 l.updated_at AS updatedAt
                 FROM locations l
+                {whereClause}
                 {orderByClause}
                 LIMIT @pageSize OFFSET @page
                 """,
@@ -117,9 +123,11 @@ namespace DirectoryService.Application.Locations
             totalQuery = $@"
                 SELECT COUNT(*) 
                 FROM locations l 
-                JOIN department_locations dl ON l.id = dl.location_id";
+                JOIN department_locations dl ON l.id = dl.location_id
+                {whereClause}"
+                ;
 
-            totalCount = await connection.ExecuteScalarAsync<int>(totalQuery);
+            totalCount = await connection.ExecuteScalarAsync<int>(totalQuery, parameters);
 
             totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
