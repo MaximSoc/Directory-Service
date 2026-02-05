@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.PositionVO;
+using SharedKernel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DirectoryService.Domain
 {
@@ -62,6 +65,39 @@ namespace DirectoryService.Domain
             IsActive = true;
 
             DeletedAt = DateTime.MinValue;
+        }
+
+        public UnitResult<Error> Update(
+            PositionName newName,
+            PositionDescription? newDescription,
+            IEnumerable<DepartmentPosition> newPositions)
+        {
+            bool isUpdated = false;
+
+            if (newName != Name)
+            {
+                Name = newName;
+                isUpdated = true;
+            }
+
+            if (newDescription != Description)
+            {
+                Description = newDescription;
+                isUpdated = true;
+            }
+
+            if (newPositions != DepartmentPositions)
+            {
+                _departmentPositions = newPositions.ToList();
+                isUpdated = true;
+            }
+
+            if (isUpdated)
+            {
+                UpdatedAt = DateTime.UtcNow;
+            }
+
+            return UnitResult.Success<Error>();
         }
     }
 }

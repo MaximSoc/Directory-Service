@@ -54,7 +54,7 @@ namespace DirectoryService.Application.Locations
         private readonly IValidator<UpdateLocationCommand> _validator;
         private readonly HybridCache _cache;
 
-        public UpdateLocationHandler(IDepartmentsRepository departmentsRepository,
+        public UpdateLocationHandler(
             ILogger<UpdateLocationHandler> logger,
             IValidator<UpdateLocationCommand> validator,
             ILocationsRepository locationsRepository,

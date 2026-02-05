@@ -101,7 +101,7 @@ namespace DirectoryService.Application.Departments
                 return deleteLocationsResult.Error.ToErrors();
             }
 
-            var deletePositionsResult = await _positionsRepository.SoftDelete(department.Id, cancellationToken);
+            var deletePositionsResult = await _positionsRepository.SoftDeleteByDepartmentId(department.Id, cancellationToken);
             if (deletePositionsResult.IsFailure)
             {
                 _logger.LogInformation("Positions soft deleted failed");

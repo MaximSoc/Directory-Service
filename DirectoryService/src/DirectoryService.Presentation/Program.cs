@@ -64,7 +64,7 @@ builder.Services.AddScoped<IDepartmentsRepository, DepartmentRepository>();
 
 builder.Services.AddScoped<CreateDepartmentHandler>();
 
-builder.Services.AddScoped<UpdateLocationHandler>();
+builder.Services.AddScoped<UpdateDepartmentLocationsHandler>();
 
 builder.Services.AddScoped<MoveDepartmentHandler>();
 
@@ -81,6 +81,14 @@ builder.Services.AddScoped<DeleteInactiveDepartmentsHandler>();
 builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
 
 builder.Services.AddScoped<CreatePositionHandler>();
+
+builder.Services.AddScoped<UpdatePositionHandler>();
+
+builder.Services.AddScoped<GetPositionsHandler>();
+
+builder.Services.AddScoped<GetOnePositionHandler>();
+
+builder.Services.AddScoped<DeletePositionHandler>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
