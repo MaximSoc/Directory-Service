@@ -72,6 +72,8 @@ builder.Services.AddScoped<GetDepartmentsWithTopPositionsHandler>();
 
 builder.Services.AddScoped<GetParentWithChildrensHandler>();
 
+builder.Services.AddScoped<GetDepartmentsHandler>();
+
 builder.Services.AddScoped<GetChildrenByParentHandler>();
 
 builder.Services.AddScoped<DeleteDepartmentHandler>();
