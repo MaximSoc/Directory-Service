@@ -3,8 +3,10 @@ using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Positions;
 using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.PositionVO;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 using System;
@@ -54,16 +56,19 @@ namespace DirectoryService.Application.Positions
         private readonly IDepartmentsRepository _departmentsRepository;
         private readonly ILogger _logger;
         private readonly IValidator<CreatePositionCommand> _validator;
+        private readonly HybridCache _cache;
 
         public CreatePositionHandler(IPositionsRepository positionsRepository,
             ILogger<CreatePositionHandler> logger,
             IValidator<CreatePositionCommand> validator,
-            IDepartmentsRepository departmentsRepository)
+            IDepartmentsRepository departmentsRepository,
+            HybridCache cache)
         {
             _positionsRepository = positionsRepository;
             _logger = logger;
             _validator = validator;
             _departmentsRepository = departmentsRepository;
+            _cache = cache;
         }
 
         public async Task<Result<Guid, Errors>> Handle(CreatePositionCommand command, CancellationToken cancellationToken)
@@ -77,19 +82,19 @@ namespace DirectoryService.Application.Positions
             }
 
             var positionNameDto = command.Request.Name;
-            var positionName = PositionName.Create(positionNameDto.Name);
+            var positionNameResult = PositionName.Create(positionNameDto.Name);
 
-            var positionExistResult = await _positionsRepository.PositionExistAsync(positionName.Value, cancellationToken);
+            var positionExistResult = await _positionsRepository.PositionExistAsync(positionNameResult.Value, cancellationToken);
             if (positionExistResult.IsFailure)
                 return positionExistResult.Error;
             if (positionExistResult.Value == false)
                 return GeneralErrors.AlreadyExist().ToErrors();
 
             var positionDescriptionDto = command.Request.Description;
-            Result<PositionDescription, Error>? positionDescription = null;
+            Result<PositionDescription, Error>? positionDescriptionResult = null;
             if (positionDescriptionDto != null)
             {
-                positionDescription = PositionDescription.Create(positionDescriptionDto.Description);
+                positionDescriptionResult = PositionDescription.Create(positionDescriptionDto.Description);
             }
 
             var positionId = Guid.NewGuid();
@@ -103,13 +108,15 @@ namespace DirectoryService.Application.Positions
 
             var departmentPositions = departmentsIds.Select(di => new DepartmentPosition(di, positionId)).ToList();
 
-            var position = new Position(positionId, positionName.Value, positionDescription?.Value, departmentPositions);
+            var position = new Position(positionId, positionNameResult.Value, positionDescriptionResult?.Value, departmentPositions);
 
             var result = await _positionsRepository.Add(position, cancellationToken);
 
             if (result.IsSuccess)
             {
                 _logger.LogInformation("Position created succesfully: {PositionId}", position.Id);
+
+                await _cache.RemoveByTagAsync(Constants.POSITIONS_CACHE_TAG, cancellationToken);
 
                 return result.Value;
             }

@@ -104,5 +104,17 @@ namespace DirectoryService.Presentation.Controllers
 
             return result;
         }
+
+        [HttpGet]
+        public async Task<EndpointResult<GetDepartmentsResponse>> GetDepartments(
+            [FromServices] GetDepartmentsHandler handler,
+            [FromQuery] GetDepartmentsRequest request,
+            CancellationToken cancellationToken
+            )
+        {
+            var result = await handler.Handle(request, cancellationToken);
+
+            return result;
+        }
     }
 }

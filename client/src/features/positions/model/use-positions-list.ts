@@ -1,16 +1,17 @@
-import { locationsQueryOptions } from "@/entities/locations/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefCallback, useCallback } from "react";
-import { LocationsFilterState } from "./locations-filter-store";
 import { useDebounce } from "use-debounce";
+import { PositionsFilterState } from "./positions-filter-store";
+import { positionsQueryOptions } from "@/entities/positions/api";
 
-export function useLocationsList({
+export function usePositionsList({
   search,
   isActive,
   pageSize,
   sortBy,
   sortDirection,
-}: LocationsFilterState) {
+  departmentIds,
+}: PositionsFilterState) {
   const [debouncedSearch] = useDebounce(search, 300);
 
   const {
@@ -21,12 +22,13 @@ export function useLocationsList({
     isFetchingNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    ...locationsQueryOptions.getLocationsInfiniteOptions({
+    ...positionsQueryOptions.getPositionsInfiniteOptions({
       search: debouncedSearch,
       isActive,
       pageSize,
       sortBy,
       sortDirection,
+      departmentIds,
     }),
   });
 
@@ -53,7 +55,7 @@ export function useLocationsList({
   );
 
   return {
-    locations: data?.locations,
+    positions: data?.positions,
     totalPages: data?.totalPages,
     isPending,
     error,

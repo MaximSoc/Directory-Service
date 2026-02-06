@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import { PAGE_SIZE } from "./use-locations-list";
 import { useShallow } from "zustand/react/shallow";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SortDirection } from "@/shared/types/custom-types";
+import { PAGE_SIZE_LOCATIONS } from "@/shared/constants/constants";
 
 export type LocationSortField =
   | "name"
@@ -31,7 +31,7 @@ type LocationsFilterStore = LocationsFilterState & Actions;
 const initialState: LocationsFilterState = {
   search: "",
   isActive: undefined,
-  pageSize: PAGE_SIZE,
+  pageSize: PAGE_SIZE_LOCATIONS,
   sortBy: "name",
   sortDirection: "asc",
 };
