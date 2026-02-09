@@ -66,19 +66,28 @@ namespace DirectoryService.Application.Positions
 
             var orderByClause = $"ORDER BY {orderByField} {direction}, p.id ASC";
 
-            static string GetSelectQuery(bool withDepartments) => withDepartments ? """
-            SELECT p.id, p.name, p.description, p.is_active AS isActive,
-                   p.created_at AS createdAt, p.updated_at AS updatedAt,
-                   (SELECT COUNT(*) FROM department_positions dp WHERE dp.position_id = p.id AND dp.is_active = true) AS DepartmentCount,
-                   COALESCE(ARRAY(SELECT d.name FROM department_positions dp JOIN departments d ON d.id = dp.department_id WHERE dp.position_id = p.id AND dp.is_active = true), ARRAY[]::text[]) AS DepartmentNames
-            FROM positions p
-        """ : """
-        SELECT p.id, p.name, p.description, p.is_active AS isActive,
-               p.created_at AS createdAt, p.updated_at AS updatedAt,
-               (SELECT COUNT(*) FROM department_positions dp WHERE dp.position_id = p.id AND dp.is_active = true) AS DepartmentCount,
-               COALESCE(ARRAY(SELECT d.name FROM department_positions dp JOIN departments d ON d.id = dp.department_id WHERE dp.position_id = p.id AND dp.is_active = true), ARRAY[]::text[]) AS DepartmentNames
-        FROM positions p
-        """;
+            string selectQuery = """
+                SELECT 
+                    p.id, 
+                    p.name, 
+                    p.description, 
+                    p.is_active AS isActive,
+                    p.created_at AS createdAt, 
+                    p.updated_at AS updatedAt,
+                    (SELECT COUNT(*) 
+                     FROM department_positions dp 
+                     WHERE dp.position_id = p.id AND dp.is_active = true) AS DepartmentCount,
+                    COALESCE(
+                        ARRAY(
+                            SELECT d.name 
+                            FROM department_positions dp 
+                            JOIN departments d ON d.id = dp.department_id 
+                            WHERE dp.position_id = p.id AND dp.is_active = true
+                        ), 
+                        ARRAY[]::text[]
+                    ) AS DepartmentNames
+                FROM positions p
+                """;
 
             var totalQuery = "";
 
@@ -101,7 +110,7 @@ namespace DirectoryService.Application.Positions
 
                 totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
-                var mainQuery = $"{GetSelectQuery(false)} {searchWhereClause} {orderByClause} LIMIT @pageSize OFFSET @page";
+                var mainQuery = $"{selectQuery} {searchWhereClause} {orderByClause} LIMIT @pageSize OFFSET @page";
 
                 positions = await connection.QueryAsync<PositionDto>(mainQuery, parameters);
             }
@@ -126,7 +135,7 @@ namespace DirectoryService.Application.Positions
 
                 totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
-                var mainQuery = $@"{GetSelectQuery(true)}
+                var mainQuery = $@"{selectQuery}
                           WHERE EXISTS (SELECT 1 FROM department_positions dp WHERE dp.position_id = p.id 
                                 AND dp.department_id = ANY(@departmentIds) AND dp.is_active = true)
                           {searchWhereClause}

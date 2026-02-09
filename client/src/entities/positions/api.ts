@@ -19,6 +19,12 @@ export type GetPositionsRequest = {
   sortDirection?: string;
 };
 
+export type CreatePositionRequest = {
+  name: string;
+  description: string | undefined;
+  departmentsIds: string[];
+};
+
 export const positionsApi = {
   getPositions: async (
     request: GetPositionsRequest
@@ -33,6 +39,21 @@ export const positionsApi = {
     }
 
     return response.data.result;
+  },
+
+  createPosition: async (
+    request: CreatePositionRequest
+  ): Promise<Envelope<Position>> => {
+    const response = await apiClient.post<Envelope<Position>>(
+      "/positions",
+      request
+    );
+
+    if (response.data.isError || !response.data.result) {
+      throw new Error("Failed to create position");
+    }
+
+    return response.data;
   },
 };
 

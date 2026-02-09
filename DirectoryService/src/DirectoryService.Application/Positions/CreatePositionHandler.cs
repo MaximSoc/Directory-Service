@@ -26,10 +26,10 @@ namespace DirectoryService.Application.Positions
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("request"));
 
-            RuleFor(x => x.Request.Name.Name)
+            RuleFor(x => x.Request.Name)
                 .MustBeValueObject(PositionName.Create);
 
-            RuleFor(x => x.Request.Description.Description)
+            RuleFor(x => x.Request.Description)
                 .MustBeValueObject(PositionDescription.Create)
                 .When(x => x.Request.Description != null);
 
@@ -81,8 +81,8 @@ namespace DirectoryService.Application.Positions
                 return validationResult.ToList();
             }
 
-            var positionNameDto = command.Request.Name;
-            var positionNameResult = PositionName.Create(positionNameDto.Name);
+            var name = command.Request.Name;
+            var positionNameResult = PositionName.Create(name);
 
             var positionExistResult = await _positionsRepository.PositionExistAsync(positionNameResult.Value, cancellationToken);
             if (positionExistResult.IsFailure)
@@ -90,11 +90,11 @@ namespace DirectoryService.Application.Positions
             if (positionExistResult.Value == false)
                 return GeneralErrors.AlreadyExist().ToErrors();
 
-            var positionDescriptionDto = command.Request.Description;
+            var description = command.Request.Description;
             Result<PositionDescription, Error>? positionDescriptionResult = null;
-            if (positionDescriptionDto != null)
+            if (description != null)
             {
-                positionDescriptionResult = PositionDescription.Create(positionDescriptionDto.Description);
+                positionDescriptionResult = PositionDescription.Create(description);
             }
 
             var positionId = Guid.NewGuid();

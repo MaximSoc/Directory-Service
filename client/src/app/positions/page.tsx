@@ -6,12 +6,14 @@ import { useGetPositionFilter } from "@/features/positions/model/positions-filte
 import { usePositionsList } from "@/features/positions/model/use-positions-list";
 import { PositionsFilters } from "@/features/positions/position-filters";
 import PositionCard from "@/entities/positions/ui/position.card";
+import { useState } from "react";
+import { CreatePositionDialog } from "@/features/positions/create-position-dialog";
 
 export default function PositionsPage() {
   // const { search, isActive, pageSize, sortBy, sortDirection, departmentIds } =
   //   useGetPositionFilter();
   const filter = useGetPositionFilter();
-  // const [openCreate, setOpenCreate] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
 
   const { positions, isPending, error, isFetchingNextPage, cursorRef } =
     usePositionsList(filter);
@@ -30,7 +32,7 @@ export default function PositionsPage() {
         <div className="mb-8 flex flex-col gap-4 items-start">
           <PositionsFilters />
 
-          {/* <Button onClick={() => setOpenCreate(true)}>Создать должность</Button> */}
+          <Button onClick={() => setOpenCreate(true)}>Создать должность</Button>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -51,7 +53,7 @@ export default function PositionsPage() {
           </div>
         )}
 
-        {/* <CreateLocationDialog open={openCreate} onOpenChange={setOpenCreate} /> */}
+        <CreatePositionDialog open={openCreate} onOpenChange={setOpenCreate} />
 
         <div ref={cursorRef} className="flex justify-center py-4">
           {isFetchingNextPage && <Spinner />}
