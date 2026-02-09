@@ -22,6 +22,8 @@ namespace DirectoryService.Contracts.Positions
 
         public string[] DepartmentNames { get; init; } = [];
 
+        public Guid[] DepartmentIds { get; init; } = [];
+
         public int DepartmentCount { get; init; } = 0;
     }
 }

@@ -39,19 +39,19 @@ namespace DirectoryService.Application.Positions
             RuleFor(x => x.Request.Description)
                 .MustBeValueObject(PositionDescription.Create);
 
-            RuleFor(x => x.Request.DepartmentIds)
+            RuleFor(x => x.Request.DepartmentsIds)
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("departments"));
 
-            RuleFor(x => x.Request.DepartmentIds)
+            RuleFor(x => x.Request.DepartmentsIds)
                 .Must(list => list is { Count: > 0 })
                 .WithError(Error.Validation("department.position", "Positions must contain at least one department"));
 
-            RuleFor(x => x.Request.DepartmentIds)
+            RuleFor(x => x.Request.DepartmentsIds)
                 .Must(list => list == null || list.Distinct().Count() == list.Count)
                 .WithError(Error.Validation("departmentIds.must.be.unique", "DepartmentIds must be unique"));
 
-            RuleForEach(x => x.Request.DepartmentIds)
+            RuleForEach(x => x.Request.DepartmentsIds)
                 .Must(id => id != Guid.Empty)
                 .WithError(GeneralErrors.ValueIsInvalid("department id"));
         }
@@ -93,7 +93,7 @@ namespace DirectoryService.Application.Positions
 
             var position = positionResult.Value;
 
-            var allDepartmentsExistResult = await _departmentsRepository.AllExistAsync(command.Request.DepartmentIds, cancellationToken);
+            var allDepartmentsExistResult = await _departmentsRepository.AllExistAsync(command.Request.DepartmentsIds, cancellationToken);
 
             if (allDepartmentsExistResult.IsFailure)
                 return allDepartmentsExistResult.Error;
@@ -101,7 +101,7 @@ namespace DirectoryService.Application.Positions
             if (allDepartmentsExistResult.Value == false)
                 return Error.NorFound("departments.not.found", "One or more departments were not found").ToErrors();
 
-            var departmentPositions = command.Request.DepartmentIds.Select(di => new DepartmentPosition(
+            var departmentPositions = command.Request.DepartmentsIds.Select(di => new DepartmentPosition(
                 di, position.Id)).ToList();
 
             PositionName positionName = PositionName.Create(command.Request.Name).Value;

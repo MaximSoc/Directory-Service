@@ -4,6 +4,7 @@ import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Position } from "../types";
 import { DeletePositionDialog } from "@/features/positions/delete-position-dialog";
+import Link from "next/link";
 
 export default function PositionCard({ position }: { position: Position }) {
   //   const [openUpdate, setOpenUpdate] = useState(false);
@@ -47,16 +48,11 @@ export default function PositionCard({ position }: { position: Position }) {
       </div>
 
       <div className="mt-6 border-t border-border pt-4">
-        <button className="w-full cursor-pointer rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 active:opacity-90">
-          Подробнее
-        </button>
+        <Button asChild className="w-full" variant="secondary">
+          <Link href={`/positions/${position.id}`}>Подробнее</Link>
+        </Button>
       </div>
 
-      {/* <UpdateLocationDialog
-        location={location}
-        open={openUpdate}
-        onOpenChange={setOpenUpdate}
-      /> */}
       <DeletePositionDialog
         open={openDelete}
         onOpenChange={setOpenDelete}

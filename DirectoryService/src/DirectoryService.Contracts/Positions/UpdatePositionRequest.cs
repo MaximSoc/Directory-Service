@@ -9,5 +9,5 @@ namespace DirectoryService.Contracts.Positions
     public record UpdatePositionRequest(
         string Name,
         string? Description,
-        List<Guid> DepartmentIds);
+        List<Guid> DepartmentsIds);
 }

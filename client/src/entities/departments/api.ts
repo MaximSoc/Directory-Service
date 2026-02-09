@@ -1,15 +1,6 @@
 import { apiClient } from "@/shared/api/axios-instance";
-import { Department } from "./types";
+import { GetDepartmentsRequest, GetDepartmentsResponse } from "./types";
 import { Envelope } from "@/shared/api/envelope";
-
-export type GetDepartmentsResponse = {
-  departments: Department[];
-};
-
-export type GetDepartmentsRequest = {
-  search?: string;
-  isActive?: boolean;
-};
 
 export const departmentsApi = {
   getDepartments: async (

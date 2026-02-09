@@ -1,29 +1,15 @@
 import { apiClient } from "@/shared/api/axios-instance";
-import { Position } from "./types";
+import {
+  CreatePositionRequest,
+  GetOnePositionResponse,
+  GetPositionsRequest,
+  GetPositionsResponse,
+  Position,
+  UpdatePositionRequest,
+} from "./types";
 import { Envelope } from "@/shared/api/envelope";
 import { infiniteQueryOptions } from "@tanstack/react-query";
 import { PositionsFilterState } from "@/features/positions/model/positions-filter-store";
-
-type GetPositionsResponse = {
-  positions: Position[];
-  totalPages: number;
-  page: number;
-};
-
-export type GetPositionsRequest = {
-  search?: string;
-  page: number;
-  pageSize: number;
-  isActive?: boolean;
-  sortBy?: string;
-  sortDirection?: string;
-};
-
-export type CreatePositionRequest = {
-  name: string;
-  description: string | undefined;
-  departmentsIds: string[];
-};
 
 export const positionsApi = {
   getPositions: async (
@@ -60,6 +46,34 @@ export const positionsApi = {
     const response = await apiClient.delete<Envelope<Position>>(
       `/positions/${positionId}`
     );
+
+    return response.data;
+  },
+
+  getOnePosition: async (id: string): Promise<GetOnePositionResponse> => {
+    const response = await apiClient.get<Envelope<GetOnePositionResponse>>(
+      `/positions/${id}`
+    );
+
+    if (response.data.isError || !response.data.result) {
+      throw new Error("Failed to load position details");
+    }
+
+    return response.data.result;
+  },
+
+  updatePosition: async ({
+    id,
+    ...data
+  }: { id: string } & UpdatePositionRequest): Promise<Envelope<Position>> => {
+    const response = await apiClient.put<Envelope<Position>>(
+      `/positions/${id}`,
+      data
+    );
+
+    if (response.data.isError) {
+      throw new Error("Failed to update position");
+    }
 
     return response.data;
   },

@@ -2,13 +2,13 @@ import { locationsApi, locationsQueryOptions } from "@/entities/locations/api";
 import { EnvelopeError } from "@/shared/api/errors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { UpdateFormData } from "../update-location-dialog";
+import { UpdateLocationFormData } from "../update-location-dialog";
 
 export function useUpdateLocation() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: ({ id, ...data }: UpdateFormData & { id: string }) =>
+    mutationFn: ({ id, ...data }: UpdateLocationFormData & { id: string }) =>
       locationsApi.updateLocation({ id, ...data }),
     onSettled: () =>
       queryClient.invalidateQueries({

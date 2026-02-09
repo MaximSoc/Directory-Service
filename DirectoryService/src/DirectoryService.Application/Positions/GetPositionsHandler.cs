@@ -75,14 +75,15 @@ namespace DirectoryService.Application.Positions
                     p.created_at AS createdAt, 
                     p.updated_at AS updatedAt,
                     (SELECT COUNT(*) 
-                     FROM department_positions dp 
-                     WHERE dp.position_id = p.id AND dp.is_active = true) AS DepartmentCount,
+                     FROM department_positions dp
+                     JOIN departments d ON d.id = dp.department_id
+                     WHERE dp.position_id = p.id AND dp.is_active = true AND d.is_active = true) AS DepartmentCount,
                     COALESCE(
                         ARRAY(
                             SELECT d.name 
                             FROM department_positions dp 
                             JOIN departments d ON d.id = dp.department_id 
-                            WHERE dp.position_id = p.id AND dp.is_active = true
+                            WHERE dp.position_id = p.id AND dp.is_active = true AND d.is_active = true
                         ), 
                         ARRAY[]::text[]
                     ) AS DepartmentNames

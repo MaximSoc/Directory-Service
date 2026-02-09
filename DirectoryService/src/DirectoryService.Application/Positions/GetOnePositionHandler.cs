@@ -45,10 +45,19 @@ namespace DirectoryService.Application.Positions
                         SELECT d.name 
                         FROM department_positions dp 
                         JOIN departments d ON d.id = dp.department_id 
-                        WHERE dp.position_id = p.id AND dp.is_active = true
+                        WHERE dp.position_id = p.id AND dp.is_active = true AND d.is_active = true
                     ), 
                     ARRAY[]::text[]
-                ) AS DepartmentNames
+                ) AS DepartmentNames,
+                COALESCE(
+                    ARRAY(
+                        SELECT d.id 
+                        FROM department_positions dp 
+                        JOIN departments d ON d.id = dp.department_id 
+                        WHERE dp.position_id = p.id AND dp.is_active = true AND d.is_active = true
+                    ), 
+                    ARRAY[]::uuid[]
+                ) AS DepartmentIds
                 FROM positions p
                 WHERE p.id = @Id
                 """,
