@@ -1,15 +1,16 @@
-import { GetDepartmentsResponse } from "@/entities/departments/api";
-import { apiClient } from "@/shared/api/axios-instance";
-import { Envelope } from "@/shared/api/envelope";
+import {
+  departmentsApi,
+  GetDepartmentsRequest,
+} from "@/entities/departments/api";
 import { useQuery } from "@tanstack/react-query";
 
-export function useDepartmentsList() {
+export function useDepartmentsList(params?: GetDepartmentsRequest) {
   return useQuery({
-    queryKey: ["departments"],
+    queryKey: ["departments", params],
     queryFn: () =>
-      apiClient
-        .get<Envelope<GetDepartmentsResponse>>("/departments")
-        .then((response) => response.data.result?.departments),
+      departmentsApi
+        .getDepartments(params ?? {})
+        .then((data) => data.departments),
     staleTime: 5 * 60 * 1000,
   });
 }

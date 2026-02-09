@@ -17,7 +17,9 @@ export function DepartmentsMultiSelect({
   onChange,
   error,
 }: DepartmentsMultiSelectProps) {
-  const { data: departments = [], isLoading } = useDepartmentsList();
+  const { data: departments = [], isLoading } = useDepartmentsList({
+    isActive: true,
+  });
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredDepartments = useMemo(

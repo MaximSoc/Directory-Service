@@ -55,6 +55,14 @@ export const positionsApi = {
 
     return response.data;
   },
+
+  deletePosition: async (positionId: string): Promise<Envelope<Position>> => {
+    const response = await apiClient.delete<Envelope<Position>>(
+      `/positions/${positionId}`
+    );
+
+    return response.data;
+  },
 };
 
 export const positionsQueryOptions = {
