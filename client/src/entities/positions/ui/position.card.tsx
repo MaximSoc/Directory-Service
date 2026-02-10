@@ -7,7 +7,6 @@ import { DeletePositionDialog } from "@/features/positions/delete-position-dialo
 import Link from "next/link";
 
 export default function PositionCard({ position }: { position: Position }) {
-  //   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
   return (

@@ -10,8 +10,6 @@ import { useState } from "react";
 import { CreatePositionDialog } from "@/features/positions/create-position-dialog";
 
 export default function PositionsPage() {
-  // const { search, isActive, pageSize, sortBy, sortDirection, departmentIds } =
-  //   useGetPositionFilter();
   const filter = useGetPositionFilter();
   const [openCreate, setOpenCreate] = useState(false);
 

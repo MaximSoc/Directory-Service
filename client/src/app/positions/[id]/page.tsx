@@ -179,11 +179,14 @@ export default function PositionDetailsPage() {
         </div>
       </div>
 
-      <UpdatePositionDialog
-        open={openUpdate}
-        onOpenChange={setOpenUpdate}
-        position={position}
-      />
+      {openUpdate && (
+        <UpdatePositionDialog
+          key={position.id}
+          open={openUpdate}
+          onOpenChange={setOpenUpdate}
+          position={position}
+        />
+      )}
     </div>
   );
 }

@@ -11,7 +11,6 @@ import { Label } from "@/shared/components/ui/label";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { useUpdatePosition } from "./model/use-update-position";
 import { Position } from "@/entities/positions/types";
@@ -47,17 +46,12 @@ export function UpdatePositionDialog({
 
   const form = useForm<UpdatePositionFormData>({
     resolver: zodResolver(updatePositionSchema),
+    defaultValues: {
+      name: position.name,
+      description: position.description || "",
+      departmentsIds: position.departmentIds || [],
+    },
   });
-
-  useEffect(() => {
-    if (open && position) {
-      form.reset({
-        name: position.name,
-        description: position.description || "",
-        departmentsIds: position.departmentIds || [],
-      });
-    }
-  }, [open, position, form]);
 
   const isDirty = form.formState.isDirty;
 
