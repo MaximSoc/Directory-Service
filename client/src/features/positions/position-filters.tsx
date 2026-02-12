@@ -7,6 +7,7 @@ import { PositionStatusFilter } from "./positions-status-filters";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -51,6 +52,9 @@ export function PositionsFilters() {
           <DialogContent className="max-w-2xl max-h-[80vh] p-1">
             <DialogHeader className="pb-4">
               <DialogTitle>Фильтр по подразделениям</DialogTitle>
+              <DialogDescription className="sr-only">
+                Выберите подразделения для фильтрации
+              </DialogDescription>
             </DialogHeader>
             <PositionDepartmentsFilter />
           </DialogContent>

@@ -18,12 +18,12 @@ namespace DirectoryService.Application.Departments
 {
     public class GetDepartmentsWithTopPositionsHandler
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IReadDbContext _dbContext;
         private readonly HybridCache _cache;
 
-        public GetDepartmentsWithTopPositionsHandler(IDbConnectionFactory dbConnectionFactory, HybridCache cache)
+        public GetDepartmentsWithTopPositionsHandler(IReadDbContext dbContext, HybridCache cache)
         {
-            _dbConnectionFactory = dbConnectionFactory;
+            _dbContext = dbContext;
             _cache = cache;
         }
 
@@ -35,7 +35,7 @@ namespace DirectoryService.Application.Departments
                 cacheKey,
                 async ct =>
                 {
-                    using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+                    var connection = _dbContext.Connection;
 
                     var departmentsWithTopPositions = await connection.QueryAsync<DepartmentWithNumberOfPositionsDto>("""
                         SELECT DISTINCT d.id,

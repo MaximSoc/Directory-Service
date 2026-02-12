@@ -67,37 +67,18 @@ namespace DirectoryService.Domain
             DeletedAt = DateTime.MinValue;
         }
 
-        public UnitResult<Error> Update(
+        public void Update(
             PositionName newName,
             PositionDescription? newDescription,
             IEnumerable<DepartmentPosition> newPositions)
         {
-            bool isUpdated = false;
-
-            if (newName != Name)
-            {
                 Name = newName;
-                isUpdated = true;
-            }
 
-            if (newDescription != Description)
-            {
                 Description = newDescription;
-                isUpdated = true;
-            }
 
-            if (newPositions != DepartmentPositions)
-            {
                 _departmentPositions = newPositions.ToList();
-                isUpdated = true;
-            }
 
-            if (isUpdated)
-            {
                 UpdatedAt = DateTime.UtcNow;
-            }
-
-            return UnitResult.Success<Error>();
         }
     }
 }

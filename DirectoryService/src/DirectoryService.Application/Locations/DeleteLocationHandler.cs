@@ -1,4 +1,5 @@
-﻿using Core.Shared;
+﻿using Core.Handlers;
+using Core.Shared;
 using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Locations
 {
-    public record DeleteLocationCommand(DeleteLocationRequest Request);
+    public record DeleteLocationCommand(DeleteLocationRequest Request) : ICommand;
 
     public class DeleteLocationCommandValidator : AbstractValidator<DeleteLocationCommand>
     {
@@ -32,7 +33,7 @@ namespace DirectoryService.Application.Locations
         }
     }
 
-    public class DeleteLocationHandler
+    public class DeleteLocationHandler : ICommandHandler<Guid, DeleteLocationCommand>
     {
         private readonly ILocationsRepository _locationsRepository;
         private readonly ILogger _logger;
@@ -64,16 +65,9 @@ namespace DirectoryService.Application.Locations
                 return validationResult.ToList();
             }
 
-            var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
-            if (transactionResult.IsFailure)
-                return transactionResult.Error.ToErrors();
-
-            using var transaction = transactionResult.Value;
-
             var locationResult = await _locationsRepository.GetById(command.Request.LocationId, cancellationToken);
             if (locationResult.IsFailure)
             {
-                transaction.Rollback();
                 return locationResult.Error;
             }
 
@@ -81,7 +75,6 @@ namespace DirectoryService.Application.Locations
             if (location.IsActive == false)
             {
                 _logger.LogInformation("Location is not active");
-                transaction.Rollback();
                 return GeneralErrors.Failure("Location is not active").ToErrors();
             }
 
@@ -89,18 +82,8 @@ namespace DirectoryService.Application.Locations
             if (deleteLocationsResult.IsFailure)
             {
                 _logger.LogInformation("Locations soft deleted failed");
-                transaction.Rollback();
                 return deleteLocationsResult.Error.ToErrors();
             }
-
-            var saveChanges = await _locationsRepository.SaveChanges(cancellationToken);
-            if (saveChanges.IsFailure)
-            {
-                transaction.Rollback();
-                return saveChanges.Error;
-            }
-
-            transaction.Commit();
 
             _logger.LogInformation("Location soft deleted succesfully: {LocationId}", location.Id);
 

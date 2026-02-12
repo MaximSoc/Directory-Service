@@ -1,14 +1,45 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import {
-  CreateLocationRequest,
-  GetLocationsByDepartmentRequest,
-  GetLocationsByDepartmentResponse,
-  Location,
-  UpdateLocationRequest,
-} from "./types";
+import { Location } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/envelope";
 import { LocationsFilterState } from "@/features/locations/model/locations-filter-store";
+
+export type GetLocationsByDepartmentResponse = {
+  items: Location[];
+  totalPages: number;
+  page: number;
+};
+
+export type GetLocationsByDepartmentRequest = {
+  search?: string;
+  page: number;
+  pageSize: number;
+  isActive?: boolean;
+  sortBy?: string;
+  sortDirection?: string;
+};
+
+export type CreateLocationRequest = {
+  name: string;
+  country: string;
+  region: string;
+  city: string;
+  postalCode: string;
+  street: string;
+  apartamentNumber: string;
+  timezone: string;
+};
+
+export type UpdateLocationRequest = {
+  name: string;
+  country: string;
+  region: string;
+  city: string;
+  postalCode: string;
+  street: string;
+  apartamentNumber: string;
+  timezone: string;
+};
 
 export const locationsApi = {
   getLocations: async (
@@ -87,7 +118,7 @@ export const locationsQueryOptions = {
       },
 
       select: (data): GetLocationsByDepartmentResponse => ({
-        locations: data.pages.flatMap((page) => page?.locations ?? []),
+        items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,
       }),

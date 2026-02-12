@@ -106,7 +106,7 @@ namespace DirectoryService.Application.Departments
                     return updateParent.Error.ToErrors();
                 }
 
-                var saveResult = await _departmentsRepository.SaveChanges(cancellationToken);
+                var saveResult = await _transactionManager.SaveChangesAsync(cancellationToken);
 
                 var lockChildrens = await _departmentsRepository.LockChildrens(oldPath, cancellationToken);
                 if (lockChildrens.IsFailure)

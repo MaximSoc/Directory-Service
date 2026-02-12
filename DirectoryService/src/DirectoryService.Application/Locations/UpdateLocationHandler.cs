@@ -1,4 +1,6 @@
-﻿using Core.Validation;
+﻿using Core.Handlers;
+using Core.Shared;
+using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Locations;
@@ -17,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Locations
 {
-    public record UpdateLocationCommand(Guid LocationId, UpdateLocationRequest Request);
+    public record UpdateLocationCommand(Guid LocationId, UpdateLocationRequest Request) : ICommand;
 
     public class UpdateLocationValidator : AbstractValidator<UpdateLocationCommand>
     {
@@ -47,26 +49,29 @@ namespace DirectoryService.Application.Locations
                 .MustBeValueObject(LocationTimeZone.Create);
         }
     }
-    public class UpdateLocationHandler
+    public class UpdateLocationHandler : ICommandHandler<Guid, UpdateLocationCommand>
     {
         private readonly ILocationsRepository _locationsRepository;
         private readonly ILogger _logger;
         private readonly IValidator<UpdateLocationCommand> _validator;
         private readonly HybridCache _cache;
+        private readonly ITransactionManager _transactionManager;
 
         public UpdateLocationHandler(
             ILogger<UpdateLocationHandler> logger,
             IValidator<UpdateLocationCommand> validator,
             ILocationsRepository locationsRepository,
-            HybridCache cache)
+            HybridCache cache,
+            ITransactionManager transactionManager)
         {
             _logger = logger;
             _validator = validator;
             _locationsRepository = locationsRepository;
             _cache = cache;
+            _transactionManager = transactionManager;
         }
 
-        public async Task<UnitResult<Errors>> Handle(UpdateLocationCommand command, CancellationToken cancellationToken)
+        public async Task<Result<Guid, Errors>> Handle(UpdateLocationCommand command, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Received UpdateLocationRequest: {Request}", command.Request);
 
@@ -100,7 +105,9 @@ namespace DirectoryService.Application.Locations
 
             await _cache.RemoveByTagAsync(Constants.LOCATIONS_CACHE_TAG, cancellationToken);
 
-            return await _locationsRepository.SaveChanges(cancellationToken);
+            await _transactionManager.SaveChangesAsync(cancellationToken);
+
+            return location.Id;
         }
     }
 }

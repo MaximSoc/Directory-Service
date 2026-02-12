@@ -1,4 +1,5 @@
-﻿using Core.Shared;
+﻿using Core.Handlers;
+using Core.Shared;
 using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Departments
 {
-    public record DeleteDepartmentCommand(DeleteDepartmentRequest Request);
+    public record DeleteDepartmentCommand(DeleteDepartmentRequest Request) : ICommand;
 
     public class DeleteDepartmentCommandValidator : AbstractValidator<DeleteDepartmentCommand>
     {
@@ -33,7 +34,7 @@ namespace DirectoryService.Application.Departments
         }
     }
 
-    public class DeleteDepartmentHandler
+    public class DeleteDepartmentHandler : ICommandHandler<Guid, DeleteDepartmentCommand>
     {
         private readonly IDepartmentsRepository _departmentsRepository;
         private readonly ILocationsRepository _locationsRepository;
@@ -120,7 +121,7 @@ namespace DirectoryService.Application.Departments
                 return result.Error;
             }
 
-            var saveChanges = await _departmentsRepository.SaveChanges(cancellationToken);
+            var saveChanges = await _transactionManager.SaveChangesAsync(cancellationToken);
             if (saveChanges.IsFailure)
             {
                 transaction.Rollback();

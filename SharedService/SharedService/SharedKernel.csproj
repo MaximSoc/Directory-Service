@@ -13,7 +13,7 @@
 
 	<PropertyGroup>
 		<PackageId>MaximSoc.SharedKernel</PackageId>
-		<Version>0.0.2</Version>
+		<Version>0.0.3</Version>
 		<Authors>MaximSoc</Authors>
 		<Company>MaximSoc</Company>
 		<PackageDescription>SharedKernel</PackageDescription>

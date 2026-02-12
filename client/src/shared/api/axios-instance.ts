@@ -1,5 +1,4 @@
 import axios from "axios";
-import qs from "qs";
 import { Envelope, RawEnvelope } from "./envelope";
 import {
   ApiError,
@@ -10,10 +9,8 @@ import {
 
 export const apiClient = axios.create({
   baseURL: "http://localhost:8080/api",
-  paramsSerializer: (params) => {
-    return qs.stringify(params, {
-      arrayFormat: "repeat",
-    });
+  paramsSerializer: {
+    indexes: null,
   },
 });
 

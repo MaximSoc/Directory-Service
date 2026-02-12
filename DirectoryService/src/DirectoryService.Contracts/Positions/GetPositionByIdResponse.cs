@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Positions
 {
-    public record GetOnePositionResponse
+    public record GetPositionByIdResponse
     {
         public PositionDto Position { get; init; } = null!;
     }

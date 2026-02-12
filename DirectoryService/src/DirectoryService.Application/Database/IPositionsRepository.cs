@@ -17,7 +17,6 @@ namespace DirectoryService.Application.Database
         Task<UnitResult<Error>> SoftDeleteByDepartmentId(Guid departmentId, CancellationToken cancellationToken);
         Task<UnitResult<Errors>> RemoveInactive(CancellationToken cancellationToken);
         Task<Result<Position, Errors>> GetById(Guid? positionId, CancellationToken cancellationToken);
-        Task<UnitResult<Errors>> SaveChanges(CancellationToken cancellationToken);
         Task<UnitResult<Error>> SoftDeleteByPositionId(Guid positionId, CancellationToken cancellationToken);
     }
 }

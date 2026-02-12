@@ -1,4 +1,5 @@
-﻿using Core.Shared;
+﻿using Core.Handlers;
+using Core.Shared;
 using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
@@ -18,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Positions
 {
-    public record DeletePositionCommand(DeletePositionRequest Request);
+    public record DeletePositionCommand(DeletePositionRequest Request) : ICommand;
 
     public class DeletePositionCommandValidator : AbstractValidator<DeletePositionCommand>
     {
@@ -33,7 +34,7 @@ namespace DirectoryService.Application.Positions
                 .WithError(GeneralErrors.ValueIsRequired("position id"));
         }
     }
-    public class DeletePositionHandler
+    public class DeletePositionHandler : ICommandHandler<Guid, DeletePositionCommand>
     {
         private readonly IPositionsRepository _positionsRepository;
         private readonly ILogger _logger;
@@ -65,16 +66,9 @@ namespace DirectoryService.Application.Positions
                 return validationResult.ToList();
             }
 
-            var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
-            if (transactionResult.IsFailure)
-                return transactionResult.Error.ToErrors();
-
-            using var transaction = transactionResult.Value;
-
             var positionResult = await _positionsRepository.GetById(command.Request.PositionId, cancellationToken);
             if (positionResult.IsFailure)
             {
-                transaction.Rollback();
                 return positionResult.Error;
             }
 
@@ -83,7 +77,6 @@ namespace DirectoryService.Application.Positions
             if (position.IsActive == false)
             {
                 _logger.LogInformation("Position is not active");
-                transaction.Rollback();
                 return GeneralErrors.Failure("Position is not active").ToErrors();
             }
 
@@ -91,18 +84,8 @@ namespace DirectoryService.Application.Positions
             if (deletePositionsResult.IsFailure)
             {
                 _logger.LogInformation("Positions soft deleted failed");
-                transaction.Rollback();
                 return deletePositionsResult.Error.ToErrors();
             }
-
-            var saveChanges = await _positionsRepository.SaveChanges(cancellationToken);
-            if (saveChanges.IsFailure)
-            {
-                transaction.Rollback();
-                return saveChanges.Error;
-            }
-
-            transaction.Commit();
 
             _logger.LogInformation("Position soft deleted succesfully: {PositionId}", position.Id);
 

@@ -49,7 +49,7 @@ export function UpdatePositionDialog({
     defaultValues: {
       name: position.name,
       description: position.description || "",
-      departmentsIds: position.departmentIds || [],
+      departmentsIds: position.departments?.map((d) => d.id) || [],
     },
   });
 
@@ -137,7 +137,11 @@ export function UpdatePositionDialog({
               <Button type="submit" disabled={isPending || !isDirty}>
                 Изменить
               </Button>
-              {error && <div>{error.message}</div>}
+              {error && (
+                <p className="text-sm text-destructive mt-2 text-right">
+                  {error.message}
+                </p>
+              )}
             </div>
           </form>
         </DialogContent>

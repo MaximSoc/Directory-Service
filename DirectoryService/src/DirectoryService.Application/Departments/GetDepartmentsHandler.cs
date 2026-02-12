@@ -1,6 +1,7 @@
 ﻿using Core.Database;
 using CSharpFunctionalExtensions;
 using Dapper;
+using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Positions;
 using Microsoft.Extensions.Logging;
@@ -16,18 +17,18 @@ namespace DirectoryService.Application.Departments
 {
     public class GetDepartmentsHandler
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IReadDbContext _dbContext;
         private readonly ILogger<GetDepartmentsHandler> _logger;
 
-        public GetDepartmentsHandler(IDbConnectionFactory dbConnectionFactory, ILogger<GetDepartmentsHandler> logger)
+        public GetDepartmentsHandler(IReadDbContext dbContext, ILogger<GetDepartmentsHandler> logger)
         {
-            _dbConnectionFactory = dbConnectionFactory;
+            _dbContext = dbContext;
             _logger = logger;
         }
 
         public async Task<Result<GetDepartmentsResponse, Errors>> Handle(GetDepartmentsRequest request, CancellationToken cancellationToken)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+            var connection = _dbContext.Connection;
 
             var parameters = new DynamicParameters();
 

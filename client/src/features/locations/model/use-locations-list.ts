@@ -53,7 +53,7 @@ export function useLocationsList({
   );
 
   return {
-    locations: data?.locations,
+    locations: data?.items,
     totalPages: data?.totalPages,
     isPending,
     error,

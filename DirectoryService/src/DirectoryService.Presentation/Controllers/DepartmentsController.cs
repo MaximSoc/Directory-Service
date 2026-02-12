@@ -53,7 +53,7 @@ namespace DirectoryService.Presentation.Controllers
             return result;
         }
 
-        [HttpGet("/top-positions")]
+        [HttpGet("top-positions")]
         public async Task<ActionResult<GetDepartmentsWithTopPositionsResponse>> GetTopPositions(
             [FromServices] GetDepartmentsWithTopPositionsHandler handler,
             CancellationToken cancellationToken)
@@ -63,7 +63,7 @@ namespace DirectoryService.Presentation.Controllers
             return result;
         }
 
-        [HttpGet("/roots")]
+        [HttpGet("roots")]
         public async Task<ActionResult<GetParentWithChildrensResponse>> GetParentWithChildrens(
             [FromServices] GetParentWithChildrensHandler handler,
             [FromQuery] GetParentWithChildrensRequest request,
@@ -77,7 +77,7 @@ namespace DirectoryService.Presentation.Controllers
             return result;
         }
 
-        [HttpGet("/{parentId}/children")]
+        [HttpGet("{parentId}/children")]
         public async Task<ActionResult<GetChildrenByParentResponse>> GetChildrenByParent(
             [FromServices] GetChildrenByParentHandler handler,
             [FromQuery] GetChildrenByParentRequest request,
@@ -91,7 +91,7 @@ namespace DirectoryService.Presentation.Controllers
             return result;
         }
 
-        [HttpDelete("/{departmentId}")] 
+        [HttpDelete("{departmentId}")] 
         public async Task<EndpointResult<Guid>> DeleteDepartment(
             [FromQuery] Guid departmentId,
             [FromServices] DeleteDepartmentHandler handler,

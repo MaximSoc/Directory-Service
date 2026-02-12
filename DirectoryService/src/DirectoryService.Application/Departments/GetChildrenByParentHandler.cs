@@ -17,12 +17,12 @@ namespace DirectoryService.Application.Departments
     public record GetChildrenByParentCommand(GetChildrenByParentRequest Request);
     public class GetChildrenByParentHandler
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IReadDbContext _dbContext;
         private readonly HybridCache _cache;
 
-        public GetChildrenByParentHandler(IDbConnectionFactory dbConnectionFactory, HybridCache cache)
+        public GetChildrenByParentHandler(IReadDbContext dbContext, HybridCache cache)
         {
-            _dbConnectionFactory = dbConnectionFactory;
+            _dbContext = dbContext;
             _cache = cache;
         }
         public async Task<GetChildrenByParentResponse?> Handle(GetChildrenByParentCommand command, CancellationToken cancellationToken)
@@ -39,7 +39,7 @@ namespace DirectoryService.Application.Departments
                 cacheKey,
                 async ct =>
                 {
-                    using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+                    var connection = _dbContext.Connection;
 
                     var children = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
                         $"""

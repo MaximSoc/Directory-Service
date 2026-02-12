@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Contracts.Positions;
 using Framework.EndpointResults;
@@ -25,7 +26,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpPut("{positionId}")]
-        public async Task<EndpointResult> Update(
+        public async Task<EndpointResult<Guid>> Update(
             [FromRoute] Guid positionId,
             [FromServices] UpdatePositionHandler handler,
             [FromBody] UpdatePositionRequest request,
@@ -39,7 +40,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<EndpointResult<GetPositionsResponse>> GetPositions(
+        public async Task<EndpointResult<PaginationResponse<PositionDto>>> GetPositions(
             [FromServices] GetPositionsHandler handler,
             [FromQuery] GetPositionsRequest request,
             CancellationToken cancellationToken
@@ -51,13 +52,15 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet("{positionId}")]
-        public async Task<EndpointResult<GetOnePositionResponse>> GetOnePosition(
+        public async Task<EndpointResult<GetPositionByIdResponse>> GetPositionById(
             [FromRoute] Guid positionId,
-            [FromServices] GetOnePositionHandler handler,
+            [FromServices] GetPositionByIdHandler handler,
             CancellationToken cancellationToken
             )
         {
-            var position = await handler.Handle(positionId, cancellationToken);
+            var request = new GetPositionByIdRequest(positionId);
+
+            var position = await handler.Handle(request, cancellationToken);
 
             return position;
         }

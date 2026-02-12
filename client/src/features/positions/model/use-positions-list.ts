@@ -55,7 +55,7 @@ export function usePositionsList({
   );
 
   return {
-    positions: data?.positions,
+    positions: data?.items,
     totalPages: data?.totalPages,
     isPending,
     error,

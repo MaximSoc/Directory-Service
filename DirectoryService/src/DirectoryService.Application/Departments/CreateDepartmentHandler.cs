@@ -1,4 +1,5 @@
-﻿using Core.Validation;
+﻿using Core.Handlers;
+using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Locations;
@@ -21,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Departments
 {
-    public record CreateDepartmentCommand(CreateDepartmentRequest Request);
+    public record CreateDepartmentCommand(CreateDepartmentRequest Request) : ICommand;
 
     public class CreateDepartmentCommandValidator : AbstractValidator<CreateDepartmentCommand>
     {
@@ -58,7 +59,7 @@ namespace DirectoryService.Application.Departments
                 .WithError(GeneralErrors.ValueIsInvalid("location id"));
         }
     }
-    public class CreateDepartmentHandler
+    public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
     {
         private readonly IDepartmentsRepository _departmentsRepository;
         private readonly ILocationsRepository _locationsRepository;

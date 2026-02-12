@@ -18,7 +18,7 @@
 
 	<PropertyGroup>
 		<PackageId>MaximSoc.Core</PackageId>
-		<Version>0.0.1</Version>
+		<Version>0.0.4</Version>
 		<Authors>MaximSoc</Authors>
 		<Company>MaximSoc</Company>
 		<PackageDescription>Core</PackageDescription>

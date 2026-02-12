@@ -1,4 +1,6 @@
-﻿using Core.Validation;
+﻿using Core.Handlers;
+using Core.Shared;
+using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Locations;
@@ -19,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Positions
 {
-    public record UpdatePositionCommand(Guid PositionId, UpdatePositionRequest Request);
+    public record UpdatePositionCommand(Guid PositionId, UpdatePositionRequest Request) : ICommand;
 
     public class UpdatePositionValidator : AbstractValidator<UpdatePositionCommand>
     {
@@ -56,28 +58,31 @@ namespace DirectoryService.Application.Positions
                 .WithError(GeneralErrors.ValueIsInvalid("department id"));
         }
     }
-    public class UpdatePositionHandler
+    public class UpdatePositionHandler : ICommandHandler<Guid, UpdatePositionCommand>
     {
         private readonly IPositionsRepository _positionsRepository;
         private readonly IDepartmentsRepository _departmentsRepository;
         private readonly ILogger _logger;
         private readonly IValidator<UpdatePositionCommand> _validator;
         private readonly HybridCache _cache;
+        private readonly ITransactionManager _transactionManager;
 
         public UpdatePositionHandler(IDepartmentsRepository departmentsRepository,
             ILogger<UpdatePositionHandler> logger,
             IValidator<UpdatePositionCommand> validator,
             IPositionsRepository positionsRepository,
-            HybridCache cache)
+            HybridCache cache,
+            ITransactionManager transactionManager)
         {
             _logger = logger;
             _validator = validator;
             _positionsRepository = positionsRepository;
             _departmentsRepository = departmentsRepository;
             _cache = cache;
+            _transactionManager = transactionManager;
         }
 
-        public async Task<UnitResult<Errors>> Handle(UpdatePositionCommand command, CancellationToken cancellationToken)
+        public async Task<Result<Guid, Errors>> Handle(UpdatePositionCommand command, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Received UpdatePositionRequest: {Request}", command.Request);
 
@@ -108,13 +113,13 @@ namespace DirectoryService.Application.Positions
 
             PositionDescription positionDescription = PositionDescription.Create(command.Request.Description).Value;
 
-            var updateResult = position.Update(positionName, positionDescription, departmentPositions);
-            if (updateResult.IsFailure)
-                return updateResult.Error.ToErrors();
+            position.Update(positionName, positionDescription, departmentPositions);
 
             await _cache.RemoveByTagAsync(Constants.POSITIONS_CACHE_TAG, cancellationToken);
 
-            return await _positionsRepository.SaveChanges(cancellationToken);
+            await _transactionManager.SaveChangesAsync(cancellationToken);
+
+            return position.Id;
         }
     }
 }

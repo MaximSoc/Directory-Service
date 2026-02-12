@@ -150,19 +150,5 @@ namespace DirectoryService.Infrastructure.Repositories
 
             return location;
         }
-
-        public async Task<UnitResult<Errors>> SaveChanges(CancellationToken cancellationToken)
-        {
-            try
-            {
-                await _dbContext.SaveChangesAsync(cancellationToken);
-                return UnitResult.Success<Errors>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Saving not completed");
-                return UnitResult.Failure<Errors>(GeneralErrors.Failure());
-            }
-        }
     }
 }

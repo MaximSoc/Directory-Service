@@ -1,4 +1,5 @@
-﻿using Core.Validation;
+﻿using Core.Handlers;
+using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Positions;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Positions
 {
-    public record CreatePositionCommand(CreatePositionRequest Request);
+    public record CreatePositionCommand(CreatePositionRequest Request) : ICommand;
     public class CreatePositionCommandValidator : AbstractValidator<CreatePositionCommand>
     {
         public CreatePositionCommandValidator()
@@ -50,7 +51,7 @@ namespace DirectoryService.Application.Positions
                 .WithError(GeneralErrors.ValueIsInvalid("location id"));
         }
     }
-    public class CreatePositionHandler
+    public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand>
     {
         private readonly IPositionsRepository _positionsRepository;
         private readonly IDepartmentsRepository _departmentsRepository;

@@ -20,10 +20,8 @@ namespace DirectoryService.Contracts.Positions
 
         public DateTime UpdatedAt { get; init; }
 
-        public string[] DepartmentNames { get; init; } = [];
+        public List<PositionDepartmentDto> Departments { get; set; } = [];
 
-        public Guid[] DepartmentIds { get; init; } = [];
-
-        public int DepartmentCount { get; init; } = 0;
+        public int DepartmentCount => Departments.Count;
     }
 }

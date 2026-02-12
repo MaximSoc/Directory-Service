@@ -14,7 +14,6 @@ namespace DirectoryService.Application.Database
         Task<Result<Guid, Errors>> Add(Department department, CancellationToken cancellationToken);
         Task<Result<Department, Errors>> GetById(Guid? departmentId, CancellationToken cancellationToken);
         Task<Result<bool, Errors>> AllExistAsync(IReadOnlyCollection<Guid> departmentIds, CancellationToken cancellationToken);
-        Task<UnitResult<Errors>> SaveChanges(CancellationToken cancellationToken);
         Task<Result<Department, Errors>> GetByIdWithLock(Guid? departmentId, CancellationToken cancellationToken);
         Task<UnitResult<Errors>> LockChildrens(string path, CancellationToken cancellationToken);
         Task<UnitResult<Errors>> UpdateChildrensPathAndDepth(string oldPath, string newPath, int depthDelta, CancellationToken cancellationToken);

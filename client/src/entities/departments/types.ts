@@ -7,12 +7,3 @@ export type Department = {
   depth: number;
   isActive: boolean;
 };
-
-export type GetDepartmentsResponse = {
-  departments: Department[];
-};
-
-export type GetDepartmentsRequest = {
-  search?: string;
-  isActive?: boolean;
-};

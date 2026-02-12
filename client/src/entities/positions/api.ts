@@ -1,15 +1,39 @@
 import { apiClient } from "@/shared/api/axios-instance";
-import {
-  CreatePositionRequest,
-  GetOnePositionResponse,
-  GetPositionsRequest,
-  GetPositionsResponse,
-  Position,
-  UpdatePositionRequest,
-} from "./types";
 import { Envelope } from "@/shared/api/envelope";
 import { infiniteQueryOptions } from "@tanstack/react-query";
 import { PositionsFilterState } from "@/features/positions/model/positions-filter-store";
+import { Position } from "./types";
+
+export type GetPositionsResponse = {
+  items: Position[];
+  totalPages: number;
+  page: number;
+};
+
+export type GetPositionsRequest = {
+  search?: string;
+  page: number;
+  pageSize: number;
+  isActive?: boolean;
+  sortBy?: string;
+  sortDirection?: string;
+};
+
+export type CreatePositionRequest = {
+  name: string;
+  description?: string | undefined;
+  departmentsIds: string[];
+};
+
+export type GetOnePositionResponse = {
+  position: Position;
+};
+
+export type UpdatePositionRequest = {
+  name: string;
+  description?: string | undefined;
+  departmentsIds: string[];
+};
 
 export const positionsApi = {
   getPositions: async (
@@ -95,7 +119,7 @@ export const positionsQueryOptions = {
       },
 
       select: (data): GetPositionsResponse => ({
-        positions: data.pages.flatMap((page) => page?.positions ?? []),
+        items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,
       }),
