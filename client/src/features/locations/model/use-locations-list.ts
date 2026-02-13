@@ -1,16 +1,21 @@
 import { locationsQueryOptions } from "@/entities/locations/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefCallback, useCallback } from "react";
-import { LocationsFilterState } from "./locations-filter-store";
+import {
+  LocationsFilterState,
+  useGetLocationFilter,
+} from "./locations-filter-store";
 import { useDebounce } from "use-debounce";
 
-export function useLocationsList({
-  search,
-  isActive,
-  pageSize,
-  sortBy,
-  sortDirection,
-}: LocationsFilterState) {
+export function useLocationsList(params?: Partial<LocationsFilterState>) {
+  const globalFilter = useGetLocationFilter();
+
+  const search = params?.search ?? globalFilter.search;
+  const isActive = params?.isActive ?? globalFilter.isActive;
+  const pageSize = params?.pageSize ?? globalFilter.pageSize;
+  const sortBy = params?.sortBy ?? globalFilter.sortBy;
+  const sortDirection = params?.sortDirection ?? globalFilter.sortDirection;
+
   const [debouncedSearch] = useDebounce(search, 300);
 
   const {

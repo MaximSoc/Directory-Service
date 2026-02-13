@@ -32,8 +32,6 @@ namespace DirectoryService.Presentation.Configuration
 
             services.AddCors();
 
-            services.AddSerilog();
-
             services.AddApplication();
 
             services.AddInfrastructure(configuration);

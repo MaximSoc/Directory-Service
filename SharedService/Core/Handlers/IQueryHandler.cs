@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Core.Handlers
 {
     public interface IQueryHandler<TResponse, in TQuery>
-        where TQuery : class
+        where TQuery : IQuery
     {
         Task<Result<TResponse, Errors>> Handle(TQuery query, CancellationToken cancellationToken);
     }

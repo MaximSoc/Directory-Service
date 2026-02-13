@@ -20,23 +20,31 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using static CSharpFunctionalExtensions.Result;
 
+Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine($"SERILOG ERROR: {msg}"));
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
 try
 {
+    Log.Information("Starting web application");
+
     var builder = WebApplication.CreateBuilder(args);
 
-    Log.Logger = new LoggerConfiguration()
-        .WriteTo.Console()
-        .WriteTo.Debug()
-        .WriteTo.Seq(builder.Configuration.GetConnectionString("Seq")
-        ?? throw new ArgumentNullException("Seq"))
-        .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore.Routing", Serilog.Events.LogEventLevel.Warning)
-        .CreateLogger();
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.Seq(context.Configuration.GetConnectionString("Seq")
+        ?? throw new ArgumentNullException("Seq")));
 
     builder.Services.AddConfiguration(builder.Configuration);
 
     var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
 
     await using var scope = app.Services.CreateAsyncScope();
 

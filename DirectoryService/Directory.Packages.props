@@ -16,6 +16,7 @@
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Http" Version="9.2.0" />
     <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Trace" Version="4.0.0" />
@@ -30,7 +31,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.11" />
     <PackageVersion Include="NodaTime" Version="3.2.2" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
-    <PackageVersion Include="MaximSoc.Core" Version="0.0.3" />
+    <PackageVersion Include="MaximSoc.Core" Version="0.0.5" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.10" />

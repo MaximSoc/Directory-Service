@@ -1,17 +1,22 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefCallback, useCallback } from "react";
 import { useDebounce } from "use-debounce";
-import { PositionsFilterState } from "./positions-filter-store";
+import {
+  PositionsFilterState,
+  useGetPositionFilter,
+} from "./positions-filter-store";
 import { positionsQueryOptions } from "@/entities/positions/api";
 
-export function usePositionsList({
-  search,
-  isActive,
-  pageSize,
-  sortBy,
-  sortDirection,
-  departmentIds,
-}: PositionsFilterState) {
+export function usePositionsList(params?: Partial<PositionsFilterState>) {
+  const globalFilter = useGetPositionFilter();
+
+  const search = params?.search ?? globalFilter.search;
+  const isActive = params?.isActive ?? globalFilter.isActive;
+  const pageSize = params?.pageSize ?? globalFilter.pageSize;
+  const sortBy = params?.sortBy ?? globalFilter.sortBy;
+  const sortDirection = params?.sortDirection ?? globalFilter.sortDirection;
+  const departmentIds = params?.departmentIds ?? globalFilter.departmentIds;
+
   const [debouncedSearch] = useDebounce(search, 300);
 
   const {

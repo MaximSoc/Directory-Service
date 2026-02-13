@@ -3,12 +3,10 @@
 import { Spinner } from "@/shared/components/ui/spinner";
 import LocationCard from "@/entities/locations/ui/location.card";
 import { useLocationsList } from "../model/use-locations-list";
-import { useGetLocationFilter } from "../model/locations-filter-store";
 
 export function LocationsList() {
-  const filter = useGetLocationFilter();
   const { locations, isPending, error, isFetchingNextPage, cursorRef } =
-    useLocationsList(filter);
+    useLocationsList();
 
   if (error) {
     return <div className="text-destructive">Ошибка: {error.message}</div>;

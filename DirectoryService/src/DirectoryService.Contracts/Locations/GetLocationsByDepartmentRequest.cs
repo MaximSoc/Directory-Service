@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Handlers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Locations
 {
-    public record GetLocationsByDepartmentRequest
+    public record GetLocationsByDepartmentRequest : IQuery
     {
         public List<Guid> DepartmentIds { get; init; } = [];
         public string? Search { get; init; }

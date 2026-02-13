@@ -15,6 +15,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;Database=directory_service_db;User Id=postgres;Password=postgres
+      - ConnectionStrings__Seq=http://seq:5341
     restart: always
   postgres:
     container_name: postgres

@@ -8,7 +8,6 @@ import {
   setDepartmentsSearch,
   useGetDepartmentsFilter,
 } from "./departments-filter-store";
-import { useDebounce } from "use-debounce";
 
 interface DepartmentsMultiSelectProps {
   value: string[];
@@ -21,14 +20,9 @@ export function DepartmentsMultiSelect({
   onChange,
   error,
 }: DepartmentsMultiSelectProps) {
-  const { search, isActive } = useGetDepartmentsFilter();
+  const { search } = useGetDepartmentsFilter();
 
-  const [debouncedSearch] = useDebounce(search, 300);
-
-  const { data, isLoading } = useDepartmentsList({
-    isActive,
-    search: debouncedSearch,
-  });
+  const { data, isLoading } = useDepartmentsList();
 
   const departments = data || [];
 

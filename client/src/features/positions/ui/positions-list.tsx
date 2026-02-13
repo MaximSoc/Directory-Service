@@ -3,13 +3,10 @@
 import { usePositionsList } from "../model/use-positions-list";
 import PositionCard from "@/entities/positions/ui/position.card";
 import { Spinner } from "@/shared/components/ui/spinner";
-import { useGetPositionFilter } from "../model/positions-filter-store";
 
 export function PositionsList() {
-  const filter = useGetPositionFilter();
-
   const { positions, error, isFetchingNextPage, cursorRef } =
-    usePositionsList(filter);
+    usePositionsList();
 
   if (error) {
     return <div>Ошибка: {error.message}</div>;
