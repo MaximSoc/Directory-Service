@@ -11,6 +11,7 @@ using DirectoryService.Infrastructure.BackgroundServices;
 using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Interceptors;
 using DirectoryService.Infrastructure.Repositories;
+using DirectoryService.Presentation.Configuration;
 using FluentValidation;
 using Framework.Middlewares;
 using Microsoft.EntityFrameworkCore;
@@ -19,132 +20,49 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using static CSharpFunctionalExtensions.Result;
 
-var builder = WebApplication.CreateBuilder(args);
+Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine($"SERILOG ERROR: {msg}"));
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.Debug()
-    .WriteTo.Seq(builder.Configuration.GetConnectionString("Seq")
-    ?? throw new ArgumentNullException("Seq"))
-    .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", Serilog.Events.LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", Serilog.Events.LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore.Routing", Serilog.Events.LogEventLevel.Warning)
-    .CreateLogger();
+    .CreateBootstrapLogger();
 
-builder.Services.AddControllers();
-
-builder.Services.AddHttpLogging(o =>
+try
 {
-    o.CombineLogs = true;
-});
+    Log.Information("Starting web application");
 
-builder.Services.AddCors();
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSerilog();
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.Seq(context.Configuration.GetConnectionString("Seq")
+        ?? throw new ArgumentNullException("Seq")));
 
-builder.Services.AddScoped<DirectoryServiceDbContext>(_ =>
-new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
+    builder.Services.AddConfiguration(builder.Configuration);
 
-builder.Services.AddScoped<IReadDbContext, DirectoryServiceDbContext>(_ =>
-new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
+    var app = builder.Build();
 
-builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+    app.UseSerilogRequestLogging();
 
-builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
+    await using var scope = app.Services.CreateAsyncScope();
 
-builder.Services.AddScoped<CreateLocationHandler>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
 
-builder.Services.AddScoped<GetLocationsByDepartmentHandler>();
+    app.ConfigureApp();
 
-builder.Services.AddScoped<UpdateLocationHandler>();
-
-builder.Services.AddScoped<DeleteLocationHandler>();
-
-builder.Services.AddScoped<IDepartmentsRepository, DepartmentRepository>();
-
-builder.Services.AddScoped<CreateDepartmentHandler>();
-
-builder.Services.AddScoped<UpdateLocationHandler>();
-
-builder.Services.AddScoped<MoveDepartmentHandler>();
-
-builder.Services.AddScoped<GetDepartmentsWithTopPositionsHandler>();
-
-builder.Services.AddScoped<GetParentWithChildrensHandler>();
-
-builder.Services.AddScoped<GetChildrenByParentHandler>();
-
-builder.Services.AddScoped<DeleteDepartmentHandler>();
-
-builder.Services.AddScoped<DeleteInactiveDepartmentsHandler>();
-
-builder.Services.AddScoped<IPositionsRepository, PositionRepository>();
-
-builder.Services.AddScoped<CreatePositionHandler>();
-
-builder.Services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
-
-builder.Services.AddValidatorsFromAssemblyContaining<CreateLocationHandler>();
-
-builder.Services.AddScoped<ITransactionManager, TransactionManager>();
-
-builder.Services.AddSingleton<SoftDeleteInterceptor>();
-
-builder.Services.AddHostedService<DepartmentCleanerBackgroundService>();
-
-builder.Services.AddSwaggerGen(c =>
+    app.Run();
+}
+catch(Exception ex)
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-});
-
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    string connection = builder.Configuration.GetConnectionString("Redis")
-    ?? throw new ArgumentNullException(nameof(connection));
-
-    options.Configuration = connection;
-});
-
-builder.Services.AddHybridCache(options =>
-options.DefaultEntryOptions = new HybridCacheEntryOptions
-{
-    Expiration = TimeSpan.FromMinutes(5),
-    LocalCacheExpiration = TimeSpan.FromMinutes(5),
-});
-
-var app = builder.Build();
-
-await using var scope = app.Services.CreateAsyncScope();
-
-var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
-
-// await dbContext.Database.MigrateAsync();
-
-app.UseExceptionMiddleware();
-
-app.UseRouting();
-
-app.UseCors(builder =>
-{
-    builder.WithOrigins("http://localhost:3000")
-    .AllowCredentials()
-    .AllowAnyHeader()
-    .AllowAnyMethod();
-});
-
-app.UseHttpLogging();
-
-app.UseSerilogRequestLogging();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"));
+    Log.Fatal(ex, "Application terminated unexpectedly");
 }
 
-app.MapControllers();
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
 
 namespace DirectoryService.Presentation
 {

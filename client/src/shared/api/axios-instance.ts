@@ -9,6 +9,9 @@ import {
 
 export const apiClient = axios.create({
   baseURL: "http://localhost:8080/api",
+  paramsSerializer: {
+    indexes: null,
+  },
 });
 
 apiClient.interceptors.response.use(

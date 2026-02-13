@@ -1,7 +1,9 @@
 ﻿using Core.Database;
+using Core.Handlers;
 using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Database;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -16,19 +18,19 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Locations
 {
-    public class GetLocationsByDepartmentHandler
+    public class GetLocationsByDepartmentHandler : IQueryHandler<PaginationResponse<LocationDto>, GetLocationsByDepartmentRequest>
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IReadDbContext _dbContext;
         private readonly ILogger<GetLocationsByDepartmentHandler> _logger;
 
-        public GetLocationsByDepartmentHandler(IDbConnectionFactory dbConnectionFactory, ILogger<GetLocationsByDepartmentHandler> logger)
+        public GetLocationsByDepartmentHandler(IReadDbContext dbContext, ILogger<GetLocationsByDepartmentHandler> logger)
         {
-            _dbConnectionFactory = dbConnectionFactory;
+            _dbContext = dbContext;
             _logger = logger;
         }
-        public async Task<Result<GetLocationsByDepartmentResponse, Errors>> Handle(GetLocationsByDepartmentRequest request, CancellationToken cancellationToken)
+        public async Task<Result<PaginationResponse<LocationDto>, Errors>> Handle(GetLocationsByDepartmentRequest request, CancellationToken cancellationToken)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+            var connection = _dbContext.Connection;
 
             var parameters = new DynamicParameters();
 
@@ -113,12 +115,14 @@ namespace DirectoryService.Application.Locations
                 """,
                 parameters);
 
-                return new GetLocationsByDepartmentResponse
-                {
-                    Locations = locations.ToList(),
-                    TotalPages = totalPages,
-                    Page = request.Page,
-                };
+                return new PaginationResponse<LocationDto>
+                (
+                    locations.ToList(),
+                    totalCount,
+                    request.Page,
+                    request.PageSize,
+                    totalPages
+                );
             }
             totalQuery = $@"
                 SELECT COUNT(*) 
@@ -152,12 +156,14 @@ namespace DirectoryService.Application.Locations
                 """,
                 parameters);
 
-            return new GetLocationsByDepartmentResponse
-            {
-                Locations = locations.ToList(),
-                TotalPages = totalPages,
-                Page = request.Page,
-            };
+            return new PaginationResponse<LocationDto>
+                (
+                    locations.ToList(),
+                    totalCount,
+                    request.Page,
+                    request.PageSize,
+                    totalPages
+                );
         }
     }
 }

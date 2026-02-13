@@ -3,6 +3,7 @@ using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace DirectoryService.Infrastructure
 {
@@ -41,6 +42,8 @@ namespace DirectoryService.Infrastructure
         public DbSet<Position> Positions => Set<Position>();
 
         public IQueryable<Location> LocationsRead => Set<Location>().AsQueryable().AsNoTracking();
+
+        public IDbConnection Connection => Database.GetDbConnection();
 
         private ILoggerFactory CreateLoggerFactory() =>
             LoggerFactory.Create(builder => { builder.AddConsole(); });

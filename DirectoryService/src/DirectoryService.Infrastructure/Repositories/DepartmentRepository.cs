@@ -136,20 +136,6 @@ namespace DirectoryService.Infrastructure.Repositories
             return existingCount == departmentIds.Count;
         }
 
-        public async Task<UnitResult<Errors>> SaveChanges(CancellationToken cancellationToken)
-        {
-            try
-            {
-                await _dbContext.SaveChangesAsync(cancellationToken);
-                return UnitResult.Success<Errors>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Saving not completed");
-                return UnitResult.Failure<Errors>(GeneralErrors.Failure());
-            }
-        }
-
         public Result<Guid, Errors> SoftDelete(Department department, CancellationToken cancellationToken)
         {
             try

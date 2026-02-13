@@ -2,6 +2,7 @@
 using DirectoryService.Application;
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Locations;
 using Framework.EndpointResults;
@@ -27,7 +28,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<EndpointResult<GetLocationsByDepartmentResponse>> GetLocationsByDepartment (
+        public async Task<EndpointResult<PaginationResponse<LocationDto>>> GetLocationsByDepartment (
             [FromServices] GetLocationsByDepartmentHandler handler,
             [FromQuery] GetLocationsByDepartmentRequest request,
             CancellationToken cancellationToken
@@ -39,7 +40,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpPut ("{locationId}")]
-        public async Task<EndpointResult> Update(
+        public async Task<EndpointResult<Guid>> Update(
             [FromRoute] Guid locationId,
             [FromServices] UpdateLocationHandler handler,
             [FromBody] UpdateLocationRequest request,

@@ -1,4 +1,5 @@
-﻿using Core.Validation;
+﻿using Core.Shared;
+using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Departments;
@@ -55,18 +56,21 @@ namespace DirectoryService.Application.Departments
         private readonly ILogger _logger;
         private readonly IValidator<UpdateDepartmentLocationsCommand> _validator;
         private readonly HybridCache _cache;
+        private readonly ITransactionManager _transactionManager;
 
         public UpdateDepartmentLocationsHandler(IDepartmentsRepository departmentsRepository,
             ILogger<UpdateDepartmentLocationsHandler> logger,
             IValidator<UpdateDepartmentLocationsCommand> validator,
             ILocationsRepository locationsRepository,
-            HybridCache cache)
+            HybridCache cache,
+            ITransactionManager transactionManager)
         {
             _departmentsRepository = departmentsRepository;
             _logger = logger;
             _validator = validator;
             _locationsRepository = locationsRepository;
             _cache = cache;
+            _transactionManager = transactionManager;
         }
 
         public async Task<UnitResult<Errors>> Handle(UpdateDepartmentLocationsCommand command, CancellationToken cancellationToken)
@@ -104,7 +108,7 @@ namespace DirectoryService.Application.Departments
 
             await _cache.RemoveByTagAsync(Constants.DEPARTMENTS_CACHE_TAG, cancellationToken);
 
-            return await _departmentsRepository.SaveChanges(cancellationToken);
+            return await _transactionManager.SaveChangesAsync(cancellationToken);
         }
     }
 }

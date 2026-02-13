@@ -4,8 +4,8 @@ import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/envelope";
 import { LocationsFilterState } from "@/features/locations/model/locations-filter-store";
 
-type GetLocationsByDepartmentResponse = {
-  locations: Location[];
+export type GetLocationsByDepartmentResponse = {
+  items: Location[];
   totalPages: number;
   page: number;
 };
@@ -118,7 +118,7 @@ export const locationsQueryOptions = {
       },
 
       select: (data): GetLocationsByDepartmentResponse => ({
-        locations: data.pages.flatMap((page) => page?.locations ?? []),
+        items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,
       }),

@@ -1,10 +1,13 @@
-﻿using Core.Validation;
+﻿using Core.Handlers;
+using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Positions;
 using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects.PositionVO;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 using System;
@@ -15,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Positions
 {
-    public record CreatePositionCommand(CreatePositionRequest Request);
+    public record CreatePositionCommand(CreatePositionRequest Request) : ICommand;
     public class CreatePositionCommandValidator : AbstractValidator<CreatePositionCommand>
     {
         public CreatePositionCommandValidator()
@@ -24,10 +27,10 @@ namespace DirectoryService.Application.Positions
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("request"));
 
-            RuleFor(x => x.Request.Name.Name)
+            RuleFor(x => x.Request.Name)
                 .MustBeValueObject(PositionName.Create);
 
-            RuleFor(x => x.Request.Description.Description)
+            RuleFor(x => x.Request.Description)
                 .MustBeValueObject(PositionDescription.Create)
                 .When(x => x.Request.Description != null);
 
@@ -48,22 +51,25 @@ namespace DirectoryService.Application.Positions
                 .WithError(GeneralErrors.ValueIsInvalid("location id"));
         }
     }
-    public class CreatePositionHandler
+    public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand>
     {
         private readonly IPositionsRepository _positionsRepository;
         private readonly IDepartmentsRepository _departmentsRepository;
         private readonly ILogger _logger;
         private readonly IValidator<CreatePositionCommand> _validator;
+        private readonly HybridCache _cache;
 
         public CreatePositionHandler(IPositionsRepository positionsRepository,
             ILogger<CreatePositionHandler> logger,
             IValidator<CreatePositionCommand> validator,
-            IDepartmentsRepository departmentsRepository)
+            IDepartmentsRepository departmentsRepository,
+            HybridCache cache)
         {
             _positionsRepository = positionsRepository;
             _logger = logger;
             _validator = validator;
             _departmentsRepository = departmentsRepository;
+            _cache = cache;
         }
 
         public async Task<Result<Guid, Errors>> Handle(CreatePositionCommand command, CancellationToken cancellationToken)
@@ -76,20 +82,20 @@ namespace DirectoryService.Application.Positions
                 return validationResult.ToList();
             }
 
-            var positionNameDto = command.Request.Name;
-            var positionName = PositionName.Create(positionNameDto.Name);
+            var name = command.Request.Name;
+            var positionNameResult = PositionName.Create(name);
 
-            var positionExistResult = await _positionsRepository.PositionExistAsync(positionName.Value, cancellationToken);
+            var positionExistResult = await _positionsRepository.PositionExistAsync(positionNameResult.Value, cancellationToken);
             if (positionExistResult.IsFailure)
                 return positionExistResult.Error;
             if (positionExistResult.Value == false)
                 return GeneralErrors.AlreadyExist().ToErrors();
 
-            var positionDescriptionDto = command.Request.Description;
-            Result<PositionDescription, Error>? positionDescription = null;
-            if (positionDescriptionDto != null)
+            var description = command.Request.Description;
+            Result<PositionDescription, Error>? positionDescriptionResult = null;
+            if (description != null)
             {
-                positionDescription = PositionDescription.Create(positionDescriptionDto.Description);
+                positionDescriptionResult = PositionDescription.Create(description);
             }
 
             var positionId = Guid.NewGuid();
@@ -103,13 +109,15 @@ namespace DirectoryService.Application.Positions
 
             var departmentPositions = departmentsIds.Select(di => new DepartmentPosition(di, positionId)).ToList();
 
-            var position = new Position(positionId, positionName.Value, positionDescription?.Value, departmentPositions);
+            var position = new Position(positionId, positionNameResult.Value, positionDescriptionResult?.Value, departmentPositions);
 
             var result = await _positionsRepository.Add(position, cancellationToken);
 
             if (result.IsSuccess)
             {
                 _logger.LogInformation("Position created succesfully: {PositionId}", position.Id);
+
+                await _cache.RemoveByTagAsync(Constants.POSITIONS_CACHE_TAG, cancellationToken);
 
                 return result.Value;
             }

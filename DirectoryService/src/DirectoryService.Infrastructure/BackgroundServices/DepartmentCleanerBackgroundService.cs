@@ -31,17 +31,18 @@ namespace DirectoryService.Infrastructure.BackgroundServices
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                using var scope = _scopeFactory.CreateScope();
-
-                var handler = scope.ServiceProvider.GetRequiredService<DeleteInactiveDepartmentsHandler>();
-
-                try
+                using (IServiceScope scope = _scopeFactory.CreateScope())
                 {
-                    await handler.Handle(stoppingToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error occurred while deleting inactive departments");
+                    var handler = scope.ServiceProvider.GetRequiredService<DeleteInactiveDepartmentsHandler>();
+
+                    try
+                    {
+                        await handler.Handle(stoppingToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error occurred while deleting inactive departments");
+                    }
                 }
 
                 var interval = GetIntervalFromConfig();

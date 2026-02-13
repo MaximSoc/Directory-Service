@@ -77,7 +77,7 @@ namespace DirectoryService.Infrastructure.Repositories
             return true;
         }
 
-        public async Task<UnitResult<Error>> SoftDelete(Guid departmentId, CancellationToken cancellationToken)
+        public async Task<UnitResult<Error>> SoftDeleteByDepartmentId(Guid departmentId, CancellationToken cancellationToken)
         {
             await _dbContext.Database.ExecuteSqlAsync(
                 $"""
@@ -122,6 +122,32 @@ namespace DirectoryService.Infrastructure.Repositories
             {
                 return UnitResult.Failure<Errors>(GeneralErrors.Failure());
             }
+        }
+
+        public async Task<Result<Position, Errors>> GetById(Guid? positionId, CancellationToken cancellationToken)
+        {
+            var position = await _dbContext.Positions
+                .Include(d => d.DepartmentPositions)
+                .FirstOrDefaultAsync(p => p.Id == positionId, cancellationToken);
+
+            if (position == null)
+                return GeneralErrors.NotFound(positionId).ToErrors();
+
+            return position;
+        }
+
+        public async Task<UnitResult<Error>> SoftDeleteByPositionId(Guid positionId, CancellationToken cancellationToken)
+        {
+            await _dbContext.Database.ExecuteSqlAsync(
+                $"""
+                UPDATE positions
+                SET is_active = false,
+                deleted_at = NOW() AT TIME ZONE 'UTC'
+                WHERE id = {positionId}
+                """,
+                cancellationToken);
+
+            return UnitResult.Success<Error>();
         }
     }
 }

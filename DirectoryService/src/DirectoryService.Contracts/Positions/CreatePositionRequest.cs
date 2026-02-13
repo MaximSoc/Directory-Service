@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Positions
 {
-    public record CreatePositionRequest(PositionNameDto Name, PositionDescriptionDto? Description, List<Guid> DepartmentsIds);
+    public record CreatePositionRequest(string Name, string? Description, List<Guid> DepartmentsIds);
 }

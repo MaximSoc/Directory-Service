@@ -1,5 +1,6 @@
 ﻿using Core.Database;
 using Dapper;
+using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Shared;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -15,12 +16,12 @@ namespace DirectoryService.Application.Departments
 
     public class GetParentWithChildrensHandler
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IReadDbContext _dbContext;
         private readonly HybridCache _cache;
 
-        public GetParentWithChildrensHandler(IDbConnectionFactory dbConnectionFactory, HybridCache cache)
+        public GetParentWithChildrensHandler(IReadDbContext dbContext, HybridCache cache)
         {
-            _dbConnectionFactory = dbConnectionFactory;
+            _dbContext = dbContext;
             _cache = cache;
         }
         public async Task<GetParentWithChildrensResponse?> Handle(GetParentWithChildrensCommand command, CancellationToken cancellationToken)
@@ -37,7 +38,7 @@ namespace DirectoryService.Application.Departments
                 cacheKey,
                 async ct =>
                 {
-                    using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+                    var connection = _dbContext.Connection;
 
                     var departmentsWithHasMoreChildren = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
                         $"""

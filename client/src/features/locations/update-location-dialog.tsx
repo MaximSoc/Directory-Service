@@ -31,7 +31,7 @@ const updateLocationSchema = z.object({
   timezone: z.string().min(1, "Укажите временную зону"),
 });
 
-export type UpdateFormData = z.infer<typeof updateLocationSchema>;
+export type UpdateLocationFormData = z.infer<typeof updateLocationSchema>;
 
 export function UpdateLocationDialog({
   open,
@@ -44,7 +44,7 @@ export function UpdateLocationDialog({
 }) {
   const { updateLocation, isPending, error } = useUpdateLocation();
 
-  const form = useForm<UpdateFormData>({
+  const form = useForm<UpdateLocationFormData>({
     resolver: zodResolver(updateLocationSchema),
   });
 
@@ -65,7 +65,7 @@ export function UpdateLocationDialog({
 
   const isDirty = form.formState.isDirty;
 
-  const onSubmit = async (data: UpdateFormData) => {
+  const onSubmit = async (data: UpdateLocationFormData) => {
     if (!isDirty) {
       toast.error("Необходимо внести изменения для сохранения");
       return;

@@ -13,10 +13,11 @@ using System.Security.Cryptography.X509Certificates;
 using DirectoryService.Contracts.Locations;
 using Core.Validation;
 using SharedKernel;
+using Core.Handlers;
 
 namespace DirectoryService.Application.Locations
 {
-    public record CreateLocationCommand(CreateLocationRequest Request);
+    public record CreateLocationCommand(CreateLocationRequest Request) : ICommand;
 
     public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCommand>
     {
@@ -43,7 +44,7 @@ namespace DirectoryService.Application.Locations
         }
     }
 
-    public class CreateLocationHandler
+    public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
     {
         private readonly ILocationsRepository _locationsRepository;
         private readonly ILogger _logger;

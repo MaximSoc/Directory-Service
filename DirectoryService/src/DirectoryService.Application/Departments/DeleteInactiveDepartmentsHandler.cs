@@ -95,7 +95,7 @@ namespace DirectoryService.Application.Departments
                 }
             }
 
-            var saveChangesOne = await _departmentsRepository.SaveChanges(cancellationToken);
+            var saveChangesOne = await _transactionManager.SaveChangesAsync(cancellationToken);
             if (saveChangesOne.IsFailure)
             {
                 transaction.Rollback();
@@ -112,7 +112,7 @@ namespace DirectoryService.Application.Departments
                 return removeDepartmentsResult.Error;
             }
 
-            var saveChangesTwo = await _departmentsRepository.SaveChanges(cancellationToken);
+            var saveChangesTwo = await _transactionManager.SaveChangesAsync(cancellationToken);
             if (saveChangesTwo.IsFailure)
             {
                 transaction.Rollback();
