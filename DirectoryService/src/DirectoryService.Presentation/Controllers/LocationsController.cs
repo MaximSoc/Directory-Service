@@ -29,8 +29,8 @@ namespace DirectoryService.Presentation.Controllers
 
         [HttpGet]
         public async Task<EndpointResult<PaginationResponse<LocationDto>>> GetLocationsByDepartment (
-            [FromServices] GetLocationsByDepartmentHandler handler,
-            [FromQuery] GetLocationsByDepartmentRequest request,
+            [FromServices] GetLocationsHandler handler,
+            [FromQuery] GetLocationsRequest request,
             CancellationToken cancellationToken
             )
         {

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { useDepartmentsList } from "../departments/model/use-departments-list";
+import { useQueryDepartmentsList } from "../departments/model/use-query-departments-list";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
@@ -12,17 +12,24 @@ import { X } from "lucide-react";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
 
 export function PositionDepartmentsFilter() {
-  const { data: departments = [], isLoading } = useDepartmentsList();
-  const { departmentIds } = useGetPositionFilter();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredDepartments = useMemo(
-    () =>
-      departments.filter((dep) =>
-        dep.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [departments, searchTerm]
-  );
+  const { data: allDepartments = [], isLoading } = useQueryDepartmentsList({
+    search: "",
+    isActive: undefined,
+  });
+  const { departmentIds } = useGetPositionFilter();
+
+  const filteredDepartments = useMemo(() => {
+    if (!searchTerm.trim()) return allDepartments;
+
+    const lowerSearch = searchTerm.toLowerCase();
+    return allDepartments.filter(
+      (dep) =>
+        dep.name.toLowerCase().includes(lowerSearch) ||
+        dep.identifier.toLowerCase().includes(lowerSearch)
+    );
+  }, [allDepartments, searchTerm]);
 
   const handleChange = useCallback(
     (id: string, checked: boolean) => {
@@ -34,63 +41,87 @@ export function PositionDepartmentsFilter() {
     [departmentIds]
   );
 
-  if (isLoading) return <Spinner />;
-
   return (
     <div className="space-y-4">
-      <Input
-        placeholder="Поиск подразделений..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="max-w-sm"
-      />
-
-      <div className="flex flex-wrap gap-1 max-h-20 overflow-auto p-2 bg-muted/50 rounded-md">
-        {departmentIds.map((id) => {
-          const dep = departments.find((d) => d.id === id);
-          return dep ? (
-            <Badge
-              key={id}
-              variant="secondary"
-              className="cursor-pointer hover:opacity-80"
-              onClick={() => handleChange(id, false)}
-            >
-              {dep.name}
-              <X className="h-3 w-3 ml-1" />
-            </Badge>
-          ) : null;
-        })}
+      <div className="relative">
+        <Input
+          placeholder="Поиск подразделений..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-9 max-w-sm"
+          autoFocus
+        />
       </div>
 
-      <ScrollArea className="h-64 w-full">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-2">
-          {filteredDepartments.map(({ id, name }) => (
-            <div
-              key={id}
-              className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent cursor-pointer"
-            >
-              <Checkbox
-                id={`dep-${id}`}
-                checked={departmentIds.includes(id)}
-                onCheckedChange={(checked) => handleChange(id, !!checked)}
-              />
-              <label
-                htmlFor={`dep-${id}`}
-                className="text-sm cursor-pointer select-none truncate"
-                title={name}
+      <div className="flex flex-wrap gap-1 min-h-10 p-2 bg-muted/30 rounded-md border border-dashed">
+        {departmentIds.length > 0 ? (
+          departmentIds.map((id) => {
+            const dep = allDepartments.find((d) => d.id === id);
+            return dep ? (
+              <Badge
+                key={id}
+                variant="secondary"
+                className="pl-2 pr-1 py-1 flex items-center gap-1 cursor-pointer hover:bg-destructive/10 transition-colors"
+                onClick={() => handleChange(id, false)}
               >
-                {name}
-              </label>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+                {dep.name}
+                <X className="h-3 w-3" />
+              </Badge>
+            ) : null;
+          })
+        ) : (
+          <span className="text-xs text-muted-foreground p-1">
+            Ничего не выбрано
+          </span>
+        )}
+      </div>
 
-      {filteredDepartments.length === 0 && searchTerm && (
-        <p className="text-sm text-muted-foreground text-center py-8">
-          Подразделения не найдены
-        </p>
-      )}
+      <ScrollArea className="h-72 w-full rounded-md border">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center h-full py-10 gap-2">
+            <Spinner className="h-6 w-6" />
+            <span className="text-sm text-muted-foreground">
+              Загрузка структуры...
+            </span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-1 p-2">
+            {filteredDepartments.map(({ id, name, identifier }) => {
+              const isChecked = departmentIds.includes(id);
+              return (
+                <div
+                  key={id}
+                  onClick={() => handleChange(id, !isChecked)}
+                  className="flex items-center space-x-2 p-2.5 rounded-md hover:bg-accent cursor-pointer transition-colors"
+                >
+                  <Checkbox
+                    id={`dep-${id}`}
+                    checked={isChecked}
+                    onCheckedChange={(checked) => handleChange(id, !!checked)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium truncate leading-none mb-1">
+                      {name}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      {identifier}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+
+            {filteredDepartments.length === 0 && (
+              <div className="col-span-full py-10 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Подразделения не найдены
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </ScrollArea>
     </div>
   );
 }

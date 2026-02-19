@@ -18,17 +18,17 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Locations
 {
-    public class GetLocationsByDepartmentHandler : IQueryHandler<PaginationResponse<LocationDto>, GetLocationsByDepartmentRequest>
+    public class GetLocationsHandler : IQueryHandler<PaginationResponse<LocationDto>, GetLocationsRequest>
     {
         private readonly IReadDbContext _dbContext;
-        private readonly ILogger<GetLocationsByDepartmentHandler> _logger;
+        private readonly ILogger<GetLocationsHandler> _logger;
 
-        public GetLocationsByDepartmentHandler(IReadDbContext dbContext, ILogger<GetLocationsByDepartmentHandler> logger)
+        public GetLocationsHandler(IReadDbContext dbContext, ILogger<GetLocationsHandler> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
         }
-        public async Task<Result<PaginationResponse<LocationDto>, Errors>> Handle(GetLocationsByDepartmentRequest request, CancellationToken cancellationToken)
+        public async Task<Result<PaginationResponse<LocationDto>, Errors>> Handle(GetLocationsRequest request, CancellationToken cancellationToken)
         {
             var connection = _dbContext.Connection;
 

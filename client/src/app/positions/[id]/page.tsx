@@ -5,7 +5,7 @@ import { routes } from "@/shared/routes";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { PositionDetails } from "@/features/positions/ui/position-details"; // Импортируем наш виджет
+import { PositionDetails } from "@/features/positions/ui/position-details";
 
 export default function PositionDetailsPage() {
   const params = useParams();

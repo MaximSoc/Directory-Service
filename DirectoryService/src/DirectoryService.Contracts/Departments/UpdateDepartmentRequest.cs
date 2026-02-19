@@ -6,5 +6,8 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Departments
 {
-    public record DepartmentIdentifierDto(string Identifier);
+    public record UpdateDepartmentRequest(
+        string Name,
+        string Identifier,
+        Guid? ParentId);
 }

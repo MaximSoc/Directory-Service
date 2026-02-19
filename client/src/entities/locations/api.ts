@@ -4,19 +4,20 @@ import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/envelope";
 import { LocationsFilterState } from "@/features/locations/model/locations-filter-store";
 
-export type GetLocationsByDepartmentResponse = {
+export type GetLocationsResponse = {
   items: Location[];
   totalPages: number;
   page: number;
 };
 
-export type GetLocationsByDepartmentRequest = {
+export type GetLocationsRequest = {
   search?: string;
-  page: number;
-  pageSize: number;
+  page?: number;
+  pageSize?: number;
   isActive?: boolean;
   sortBy?: string;
   sortDirection?: string;
+  departmentIds?: string[];
 };
 
 export type CreateLocationRequest = {
@@ -43,11 +44,12 @@ export type UpdateLocationRequest = {
 
 export const locationsApi = {
   getLocations: async (
-    request: GetLocationsByDepartmentRequest
-  ): Promise<GetLocationsByDepartmentResponse> => {
-    const response = await apiClient.get<
-      Envelope<GetLocationsByDepartmentResponse>
-    >("/locations", { params: request });
+    request: GetLocationsRequest
+  ): Promise<GetLocationsResponse> => {
+    const response = await apiClient.get<Envelope<GetLocationsResponse>>(
+      "/locations",
+      { params: request }
+    );
 
     if (response.data.isError || !response.data.result) {
       throw new Error("Failed to load locations");
@@ -91,17 +93,11 @@ export const locationsApi = {
 export const locationsQueryOptions = {
   baseKey: "locations",
 
-  getLocationsOptions: ({
-    page,
-    pageSize,
-  }: {
-    page: number;
-    pageSize: number;
-  }) => {
+  getLocationsQueryOptions: (request: GetLocationsRequest) => {
     return queryOptions({
       queryFn: () =>
-        locationsApi.getLocations({ page: page, pageSize: pageSize }),
-      queryKey: [locationsQueryOptions.baseKey, { page }],
+        locationsApi.getLocations({ page: 1, pageSize: 1000, ...request }),
+      queryKey: [locationsQueryOptions.baseKey, request],
     });
   },
 
@@ -117,7 +113,7 @@ export const locationsQueryOptions = {
         return response.page + 1;
       },
 
-      select: (data): GetLocationsByDepartmentResponse => ({
+      select: (data): GetLocationsResponse => ({
         items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,

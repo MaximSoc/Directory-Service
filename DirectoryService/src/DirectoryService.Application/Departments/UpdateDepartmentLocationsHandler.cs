@@ -1,7 +1,9 @@
-﻿using Core.Shared;
+﻿using Core.Handlers;
+using Core.Shared;
 using Core.Validation;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Database;
+using DirectoryService.Application.Positions;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain;
 using DirectoryService.Domain.Shared;
@@ -18,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Departments
 {
-    public record UpdateDepartmentLocationsCommand(UpdateDepartmentLocationsRequest Request);
+    public record UpdateDepartmentLocationsCommand(Guid DepartmentId, UpdateDepartmentLocationsRequest Request) : ICommand;
 
     public class UpdateDepartmentLocationsValidator : AbstractValidator<UpdateDepartmentLocationsCommand>
     {
@@ -28,28 +30,28 @@ namespace DirectoryService.Application.Departments
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("request"));
 
-            RuleFor(x => x.Request.DepartmentId)
+            RuleFor(x => x.DepartmentId)
                 .Must(id => id != Guid.Empty)
                 .WithError(GeneralErrors.ValueIsInvalid("department id"));
 
-            RuleFor(x => x.Request.LocationsIds)
+            RuleFor(x => x.Request.LocationIds)
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("locations"));
 
-            RuleFor(x => x.Request.LocationsIds)
+            RuleFor(x => x.Request.LocationIds)
                 .Must(list => list is { Count: > 0 })
                 .WithError(Error.Validation("department.location", "Department locations must contain at least one location"));
 
-            RuleFor(x => x.Request.LocationsIds)
+            RuleFor(x => x.Request.LocationIds)
                 .Must(list => list == null || list.Distinct().Count() == list.Count)
                 .WithError(Error.Validation("locationIds.must.be.unique", "LocationIds must be unique"));
 
-            RuleForEach(x => x.Request.LocationsIds)
+            RuleForEach(x => x.Request.LocationIds)
                 .Must(id => id != Guid.Empty)
                 .WithError(GeneralErrors.ValueIsInvalid("location id"));
         }
     }
-    public class UpdateDepartmentLocationsHandler
+    public class UpdateDepartmentLocationsHandler : ICommandHandler<Guid, UpdateDepartmentLocationsCommand>
     {
         private readonly IDepartmentsRepository _departmentsRepository;
         private readonly ILocationsRepository _locationsRepository;
@@ -73,7 +75,7 @@ namespace DirectoryService.Application.Departments
             _transactionManager = transactionManager;
         }
 
-        public async Task<UnitResult<Errors>> Handle(UpdateDepartmentLocationsCommand command, CancellationToken cancellationToken)
+        public async Task<Result<Guid, Errors>> Handle(UpdateDepartmentLocationsCommand command, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Received UpdateDepartmentLocationsRequest: {Request}", command.Request);
 
@@ -83,13 +85,13 @@ namespace DirectoryService.Application.Departments
                 return validationResult.ToList();
             }
 
-            var departmentResult = await _departmentsRepository.GetById(command.Request.DepartmentId, cancellationToken);
+            var departmentResult = await _departmentsRepository.GetById(command.DepartmentId, cancellationToken);
             if (departmentResult.IsFailure)
                 return departmentResult.Error;
 
             var department = departmentResult.Value;
 
-            var locationIds = command.Request.LocationsIds.ToList();
+            var locationIds = command.Request.LocationIds.ToList();
 
             var allLocationsExistResult = await _locationsRepository.AllExistAsync(locationIds, cancellationToken);
 
@@ -99,7 +101,7 @@ namespace DirectoryService.Application.Departments
             if (allLocationsExistResult.Value == false)
                 return Error.NorFound("locations.not.found", "One or more locations were not found").ToErrors();
 
-            var departmentLocations = command.Request.LocationsIds.Select(li => new DepartmentLocation(
+            var departmentLocations = command.Request.LocationIds.Select(li => new DepartmentLocation(
                 department.Id, li)).ToList();
 
             var updateResult = department.UpdateLocations(departmentLocations);
@@ -108,7 +110,9 @@ namespace DirectoryService.Application.Departments
 
             await _cache.RemoveByTagAsync(Constants.DEPARTMENTS_CACHE_TAG, cancellationToken);
 
-            return await _transactionManager.SaveChangesAsync(cancellationToken);
+            await _transactionManager.SaveChangesAsync(cancellationToken);
+
+            return department.Id;
         }
     }
 }

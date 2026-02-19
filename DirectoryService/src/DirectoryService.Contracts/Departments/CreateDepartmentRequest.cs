@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Departments
 {
-    public record CreateDepartmentRequest(DepartmentNameDto Name, DepartmentIdentifierDto Identifier, Guid? ParentId, List<Guid> LocationIds);
+    public record CreateDepartmentRequest(string Name, string Identifier, Guid? ParentId, List<Guid> LocationIds);
 }

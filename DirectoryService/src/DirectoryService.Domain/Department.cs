@@ -1,14 +1,15 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
+using DirectoryService.Domain.ValueObjects.DepartmentVO;
+using DirectoryService.Domain.ValueObjects.PositionVO;
+using SharedKernel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Shared;
-using DirectoryService.Domain.ValueObjects.DepartmentVO;
-using SharedKernel;
 
 namespace DirectoryService.Domain
 {
@@ -156,6 +157,28 @@ namespace DirectoryService.Domain
             UpdatedAt = DateTime.UtcNow;
 
             return UnitResult.Success<Error>();
+        }
+
+        public void Update(
+            DepartmentName newName,
+            DepartmentIdentifier newIdentifier,
+            Department? parent)
+        {
+            Name = newName;
+
+            Identifier = newIdentifier;
+
+            Path = parent is null
+                ? DepartmentPath.CreateParent(Identifier)
+                : parent.Path.CreateChild(Identifier);
+
+            Depth = parent is null
+                ? 0
+                : parent.Depth + 1;
+
+            ParentId = parent?.Id;
+
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void Delete()

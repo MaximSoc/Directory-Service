@@ -124,6 +124,19 @@ namespace DirectoryService.Infrastructure.Repositories
             return UnitResult.Success<Errors>();
         }
 
+        public async Task UpdateBranchPath(string oldPath, int oldDepth,  Department updatedDepartment, CancellationToken cancellationToken)
+        {
+            await LockChildrens(oldPath, cancellationToken);
+
+            int depthDelta = updatedDepartment.Depth - oldDepth;
+
+            await UpdateChildrensPathAndDepth(
+                oldPath,
+                updatedDepartment.Path.Value,
+                depthDelta,
+                cancellationToken);
+        }
+
         public async Task<Result<bool, Errors>> AllExistAsync(IReadOnlyCollection<Guid> departmentIds, CancellationToken cancellationToken)
         {
             if (departmentIds.Count == 0)

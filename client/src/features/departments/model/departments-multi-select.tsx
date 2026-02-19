@@ -1,11 +1,11 @@
-import { useDepartmentsList } from "./use-departments-list";
+import { useQueryDepartmentsList } from "./use-query-departments-list";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
 import { Check, X } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import {
-  setDepartmentsSearch,
+  setDepartmentsFilterSearch,
   useGetDepartmentsFilter,
 } from "./departments-filter-store";
 
@@ -22,12 +22,12 @@ export function DepartmentsMultiSelect({
 }: DepartmentsMultiSelectProps) {
   const { search } = useGetDepartmentsFilter();
 
-  const { data, isLoading } = useDepartmentsList();
+  const { data, isLoading } = useQueryDepartmentsList();
 
   const departments = data || [];
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDepartmentsSearch(e.target.value);
+    setDepartmentsFilterSearch(e.target.value);
   };
 
   const handleToggle = (id: string) => {

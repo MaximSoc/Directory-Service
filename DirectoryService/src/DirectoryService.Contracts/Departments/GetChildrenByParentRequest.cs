@@ -9,10 +9,8 @@ namespace DirectoryService.Contracts.Departments
 {
     public class GetChildrenByParentRequest : IQuery
     {
-        public Guid ParentId { get; init; }
-
         public int Page { get; init; } = 1;
 
-        public int Size { get; init; } = 20;
+        public int PageSize { get; init; } = 20;
     }
 }

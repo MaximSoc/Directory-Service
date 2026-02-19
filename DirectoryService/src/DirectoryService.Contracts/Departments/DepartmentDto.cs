@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirectoryService.Contracts.Positions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,5 +26,9 @@ namespace DirectoryService.Contracts.Departments
         public DateTime CreatedAt { get; init; }
 
         public DateTime UpdatedAt { get; init; }
+
+        public List<DepartmentPositionDto> Positions { get; set; } = [];
+
+        public List<DepartmentLocationDto> Locations { get; set; } = [];
     }
 }

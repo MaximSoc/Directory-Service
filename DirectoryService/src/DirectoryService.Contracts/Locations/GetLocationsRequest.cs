@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Locations
 {
-    public record GetLocationsByDepartmentRequest : IQuery
+    public record GetLocationsRequest : IQuery
     {
         public List<Guid> DepartmentIds { get; init; } = [];
         public string? Search { get; init; }
