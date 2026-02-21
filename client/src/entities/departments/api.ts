@@ -48,6 +48,11 @@ export type GetOneDepartmentResponse = {
   department: Department;
 };
 
+export type GetRootsRequest = {
+  page?: number;
+  pageSize?: number;
+};
+
 export const departmentsApi = {
   getDepartments: async (
     request: GetDepartmentsRequest
@@ -61,7 +66,7 @@ export const departmentsApi = {
       throw new Error("Failed to load departments");
     }
 
-    return response.data.result;
+    return response.data.result!;
   },
 
   getOneDepartment: async (id: string): Promise<GetOneDepartmentResponse> => {
@@ -74,6 +79,16 @@ export const departmentsApi = {
     }
 
     return response.data.result;
+  },
+
+  getRoots: async (
+    request: GetRootsRequest
+  ): Promise<GetDepartmentsResponse> => {
+    const response = await apiClient.get<Envelope<GetDepartmentsResponse>>(
+      "/departments/roots",
+      { params: request }
+    );
+    return response.data.result!;
   },
 
   getDepartmentChildren: async ({
@@ -91,7 +106,7 @@ export const departmentsApi = {
       throw new Error("Failed to load children");
     }
 
-    return response.data.result;
+    return response.data.result!;
   },
 
   createDepartment: async (
@@ -199,6 +214,51 @@ export const departmentsQueryOptions = {
         departmentId,
         request,
       ],
+    });
+  },
+
+  getTreeRootsInfiniteOptions: (isActive?: boolean) => {
+    return infiniteQueryOptions({
+      queryKey: [
+        departmentsQueryOptions.baseKey,
+        "tree",
+        "roots",
+        { isActive },
+      ],
+      queryFn: ({ pageParam }) => {
+        return departmentsApi.getRoots({
+          page: pageParam,
+          pageSize: 10,
+        });
+      },
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page >= lastPage.totalPages) return undefined;
+        return lastPage.page + 1;
+      },
+    });
+  },
+
+  getDepartmentChildrenInfiniteOptions: (departmentId: string) => {
+    return infiniteQueryOptions({
+      queryKey: [
+        departmentsQueryOptions.baseKey,
+        "tree",
+        "children",
+        departmentId,
+      ],
+      queryFn: ({ pageParam }) => {
+        return departmentsApi.getDepartmentChildren({
+          departmentId,
+          page: pageParam,
+          pageSize: 10,
+        });
+      },
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page >= lastPage.totalPages) return undefined;
+        return lastPage.page + 1;
+      },
     });
   },
 };

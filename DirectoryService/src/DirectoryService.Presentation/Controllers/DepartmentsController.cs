@@ -81,13 +81,13 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet("roots")]
-        public async Task<ActionResult<GetParentWithChildrensResponse>> GetParentWithChildrens(
-            [FromServices] GetParentWithChildrensHandler handler,
-            [FromQuery] GetParentWithChildrensRequest request,
+        public async Task<EndpointResult<PaginationResponse<DepartmentWithHasMoreChildrenDto>>> GetRoots(
+            [FromServices] GetRootsHandler handler,
+            [FromQuery] GetRootsRequest request,
             CancellationToken cancellationToken
             )
         {
-            var command = new GetParentWithChildrensCommand(request);
+            var command = new GetRootsQuery(request);
 
             var result = await handler.Handle(command, cancellationToken);
 
@@ -95,7 +95,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet("{parentId}/children")]
-        public async Task<EndpointResult<PaginationResponse<DepartmentDto>>> GetChildrenByParent(
+        public async Task<EndpointResult<PaginationResponse<DepartmentWithHasMoreChildrenDto>>> GetChildrenByParent(
             [FromRoute] Guid parentId,
             [FromServices] GetChildrenByParentHandler handler,
             [FromQuery] GetChildrenByParentRequest request,

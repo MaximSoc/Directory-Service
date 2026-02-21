@@ -6,9 +6,9 @@ export type Department = {
   path: string;
   depth: number;
   isActive: boolean;
+  hasMoreChildren: boolean;
   positions: DepartmentPositions[];
   locations: DepartmentLocations[];
-  children: DepartmentChildren[];
 };
 
 type DepartmentPositions = {
@@ -17,11 +17,6 @@ type DepartmentPositions = {
 };
 
 type DepartmentLocations = {
-  id: string;
-  name: string;
-};
-
-type DepartmentChildren = {
   id: string;
   name: string;
 };

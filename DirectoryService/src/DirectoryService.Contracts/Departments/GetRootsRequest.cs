@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Departments
 {
-    public record GetParentWithChildrensRequest : IQuery
+    public record GetRootsRequest : IQuery
     {
         public int Page { get; init; } = 1;
 
-        public int Size { get; init; } = 20;
-
-        public int Prefetch { get; init; } = 3;
+        public int PageSize { get; init; } = 20;
     }
 }

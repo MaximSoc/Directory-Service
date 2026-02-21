@@ -20,7 +20,7 @@ namespace DirectoryService.Application.Departments
 {
     public record GetChildrenByParentQuery(Guid ParentId, GetChildrenByParentRequest Request) : IQuery;
 
-    public class GetChildrenByParentHandler : IQueryHandler<PaginationResponse<DepartmentDto>, GetChildrenByParentQuery>
+    public class GetChildrenByParentHandler : IQueryHandler<PaginationResponse<DepartmentWithHasMoreChildrenDto>, GetChildrenByParentQuery>
     {
         private readonly IReadDbContext _dbContext;
         private readonly HybridCache _cache;
@@ -30,7 +30,7 @@ namespace DirectoryService.Application.Departments
             _dbContext = dbContext;
             _cache = cache;
         }
-        public async Task<Result<PaginationResponse<DepartmentDto>, Errors>> Handle(GetChildrenByParentQuery query, CancellationToken cancellationToken)
+        public async Task<Result<PaginationResponse<DepartmentWithHasMoreChildrenDto>, Errors>> Handle(GetChildrenByParentQuery query, CancellationToken cancellationToken)
         {
             var size = query.Request.PageSize;
 
@@ -42,7 +42,7 @@ namespace DirectoryService.Application.Departments
 
             var cacheKey = $"departments_children_parent={parentId}_page={page}_size={size}";
 
-            var children = await _cache.GetOrCreateAsync<PaginationResponse<DepartmentDto>>(
+            var children = await _cache.GetOrCreateAsync<PaginationResponse<DepartmentWithHasMoreChildrenDto>>(
                 cacheKey,
                 async ct =>
                 {
@@ -53,7 +53,7 @@ namespace DirectoryService.Application.Departments
 
                     var totalPages = (int)Math.Ceiling(totalCount / (double)size);
 
-                    var children = await connection.QueryAsync<DepartmentDto>(
+                    var children = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
                         $"""
                         SELECT 
                             id, 
@@ -64,15 +64,16 @@ namespace DirectoryService.Application.Departments
                             depth, 
                             is_active AS isActive, 
                             created_at AS createdAt, 
-                            updated_at AS updatedAt
-                        FROM departments
-                        WHERE parent_id = @parentId AND is_active = true
-                        ORDER BY name
+                            updated_at AS updatedAt,
+                            EXISTS (SELECT 1 FROM departments WHERE parent_id = d.id AND is_active = true) AS hasMoreChildren
+                        FROM departments d
+                        WHERE d.parent_id = @parentId AND d.is_active = true
+                        ORDER BY d.name
                         LIMIT @size OFFSET @offset
                         """,
                         new { parentId, size, offset });
 
-                    return new PaginationResponse<DepartmentDto>(
+                    return new PaginationResponse<DepartmentWithHasMoreChildrenDto>(
                         children.ToList(),
                         totalCount,
                         page,
