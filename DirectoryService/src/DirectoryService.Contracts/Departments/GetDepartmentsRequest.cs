@@ -11,5 +11,16 @@ namespace DirectoryService.Contracts.Departments
     {
         public string? Search { get; init; }
         public bool? IsActive { get; init; }
+
+        public int Page { get; init; } = 1;
+        public int PageSize { get; init; } = 20;
+
+        public string? SortBy { get; init; }
+
+        public string? SortDirection { get; init; }
+
+        public Guid? ParentId { get; init; }
+
+        public List<Guid> LocationIds { get; init; } = [];
     }
 }

@@ -21,5 +21,6 @@ namespace DirectoryService.Application.Database
         Task<UnitResult<Errors>> RemoveInactiveByDate(DateTime date, CancellationToken cancellationToken);
         Task<Result<List<Department>, Errors>> GetInactiveByDate(DateTime date, CancellationToken cancellationToken);
         Task<Result<List<Department>, Errors>> GetByIds(IEnumerable<Guid?> departmentIds, CancellationToken cancellationToken);
+        Task UpdateBranchPath(string oldPath, int oldDepth, Department updatedDepartment, CancellationToken cancellationToken);
     }
 }

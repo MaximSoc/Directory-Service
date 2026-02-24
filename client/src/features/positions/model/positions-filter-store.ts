@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SortDirection } from "@/shared/types/custom-types";
-import { PAGE_SIZE_POSITIONS } from "@/shared/constants/constants";
+import { PAGINATION_CONFIG } from "@/shared/constants/constants";
 
 export type PositionSortField = "name" | "isActive";
 
@@ -30,7 +30,7 @@ type PositionsFilterStore = PositionsFilterState & Actions;
 const initialState: PositionsFilterState = {
   search: "",
   isActive: undefined,
-  pageSize: PAGE_SIZE_POSITIONS,
+  pageSize: PAGINATION_CONFIG.DEFAULT.PAGE_SIZE,
   sortBy: "name",
   sortDirection: "asc",
   departmentIds: [],

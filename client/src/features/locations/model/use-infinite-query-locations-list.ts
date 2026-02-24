@@ -1,13 +1,15 @@
 import { locationsQueryOptions } from "@/entities/locations/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { RefCallback, useCallback } from "react";
 import {
   LocationsFilterState,
   useGetLocationFilter,
 } from "./locations-filter-store";
 import { useDebounce } from "use-debounce";
+import { useCursorRef } from "@/shared/hooks/use-cursor-ref";
 
-export function useLocationsList(params?: Partial<LocationsFilterState>) {
+export function useInfiniteQueryLocationsList(
+  params?: Partial<LocationsFilterState>
+) {
   const globalFilter = useGetLocationFilter();
 
   const search = params?.search ?? globalFilter.search;
@@ -35,27 +37,11 @@ export function useLocationsList(params?: Partial<LocationsFilterState>) {
     }),
   });
 
-  const cursorRef: RefCallback<HTMLDivElement> = useCallback(
-    (el) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-          }
-        },
-        {
-          threshold: 0.5,
-        }
-      );
-
-      if (el) {
-        observer.observe(el);
-
-        return () => observer.disconnect();
-      }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage]
-  );
+  const cursorRef = useCursorRef({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   return {
     locations: data?.items,

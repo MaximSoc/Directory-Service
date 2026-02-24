@@ -125,9 +125,7 @@ namespace DirectoryService.Application.Positions
                 positionDict.Values.ToList(),
                 totalCount,
                 request.Page,
-                request.PageSize,
-                totalPages              
-            );
+                request.PageSize);
         }
     }
 }

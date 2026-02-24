@@ -7,7 +7,7 @@ export type Position = {
   departmentCount: number;
 };
 
-export type PositionDepartment = {
+type PositionDepartment = {
   id: string;
   name: string;
 };

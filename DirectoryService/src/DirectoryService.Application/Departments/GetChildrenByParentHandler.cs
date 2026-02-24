@@ -1,11 +1,15 @@
 ﻿using Core.Database;
+using Core.Handlers;
+using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Database;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Shared;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +18,9 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Departments
 {
-    public record GetChildrenByParentCommand(GetChildrenByParentRequest Request);
-    public class GetChildrenByParentHandler
+    public record GetChildrenByParentQuery(Guid ParentId, GetChildrenByParentRequest Request) : IQuery;
+
+    public class GetChildrenByParentHandler : IQueryHandler<PaginationResponse<DepartmentWithHasMoreChildrenDto>, GetChildrenByParentQuery>
     {
         private readonly IReadDbContext _dbContext;
         private readonly HybridCache _cache;
@@ -25,53 +30,61 @@ namespace DirectoryService.Application.Departments
             _dbContext = dbContext;
             _cache = cache;
         }
-        public async Task<GetChildrenByParentResponse?> Handle(GetChildrenByParentCommand command, CancellationToken cancellationToken)
+        public async Task<Result<PaginationResponse<DepartmentWithHasMoreChildrenDto>, Errors>> Handle(GetChildrenByParentQuery query, CancellationToken cancellationToken)
         {
-            var size = command.Request.Size;
+            var size = query.Request.PageSize;
 
-            var page = (command.Request.Page - 1) * size;
+            var page = query.Request.Page;
 
-            var parentId = command.Request.ParentId;
+            var parentId = query.ParentId;
 
-            var cacheKey = $"departments_children_parent={parentId}_page={page}_size={size}";
+            var cacheKey = DepartmentCacheKeys.GetChildrenKey(parentId, page, size);
 
-            var children = await _cache.GetOrCreateAsync<GetChildrenByParentResponse?>(
+            return await _cache.GetOrCreateAsync<PaginationResponse<DepartmentWithHasMoreChildrenDto>>(
                 cacheKey,
-                async ct =>
-                {
-                    var connection = _dbContext.Connection;
-
-                    var children = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
-                        $"""
-                        WITH children AS
-                        (SELECT d.id,
-                        d.name,
-                        d.identifier,
-                        d.parent_id AS parentId,
-                        d.path,
-                        d.depth,
-                        d.is_active AS isActive,
-                        d.created_at AS createdAt,
-                        d.updated_at AS updatedAt
-                        FROM departments d
-                        WHERE d.parent_id = @parentId
-                        LIMIT {size} OFFSET {page})
-                
-                        SELECT *, (EXISTS (SELECT 1 FROM departments WHERE parent_id = children.id OFFSET {page} LIMIT 1))
-                        AS hasMoreChildren
-                        FROM children
-                        """,
-                        new { parentId });
-
-                    return new GetChildrenByParentResponse
-                    {
-                        DepartmentsWithHasMoreChildren = children.ToList()
-                    };
-                },
+                ct => GetChildrenByParentFromDb(parentId, page, size, ct),
                 tags: new[] { Constants.DEPARTMENTS_CACHE_TAG },
                 cancellationToken: cancellationToken);
+        }
 
-            return children;
+        private async ValueTask<PaginationResponse<DepartmentWithHasMoreChildrenDto>> GetChildrenByParentFromDb(
+            Guid parentId,
+            int page,
+            int size,
+            CancellationToken ct)
+        {
+            var offset = (page - 1) * size;
+            var connection = _dbContext.Connection;
+
+            var totalCountSql = "SELECT COUNT(*) FROM departments WHERE parent_id = @parentId AND is_active = true";
+            var totalCount = await connection.ExecuteScalarAsync<int>(totalCountSql, new { parentId });
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)size);
+
+            var children = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
+                $"""
+                SELECT 
+                    id,
+                    name,
+                    identifier,
+                    parent_id AS parentId,
+                    path, depth, 
+                    is_active AS isActive,
+                    created_at AS createdAt,
+                    updated_at AS updatedAt,
+                    EXISTS (SELECT 1 FROM departments WHERE parent_id = d.id AND is_active = true) AS hasMoreChildren
+                FROM departments d
+                WHERE d.parent_id = @parentId AND d.is_active = true
+                ORDER BY d.name
+                LIMIT @size OFFSET @offset
+                """,
+                new { parentId, size, offset });
+
+            return new PaginationResponse<DepartmentWithHasMoreChildrenDto>(
+                children.ToList(),
+                totalCount,
+                page,
+                size);
         }
     }
 }

@@ -32,10 +32,10 @@ namespace DirectoryService.Application.Departments
                 .NotNull()
                 .WithError(GeneralErrors.ValueIsRequired("request"));
 
-            RuleFor(x => x.Request.Name.Name)
+            RuleFor(x => x.Request.Name)
                 .MustBeValueObject(DepartmentName.Create);
 
-            RuleFor(x => x.Request.Identifier.Identifier)
+            RuleFor(x => x.Request.Identifier)
                 .MustBeValueObject(DepartmentIdentifier.Create);
 
             RuleFor(x => x.Request.ParentId)
@@ -90,11 +90,9 @@ namespace DirectoryService.Application.Departments
                 return validationResult.ToList();
             }
 
-            var departmentNameDto = command.Request.Name;
-            var departmentName = DepartmentName.Create(departmentNameDto.Name);
+            var departmentName = DepartmentName.Create(command.Request.Name);
 
-            var departmentIdentifierDto = command.Request.Identifier;
-            var departmentIdentifier = DepartmentIdentifier.Create(departmentIdentifierDto.Identifier);
+            var departmentIdentifier = DepartmentIdentifier.Create(command.Request.Identifier);
 
             Department? parent = null;
 

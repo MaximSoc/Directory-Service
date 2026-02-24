@@ -3,12 +3,8 @@ import { Envelope } from "@/shared/api/envelope";
 import { infiniteQueryOptions } from "@tanstack/react-query";
 import { PositionsFilterState } from "@/features/positions/model/positions-filter-store";
 import { Position } from "./types";
-
-export type GetPositionsResponse = {
-  items: Position[];
-  totalPages: number;
-  page: number;
-};
+import { PaginationResponse } from "@/shared/types/custom-types";
+import { PAGINATION_CONFIG } from "@/shared/constants/constants";
 
 export type GetPositionsRequest = {
   search?: string;
@@ -38,11 +34,10 @@ export type UpdatePositionRequest = {
 export const positionsApi = {
   getPositions: async (
     request: GetPositionsRequest
-  ): Promise<GetPositionsResponse> => {
-    const response = await apiClient.get<Envelope<GetPositionsResponse>>(
-      "/positions",
-      { params: request }
-    );
+  ): Promise<PaginationResponse<Position>> => {
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Position>>
+    >("/positions", { params: request });
 
     if (response.data.isError || !response.data.result) {
       throw new Error("Failed to load positions");
@@ -112,13 +107,13 @@ export const positionsQueryOptions = {
       queryFn: ({ pageParam }) => {
         return positionsApi.getPositions({ ...filter, page: pageParam });
       },
-      initialPageParam: 1,
+      initialPageParam: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
       getNextPageParam: (response) => {
         if (!response || response.page >= response.totalPages) return undefined;
         return response.page + 1;
       },
 
-      select: (data): GetPositionsResponse => ({
+      select: (data): PaginationResponse<Position> => ({
         items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,

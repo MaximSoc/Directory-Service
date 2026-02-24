@@ -2,11 +2,11 @@
 
 import { Spinner } from "@/shared/components/ui/spinner";
 import LocationCard from "@/entities/locations/ui/location.card";
-import { useLocationsList } from "../model/use-locations-list";
+import { useInfiniteQueryLocationsList } from "../model/use-infinite-query-locations-list";
 
 export function LocationsList() {
   const { locations, isPending, error, isFetchingNextPage, cursorRef } =
-    useLocationsList();
+    useInfiniteQueryLocationsList();
 
   if (error) {
     return <div className="text-destructive">Ошибка: {error.message}</div>;

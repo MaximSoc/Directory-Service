@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Departments
 {
-    public record UpdateDepartmentLocationsRequest(Guid DepartmentId, List<Guid> LocationsIds);
+    public record UpdateDepartmentLocationsRequest(List<Guid> LocationIds);
 }

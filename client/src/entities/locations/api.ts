@@ -3,20 +3,17 @@ import { Location } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/envelope";
 import { LocationsFilterState } from "@/features/locations/model/locations-filter-store";
+import { PaginationResponse } from "@/shared/types/custom-types";
+import { PAGINATION_CONFIG } from "@/shared/constants/constants";
 
-export type GetLocationsByDepartmentResponse = {
-  items: Location[];
-  totalPages: number;
-  page: number;
-};
-
-export type GetLocationsByDepartmentRequest = {
+export type GetLocationsRequest = {
   search?: string;
-  page: number;
-  pageSize: number;
+  page?: number;
+  pageSize?: number;
   isActive?: boolean;
   sortBy?: string;
   sortDirection?: string;
+  departmentIds?: string[];
 };
 
 export type CreateLocationRequest = {
@@ -43,10 +40,10 @@ export type UpdateLocationRequest = {
 
 export const locationsApi = {
   getLocations: async (
-    request: GetLocationsByDepartmentRequest
-  ): Promise<GetLocationsByDepartmentResponse> => {
+    request: GetLocationsRequest
+  ): Promise<PaginationResponse<Location>> => {
     const response = await apiClient.get<
-      Envelope<GetLocationsByDepartmentResponse>
+      Envelope<PaginationResponse<Location>>
     >("/locations", { params: request });
 
     if (response.data.isError || !response.data.result) {
@@ -91,17 +88,15 @@ export const locationsApi = {
 export const locationsQueryOptions = {
   baseKey: "locations",
 
-  getLocationsOptions: ({
-    page,
-    pageSize,
-  }: {
-    page: number;
-    pageSize: number;
-  }) => {
+  getLocationsQueryOptions: (request: GetLocationsRequest) => {
     return queryOptions({
       queryFn: () =>
-        locationsApi.getLocations({ page: page, pageSize: pageSize }),
-      queryKey: [locationsQueryOptions.baseKey, { page }],
+        locationsApi.getLocations({
+          page: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
+          pageSize: PAGINATION_CONFIG.LOCATIONS.MAX_PREVIEW,
+          ...request,
+        }),
+      queryKey: [locationsQueryOptions.baseKey, request],
     });
   },
 
@@ -111,13 +106,13 @@ export const locationsQueryOptions = {
       queryFn: ({ pageParam }) => {
         return locationsApi.getLocations({ ...filter, page: pageParam });
       },
-      initialPageParam: 1,
+      initialPageParam: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
       getNextPageParam: (response) => {
         if (!response || response.page >= response.totalPages) return undefined;
         return response.page + 1;
       },
 
-      select: (data): GetLocationsByDepartmentResponse => ({
+      select: (data): PaginationResponse<Location> => ({
         items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,

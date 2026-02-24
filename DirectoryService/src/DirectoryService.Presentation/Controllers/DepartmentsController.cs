@@ -2,9 +2,11 @@
 using DirectoryService.Application;
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
+using DirectoryService.Application.Positions;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Locations;
+using DirectoryService.Contracts.Positions;
 using Framework.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,13 +29,28 @@ namespace DirectoryService.Presentation.Controllers
             return result;
         }
 
+        [HttpPut("{departmentId}")]
+        public async Task<EndpointResult<Guid>> Update(
+            [FromRoute] Guid departmentId,
+            [FromServices] UpdateDepartmentHandler handler,
+            [FromBody] UpdateDepartmentRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new UpdateDepartmentCommand(departmentId, request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result;
+        }
+
         [HttpPut("{departmentId}/locations")]
-        public async Task<EndpointResult> UpdateLocations(
+        public async Task<EndpointResult<Guid>> UpdateLocations(
+            [FromRoute] Guid departmentId,
             [FromServices] UpdateDepartmentLocationsHandler handler,
             [FromBody] UpdateDepartmentLocationsRequest request,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateDepartmentLocationsCommand(request);
+            var command = new UpdateDepartmentLocationsCommand(departmentId ,request);
 
             var result = await handler.Handle(command, cancellationToken);
 
@@ -64,13 +81,13 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet("roots")]
-        public async Task<ActionResult<GetParentWithChildrensResponse>> GetParentWithChildrens(
-            [FromServices] GetParentWithChildrensHandler handler,
-            [FromQuery] GetParentWithChildrensRequest request,
+        public async Task<EndpointResult<PaginationResponse<DepartmentWithHasMoreChildrenDto>>> GetRoots(
+            [FromServices] GetDepartmentRootsHandler handler,
+            [FromQuery] GetDepartmentRootsRequest request,
             CancellationToken cancellationToken
             )
         {
-            var command = new GetParentWithChildrensCommand(request);
+            var command = new GetDepartmentRootsQuery(request);
 
             var result = await handler.Handle(command, cancellationToken);
 
@@ -78,22 +95,37 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet("{parentId}/children")]
-        public async Task<ActionResult<GetChildrenByParentResponse>> GetChildrenByParent(
+        public async Task<EndpointResult<PaginationResponse<DepartmentWithHasMoreChildrenDto>>> GetChildrenByParent(
+            [FromRoute] Guid parentId,
             [FromServices] GetChildrenByParentHandler handler,
             [FromQuery] GetChildrenByParentRequest request,
             CancellationToken cancellationToken
             )
         {
-            var command = new GetChildrenByParentCommand(request);
+            var query = new GetChildrenByParentQuery(parentId, request);
 
-            var result = await handler.Handle(command, cancellationToken);
+            var result = await handler.Handle(query, cancellationToken);
 
             return result;
         }
 
+        [HttpGet("{departmentId}")]
+        public async Task<EndpointResult<DepartmentDto>> GetDepartmentById(
+            [FromRoute] Guid departmentId,
+            [FromServices] GetDepartmentByIdHandler handler,
+            CancellationToken cancellationToken
+            )
+        {
+            var query = new GetDepartmentByIdQuery(departmentId);
+
+            var department = await handler.Handle(query, cancellationToken);
+
+            return department;
+        }
+
         [HttpDelete("{departmentId}")] 
         public async Task<EndpointResult<Guid>> DeleteDepartment(
-            [FromQuery] Guid departmentId,
+            [FromRoute] Guid departmentId,
             [FromServices] DeleteDepartmentHandler handler,
             CancellationToken cancellationToken)
         {
@@ -106,7 +138,7 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<EndpointResult<GetDepartmentsResponse>> GetDepartments(
+        public async Task<EndpointResult<PaginationResponse<DepartmentDto>>> GetDepartments(
             [FromServices] GetDepartmentsHandler handler,
             [FromQuery] GetDepartmentsRequest request,
             CancellationToken cancellationToken

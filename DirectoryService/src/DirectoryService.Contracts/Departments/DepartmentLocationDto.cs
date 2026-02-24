@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Departments
 {
-    public record DepartmentNameDto(string Name);
+    public record DepartmentLocationDto(Guid Id, string Name);
 }
