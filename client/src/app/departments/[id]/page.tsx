@@ -1,19 +1,15 @@
-"use client";
-
 import { DepartmentDetails } from "@/features/departments/ui/department-details";
 import { Button } from "@/shared/components/ui/button";
 import { routes } from "@/shared/routes";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { use } from "react";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function DepartmentDetailsPage({ params }: PageProps) {
-  const resolvedParams = use(params);
-  const id = resolvedParams.id;
+export default async function DepartmentDetailsPage({ params }: PageProps) {
+  const { id } = await params;
 
   return (
     <div className="container mx-auto max-w-5xl py-8 px-4 sm:px-6">
