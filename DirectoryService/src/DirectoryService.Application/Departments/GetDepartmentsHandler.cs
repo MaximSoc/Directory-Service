@@ -144,9 +144,7 @@ namespace DirectoryService.Application.Departments
                 departmentDict.Values.ToList(),
                 totalCount,
                 request.Page,
-                request.PageSize,
-                totalPages
-            );
+                request.PageSize);
         }
 
     }

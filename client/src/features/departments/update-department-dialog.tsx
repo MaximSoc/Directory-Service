@@ -15,8 +15,9 @@ import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { DepartmentParentSelect } from "./model/department-parent-select";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useWatch } from "react-hook-form";
+import { useMoveDepartment } from "./model/use-move-department";
 
 const updateDepartmentSchema = z.object({
   name: z
@@ -43,7 +44,9 @@ export function UpdateDepartmentDialog({
   onOpenChange: (open: boolean) => void;
   department: Department;
 }) {
-  const { updateDepartment, isPending, error } = useUpdateDepartment();
+  const { mutateAsync: moveDepartment, isPending: isMoving } =
+    useMoveDepartment();
+  const { updateDepartment, isPending: isUpdating } = useUpdateDepartment();
 
   const form = useForm<UpdateDepartmentFormData>({
     resolver: zodResolver(updateDepartmentSchema),
@@ -54,7 +57,7 @@ export function UpdateDepartmentDialog({
     },
   });
 
-  const isDirty = form.formState.isDirty;
+  const { isDirty, errors } = form.formState;
 
   const currentParentId = useWatch({
     control: form.control,
@@ -62,122 +65,129 @@ export function UpdateDepartmentDialog({
   });
 
   const onSubmit = async (data: UpdateDepartmentFormData) => {
-    const parentIdValue = data.parentId === "" ? null : data.parentId;
+    const newParentId = data.parentId === "" ? null : data.parentId;
+    const oldParentId = department.parentId || null;
 
-    if (parentIdValue === department.id) {
-      toast.error("Подразделение не может быть своим собственным родителем");
-      return;
-    }
+    try {
+      if (newParentId !== oldParentId) {
+        if (newParentId === department.id) {
+          toast.error(
+            "Подразделение не может быть своим собственным родителем"
+          );
+          return;
+        }
 
-    updateDepartment(
-      {
-        departmentId: department.id,
-        ...data,
-        parentId: parentIdValue as string,
-      },
-      {
-        onSuccess: () => {
-          onOpenChange(false);
-          form.reset(data);
-        },
+        await moveDepartment({
+          departmentId: department.id,
+          parentId: newParentId,
+        });
       }
-    );
+
+      if (
+        data.name !== department.name ||
+        data.identifier !== department.identifier
+      ) {
+        updateDepartment({
+          departmentId: department.id,
+          name: data.name,
+          identifier: data.identifier,
+        });
+      }
+      toast.success("Изменения сохранены");
+      onOpenChange(false);
+      form.reset(data);
+    } catch (e) {}
   };
 
+  const isLoading = isUpdating || isMoving;
+
   return (
-    <div>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-125">
-          <DialogHeader>
-            <DialogTitle>Редактирование подразделения</DialogTitle>
-            <DialogDescription>
-              Заполните форму для редактирования подразделения
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            className="space-y-4 py-4"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <div className="space-y-2">
-              <Label htmlFor="name">Название</Label>
-              <Input
-                id="name"
-                placeholder="Введите название подразделения"
-                {...form.register("name")}
-              />
-              {form.formState.errors.name && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.name.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Идентификатор</Label>
-              <Input
-                id="identifier"
-                placeholder="Введите идентификатор"
-                {...form.register("identifier")}
-              />
-              {form.formState.errors.identifier && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.identifier.message}
-                </p>
-              )}
-            </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-125">
+        <DialogHeader>
+          <DialogTitle>Редактирование подразделения</DialogTitle>
+          <DialogDescription>
+            Измените данные подразделения или его положение в структуре
+          </DialogDescription>
+        </DialogHeader>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="parentId">Родительское подразделение</Label>
+        <form className="space-y-4 py-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="space-y-2">
+            <Label htmlFor="name">Название</Label>
+            <Input
+              id="name"
+              disabled={isLoading}
+              placeholder="Введите название подразделения"
+              {...form.register("name")}
+            />
+            {errors.name && (
+              <p className="text-sm text-destructive">{errors.name.message}</p>
+            )}
+          </div>
 
-                {currentParentId && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-[10px] text-muted-foreground hover:text-destructive"
-                    onClick={() =>
-                      form.setValue("parentId", "", { shouldDirty: true })
-                    }
-                  >
-                    <X className="mr-1 h-3 w-3" /> Сбросить (корневое)
-                  </Button>
-                )}
-              </div>
-              <Controller
-                control={form.control}
-                name="parentId"
-                render={({ field }) => (
-                  <DepartmentParentSelect
-                    value={field.value || ""}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-              <p className="text-[10px] text-muted-foreground italic">
-                Оставьте пустым, если подразделение должно быть корневым
+          <div className="space-y-2">
+            <Label htmlFor="identifier">Идентификатор</Label>
+            <Input
+              id="identifier"
+              disabled={isLoading}
+              placeholder="Введите идентификатор"
+              {...form.register("identifier")}
+            />
+            {errors.identifier && (
+              <p className="text-sm text-destructive">
+                {errors.identifier.message}
               </p>
-            </div>
+            )}
+          </div>
 
-            <div className="flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Отмена
-              </Button>
-              <Button type="submit" disabled={isPending || !isDirty}>
-                Изменить
-              </Button>
-              {error && (
-                <p className="text-sm text-destructive mt-2 text-right">
-                  {error.message}
-                </p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="parentId">Родительское подразделение</Label>
+              {currentParentId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-[10px] text-muted-foreground hover:text-destructive"
+                  onClick={() =>
+                    form.setValue("parentId", "", { shouldDirty: true })
+                  }
+                >
+                  <X className="mr-1 h-3 w-3" /> Сбросить (сделать корневым)
+                </Button>
               )}
             </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+            <Controller
+              control={form.control}
+              name="parentId"
+              render={({ field }) => (
+                <DepartmentParentSelect
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <p className="text-[10px] text-muted-foreground italic">
+              При смене родителя вся ветка подразделения будет перемещена
+            </p>
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Отмена
+            </Button>
+            <Button type="submit" disabled={isLoading || !isDirty}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Сохранить изменения
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

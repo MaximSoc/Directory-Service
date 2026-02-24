@@ -172,12 +172,6 @@ namespace DirectoryService.Domain
                 ? DepartmentPath.CreateParent(Identifier)
                 : parent.Path.CreateChild(Identifier);
 
-            Depth = parent is null
-                ? 0
-                : parent.Depth + 1;
-
-            ParentId = parent?.Id;
-
             UpdatedAt = DateTime.UtcNow;
         }
 

@@ -7,5 +7,10 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Contracts.Departments
 {
-    public record GetDepartmentByIdRequest(Guid DepartmentId) : IQuery;
+    public record GetDepartmentRootsRequest : IQuery
+    {
+        public int Page { get; init; } = 1;
+
+        public int PageSize { get; init; } = 20;
+    }
 }

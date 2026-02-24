@@ -36,6 +36,13 @@ const createDepartmentSchema = z.object({
 
 type CreateFormData = z.infer<typeof createDepartmentSchema>;
 
+const initialData: CreateFormData = {
+  name: "",
+  identifier: "",
+  locationIds: [],
+  parentId: "",
+};
+
 export function CreateDepartmentDialog({
   open,
   onOpenChange,
@@ -43,13 +50,6 @@ export function CreateDepartmentDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const initialData: CreateFormData = {
-    name: "",
-    identifier: "",
-    locationIds: [],
-    parentId: "",
-  };
-
   const {
     register,
     handleSubmit,

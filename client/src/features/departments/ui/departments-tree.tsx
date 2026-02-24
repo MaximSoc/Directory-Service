@@ -3,7 +3,8 @@
 import { Button } from "@/shared/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { useDepartmentRootsInfinite } from "../model/use-department-tree-queries";
-import { TreeNode } from "./tree-node";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { DepartmentTreeNode } from "./department-tree-node";
 
 interface DepartmentsTreeProps {
   isActive?: boolean;
@@ -17,7 +18,7 @@ export function DepartmentsTree({ isActive }: DepartmentsTreeProps) {
     return (
       <div className="flex flex-col gap-3 p-4 bg-card border rounded-lg">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-6 w-full bg-muted animate-pulse rounded" />
+          <Skeleton key={i} className="h-6 w-full" />
         ))}
       </div>
     );
@@ -38,7 +39,7 @@ export function DepartmentsTree({ isActive }: DepartmentsTreeProps) {
     <div className="rounded-xl border bg-card shadow-sm p-2">
       <div className="flex flex-col gap-1">
         {roots.map((node) => (
-          <TreeNode key={node.id} node={node} />
+          <DepartmentTreeNode key={node.id} node={node} />
         ))}
       </div>
 

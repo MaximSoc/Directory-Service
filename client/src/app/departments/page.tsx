@@ -1,13 +1,11 @@
 "use client";
 
-import { DepartmentsList } from "@/features/departments/ui/departments-list";
+import { useDepartmentsViewStore } from "@/features/departments/model/use-departments-view-store";
 import { DepartmentsToolbar } from "@/features/departments/ui/departments-toolbar";
-import { useState } from "react";
-
-export type ViewMode = "list" | "tree";
+import { DepartmentsView } from "@/features/departments/ui/departments-view";
 
 export default function DepartmentsPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const { viewMode, setViewMode } = useDepartmentsViewStore();
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6">
@@ -16,7 +14,7 @@ export default function DepartmentsPage() {
       </div>
 
       <DepartmentsToolbar viewMode={viewMode} onViewModeChange={setViewMode} />
-      <DepartmentsList viewMode={viewMode} />
+      <DepartmentsView viewMode={viewMode} />
     </div>
   );
 }

@@ -36,54 +36,55 @@ namespace DirectoryService.Application.Departments
 
             var page = query.Request.Page;
 
-            var offset = (page - 1) * size;
-
             var parentId = query.ParentId;
 
-            var cacheKey = $"departments_children_parent={parentId}_page={page}_size={size}";
+            var cacheKey = DepartmentCacheKeys.GetChildrenKey(parentId, page, size);
 
-            var children = await _cache.GetOrCreateAsync<PaginationResponse<DepartmentWithHasMoreChildrenDto>>(
+            return await _cache.GetOrCreateAsync<PaginationResponse<DepartmentWithHasMoreChildrenDto>>(
                 cacheKey,
-                async ct =>
-                {
-                    var connection = _dbContext.Connection;
-
-                    var totalCountSql = "SELECT COUNT(*) FROM departments WHERE parent_id = @parentId AND is_active = true";
-                    var totalCount = await connection.ExecuteScalarAsync<int>(totalCountSql, new { parentId });
-
-                    var totalPages = (int)Math.Ceiling(totalCount / (double)size);
-
-                    var children = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
-                        $"""
-                        SELECT 
-                            id, 
-                            name, 
-                            identifier, 
-                            parent_id AS parentId, 
-                            path, 
-                            depth, 
-                            is_active AS isActive, 
-                            created_at AS createdAt, 
-                            updated_at AS updatedAt,
-                            EXISTS (SELECT 1 FROM departments WHERE parent_id = d.id AND is_active = true) AS hasMoreChildren
-                        FROM departments d
-                        WHERE d.parent_id = @parentId AND d.is_active = true
-                        ORDER BY d.name
-                        LIMIT @size OFFSET @offset
-                        """,
-                        new { parentId, size, offset });
-
-                    return new PaginationResponse<DepartmentWithHasMoreChildrenDto>(
-                        children.ToList(),
-                        totalCount,
-                        page,
-                        size,
-                        totalPages);
-                },
+                ct => GetChildrenByParentFromDb(parentId, page, size, ct),
                 tags: new[] { Constants.DEPARTMENTS_CACHE_TAG },
                 cancellationToken: cancellationToken);
+        }
 
-            return children;
+        private async ValueTask<PaginationResponse<DepartmentWithHasMoreChildrenDto>> GetChildrenByParentFromDb(
+            Guid parentId,
+            int page,
+            int size,
+            CancellationToken ct)
+        {
+            var offset = (page - 1) * size;
+            var connection = _dbContext.Connection;
+
+            var totalCountSql = "SELECT COUNT(*) FROM departments WHERE parent_id = @parentId AND is_active = true";
+            var totalCount = await connection.ExecuteScalarAsync<int>(totalCountSql, new { parentId });
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)size);
+
+            var children = await connection.QueryAsync<DepartmentWithHasMoreChildrenDto>(
+                $"""
+                SELECT 
+                    id,
+                    name,
+                    identifier,
+                    parent_id AS parentId,
+                    path, depth, 
+                    is_active AS isActive,
+                    created_at AS createdAt,
+                    updated_at AS updatedAt,
+                    EXISTS (SELECT 1 FROM departments WHERE parent_id = d.id AND is_active = true) AS hasMoreChildren
+                FROM departments d
+                WHERE d.parent_id = @parentId AND d.is_active = true
+                ORDER BY d.name
+                LIMIT @size OFFSET @offset
+                """,
+                new { parentId, size, offset });
+
+            return new PaginationResponse<DepartmentWithHasMoreChildrenDto>(
+                children.ToList(),
+                totalCount,
+                page,
+                size);
         }
     }
 }

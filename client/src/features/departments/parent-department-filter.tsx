@@ -11,13 +11,16 @@ import {
 } from "./model/departments-filter-store";
 import { cn } from "@/shared/lib/utils";
 
+const initialData = {
+  isActive: undefined,
+  search: "",
+  page: 1,
+  pageSize: 1000,
+};
+
 export function ParentDepartmentFilter() {
-  const { data: departments = [], isLoading } = useQueryDepartmentsList({
-    isActive: undefined,
-    search: "",
-    page: 1,
-    pageSize: 1000,
-  });
+  const { data: departments = [], isLoading } =
+    useQueryDepartmentsList(initialData);
   const { parentId } = useGetDepartmentsFilter();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -55,7 +58,6 @@ export function ParentDepartmentFilter() {
         className="max-w-full"
       />
 
-      {/* Зона выбранного элемента */}
       <div className="flex flex-wrap gap-1 min-h-10 items-center p-2 bg-muted/50 rounded-md border border-dashed">
         {selectedDepartment ? (
           <Badge

@@ -37,10 +37,6 @@ namespace DirectoryService.Application.Departments
 
             RuleFor(x => x.Request.Identifier)
                 .MustBeValueObject(DepartmentIdentifier.Create);
-
-            RuleFor(x => x.Request.ParentId)
-                .Must(id => id == null || id != Guid.Empty)
-                .WithError(GeneralErrors.ValueIsInvalid("parent id"));
         }
     }
     public class UpdateDepartmentHandler : ICommandHandler<Guid, UpdateDepartmentCommand>
@@ -92,24 +88,24 @@ namespace DirectoryService.Application.Departments
                 var oldPath = department.Path.Value;
                 var oldDepth = department.Depth;
 
-                Department? newParent = null;
+                var newDepartmentName = DepartmentName.Create(command.Request.Name);
 
-                if (command.Request.ParentId.HasValue)
+                var newDepartmentIdentifier = DepartmentIdentifier.Create(command.Request.Identifier);
+
+                Department? parent = null;
+
+                if (department.ParentId != null)
                 {
-                    var parentResult = (await _departmentsRepository.GetById(command.Request.ParentId.Value, cancellationToken));
+                    var parentResult = (await _departmentsRepository.GetById(department.ParentId, cancellationToken));
                     if (parentResult.IsFailure)
                     {
                         transaction.Rollback();
                         return parentResult.Error;
                     }
-                    newParent = parentResult.Value;
+                    parent = parentResult.Value;
                 }
 
-                var newDepartmentName = DepartmentName.Create(command.Request.Name);
-
-                var newDepartmentIdentifier = DepartmentIdentifier.Create(command.Request.Identifier);
-
-                department.Update(newDepartmentName.Value, newDepartmentIdentifier.Value, newParent);
+                department.Update(newDepartmentName.Value, newDepartmentIdentifier.Value, parent);
 
                 if (department.Path.Value != oldPath)
                 {

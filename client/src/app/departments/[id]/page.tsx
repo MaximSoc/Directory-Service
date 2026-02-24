@@ -5,11 +5,15 @@ import { Button } from "@/shared/components/ui/button";
 import { routes } from "@/shared/routes";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { use } from "react";
 
-export default function DepartmentDetailsPage() {
-  const params = useParams();
-  const id = params.id as string;
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function DepartmentDetailsPage({ params }: PageProps) {
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
 
   return (
     <div className="container mx-auto max-w-5xl py-8 px-4 sm:px-6">

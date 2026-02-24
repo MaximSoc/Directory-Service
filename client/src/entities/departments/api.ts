@@ -3,13 +3,8 @@ import { Envelope } from "@/shared/api/envelope";
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { Department } from "./types";
 import { DepartmentsFilterState } from "@/features/departments/model/departments-filter-store";
-
-export type GetDepartmentsResponse = {
-  items: Department[];
-  totalPages: number;
-  page: number;
-  totalCount: number;
-};
+import { PaginationResponse } from "@/shared/types/custom-types";
+import { PAGINATION_CONFIG } from "@/shared/constants/constants";
 
 export type GetDepartmentsRequest = {
   search?: string;
@@ -37,18 +32,13 @@ export type CreateDepartmentRequest = {
 export type UpdateDepartmentRequest = {
   name: string;
   identifier: string;
-  parentId?: string;
 };
 
 export type UpdateDepartmentLocationsRequest = {
   locationIds: string[];
 };
 
-export type GetOneDepartmentResponse = {
-  department: Department;
-};
-
-export type GetRootsRequest = {
+export type GetDepartmentRootsRequest = {
   page?: number;
   pageSize?: number;
 };
@@ -56,11 +46,10 @@ export type GetRootsRequest = {
 export const departmentsApi = {
   getDepartments: async (
     request: GetDepartmentsRequest
-  ): Promise<GetDepartmentsResponse> => {
-    const response = await apiClient.get<Envelope<GetDepartmentsResponse>>(
-      "/departments",
-      { params: request }
-    );
+  ): Promise<PaginationResponse<Department>> => {
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Department>>
+    >("/departments", { params: request });
 
     if (response.data.isError || !response.data.result) {
       throw new Error("Failed to load departments");
@@ -69,8 +58,8 @@ export const departmentsApi = {
     return response.data.result!;
   },
 
-  getOneDepartment: async (id: string): Promise<GetOneDepartmentResponse> => {
-    const response = await apiClient.get<Envelope<GetOneDepartmentResponse>>(
+  getDepartmentById: async (id: string): Promise<Department> => {
+    const response = await apiClient.get<Envelope<Department>>(
       `/departments/${id}`
     );
 
@@ -81,13 +70,12 @@ export const departmentsApi = {
     return response.data.result;
   },
 
-  getRoots: async (
-    request: GetRootsRequest
-  ): Promise<GetDepartmentsResponse> => {
-    const response = await apiClient.get<Envelope<GetDepartmentsResponse>>(
-      "/departments/roots",
-      { params: request }
-    );
+  getDepartmentRoots: async (
+    request: GetDepartmentRootsRequest
+  ): Promise<PaginationResponse<Department>> => {
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Department>>
+    >("/departments/roots", { params: request });
     return response.data.result!;
   },
 
@@ -96,11 +84,12 @@ export const departmentsApi = {
     ...data
   }: {
     departmentId: string;
-  } & GetDepartmentChildrenRequest): Promise<GetDepartmentsResponse> => {
-    const response = await apiClient.get<Envelope<GetDepartmentsResponse>>(
-      `/departments/${departmentId}/children`,
-      { params: data }
-    );
+  } & GetDepartmentChildrenRequest): Promise<
+    PaginationResponse<Department>
+  > => {
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Department>>
+    >(`/departments/${departmentId}/children`, { params: data });
 
     if (response.data.isError || !response.data.result) {
       throw new Error("Failed to load children");
@@ -142,6 +131,17 @@ export const departmentsApi = {
     return response.data;
   },
 
+  moveDepartment: async (
+    departmentId: string,
+    parentId?: string | null
+  ): Promise<Envelope<void>> => {
+    const response = await apiClient.put<Envelope<void>>(
+      `/departments/${departmentId}/parent`,
+      { departmentId, parentId }
+    );
+    return response.data;
+  },
+
   updateDepartmentLocations: async (
     departmentId: string,
     request: UpdateDepartmentLocationsRequest
@@ -175,7 +175,11 @@ export const departmentsQueryOptions = {
   getDepartmentsQueryOptions: (request: GetDepartmentsRequest) => {
     return queryOptions({
       queryFn: () =>
-        departmentsApi.getDepartments({ page: 1, pageSize: 1000, ...request }),
+        departmentsApi.getDepartments({
+          page: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
+          pageSize: PAGINATION_CONFIG.DEPARTMENTS.MAX_PREVIEW,
+          ...request,
+        }),
       queryKey: [departmentsQueryOptions.baseKey, request],
     });
   },
@@ -186,13 +190,13 @@ export const departmentsQueryOptions = {
       queryFn: ({ pageParam }) => {
         return departmentsApi.getDepartments({ ...filter, page: pageParam });
       },
-      initialPageParam: 1,
+      initialPageParam: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
       getNextPageParam: (response) => {
         if (!response || response.page >= response.totalPages) return undefined;
         return response.page + 1;
       },
 
-      select: (data): GetDepartmentsResponse => ({
+      select: (data): PaginationResponse<Department> => ({
         items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,
@@ -203,7 +207,10 @@ export const departmentsQueryOptions = {
 
   getDepartmentChildrenQueryOptions: (
     departmentId: string,
-    request: GetDepartmentChildrenRequest = { page: 1, pageSize: 10 }
+    request: GetDepartmentChildrenRequest = {
+      page: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
+      pageSize: PAGINATION_CONFIG.DEPARTMENTS.MAX_PREVIEW,
+    }
   ) => {
     return queryOptions({
       queryFn: () =>
@@ -226,12 +233,12 @@ export const departmentsQueryOptions = {
         { isActive },
       ],
       queryFn: ({ pageParam }) => {
-        return departmentsApi.getRoots({
+        return departmentsApi.getDepartmentRoots({
           page: pageParam,
-          pageSize: 10,
+          pageSize: PAGINATION_CONFIG.DEPARTMENTS.TREE_ROOTS_SIZE,
         });
       },
-      initialPageParam: 1,
+      initialPageParam: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
       getNextPageParam: (lastPage) => {
         if (lastPage.page >= lastPage.totalPages) return undefined;
         return lastPage.page + 1;
@@ -251,10 +258,10 @@ export const departmentsQueryOptions = {
         return departmentsApi.getDepartmentChildren({
           departmentId,
           page: pageParam,
-          pageSize: 10,
+          pageSize: PAGINATION_CONFIG.DEPARTMENTS.TREE_CHILDREN_SIZE,
         });
       },
-      initialPageParam: 1,
+      initialPageParam: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
       getNextPageParam: (lastPage) => {
         if (lastPage.page >= lastPage.totalPages) return undefined;
         return lastPage.page + 1;

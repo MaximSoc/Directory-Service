@@ -1,5 +1,21 @@
-export const PAGE_SIZE_LOCATIONS = 3;
+export const PAGINATION_CONFIG = {
+  DEFAULT: {
+    PAGE_SIZE: 10,
+    INITIAL_PAGE: 1 as number,
+  },
 
-export const PAGE_SIZE_POSITIONS = 3;
+  DEPARTMENTS: {
+    MAX_PREVIEW: 1000,
+    TREE_CHILDREN_SIZE: 10,
+    TREE_ROOTS_SIZE: 10,
+    LIST_CHILDREN_SIZE: 5,
+  },
 
-export const PAGE_SIZE_DEPARTMENTS = 3;
+  POSITIONS: {
+    MAX_PREVIEW: 1000,
+  },
+
+  LOCATIONS: {
+    MAX_PREVIEW: 1000,
+  },
+};

@@ -10,6 +10,10 @@ namespace DirectoryService.Contracts
         IReadOnlyList<T> Items,
         int TotalCount,
         int Page,
-        int PageSize,
-        int TotalPages);
+        int PageSize)
+    {
+        public int TotalPages => PageSize > 0
+            ? (int)Math.Ceiling((double)TotalCount / PageSize)
+            : 0;
+    }
 }

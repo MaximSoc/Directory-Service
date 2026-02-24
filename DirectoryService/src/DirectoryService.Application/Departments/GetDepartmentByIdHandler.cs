@@ -16,7 +16,8 @@ using System.Threading.Tasks;
 
 namespace DirectoryService.Application.Departments
 {
-    public class GetDepartmentByIdHandler : IQueryHandler<GetDepartmentByIdResponse, GetDepartmentByIdRequest>
+    public record GetDepartmentByIdQuery(Guid DepartmentId) : IQuery;
+    public class GetDepartmentByIdHandler : IQueryHandler<DepartmentDto, GetDepartmentByIdQuery>
     {
         private readonly IReadDbContext _dbContext;
         private readonly ILogger<GetDepartmentByIdHandler> _logger;
@@ -27,7 +28,7 @@ namespace DirectoryService.Application.Departments
             _logger = logger;
         }
 
-        public async Task<Result<GetDepartmentByIdResponse, Errors>> Handle(GetDepartmentByIdRequest request, CancellationToken cancellationToken)
+        public async Task<Result<DepartmentDto, Errors>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
             Guid departmentId = request.DepartmentId;
 
@@ -82,10 +83,7 @@ namespace DirectoryService.Application.Departments
                 return GeneralErrors.NotFound(departmentId).ToErrors();
             }
 
-            return new GetDepartmentByIdResponse
-            {
-                Department = department
-            };
+            return department;
         }
     }
 }

@@ -6,7 +6,7 @@ import { Plus, List, Network } from "lucide-react"; // Иконки для ре�
 import { DepartmentsFilters } from "../departments-filters";
 import { CreateDepartmentDialog } from "../create-department-dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { ViewMode } from "@/app/departments/page";
+import { ViewMode } from "../model/use-departments-view-store";
 
 interface ToolbarProps {
   viewMode: ViewMode;

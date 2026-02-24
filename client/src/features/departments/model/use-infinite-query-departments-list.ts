@@ -1,11 +1,11 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { RefCallback, useCallback } from "react";
 import { useDebounce } from "use-debounce";
 import {
   DepartmentsFilterState,
   useGetDepartmentsFilter,
 } from "./departments-filter-store";
 import { departmentsQueryOptions } from "@/entities/departments/api";
+import { useCursorRef } from "@/shared/hooks/use-cursor-ref";
 
 export function useInfiniteQueryDepartmentsList(
   params?: Partial<DepartmentsFilterState>
@@ -41,27 +41,11 @@ export function useInfiniteQueryDepartmentsList(
     }),
   });
 
-  const cursorRef: RefCallback<HTMLDivElement> = useCallback(
-    (el) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-          }
-        },
-        {
-          threshold: 0.5,
-        }
-      );
-
-      if (el) {
-        observer.observe(el);
-
-        return () => observer.disconnect();
-      }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage]
-  );
+  const cursorRef = useCursorRef({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   return {
     departments: data?.items,

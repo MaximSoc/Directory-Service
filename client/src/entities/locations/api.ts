@@ -3,12 +3,8 @@ import { Location } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/envelope";
 import { LocationsFilterState } from "@/features/locations/model/locations-filter-store";
-
-export type GetLocationsResponse = {
-  items: Location[];
-  totalPages: number;
-  page: number;
-};
+import { PaginationResponse } from "@/shared/types/custom-types";
+import { PAGINATION_CONFIG } from "@/shared/constants/constants";
 
 export type GetLocationsRequest = {
   search?: string;
@@ -45,11 +41,10 @@ export type UpdateLocationRequest = {
 export const locationsApi = {
   getLocations: async (
     request: GetLocationsRequest
-  ): Promise<GetLocationsResponse> => {
-    const response = await apiClient.get<Envelope<GetLocationsResponse>>(
-      "/locations",
-      { params: request }
-    );
+  ): Promise<PaginationResponse<Location>> => {
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Location>>
+    >("/locations", { params: request });
 
     if (response.data.isError || !response.data.result) {
       throw new Error("Failed to load locations");
@@ -96,7 +91,11 @@ export const locationsQueryOptions = {
   getLocationsQueryOptions: (request: GetLocationsRequest) => {
     return queryOptions({
       queryFn: () =>
-        locationsApi.getLocations({ page: 1, pageSize: 1000, ...request }),
+        locationsApi.getLocations({
+          page: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
+          pageSize: PAGINATION_CONFIG.LOCATIONS.MAX_PREVIEW,
+          ...request,
+        }),
       queryKey: [locationsQueryOptions.baseKey, request],
     });
   },
@@ -107,13 +106,13 @@ export const locationsQueryOptions = {
       queryFn: ({ pageParam }) => {
         return locationsApi.getLocations({ ...filter, page: pageParam });
       },
-      initialPageParam: 1,
+      initialPageParam: PAGINATION_CONFIG.DEFAULT.INITIAL_PAGE,
       getNextPageParam: (response) => {
         if (!response || response.page >= response.totalPages) return undefined;
         return response.page + 1;
       },
 
-      select: (data): GetLocationsResponse => ({
+      select: (data): PaginationResponse<Location> => ({
         items: data.pages.flatMap((page) => page?.items ?? []),
         totalPages: data.pages[0]?.totalPages ?? 0,
         page: data.pages[0]?.page ?? 1,

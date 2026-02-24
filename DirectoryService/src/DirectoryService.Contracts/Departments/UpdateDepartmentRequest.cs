@@ -8,6 +8,5 @@ namespace DirectoryService.Contracts.Departments
 {
     public record UpdateDepartmentRequest(
         string Name,
-        string Identifier,
-        Guid? ParentId);
+        string Identifier);
 }

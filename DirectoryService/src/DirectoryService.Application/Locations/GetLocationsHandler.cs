@@ -120,9 +120,7 @@ namespace DirectoryService.Application.Locations
                     locations.ToList(),
                     totalCount,
                     request.Page,
-                    request.PageSize,
-                    totalPages
-                );
+                    request.PageSize);
             }
             totalQuery = $@"
                 SELECT COUNT(*) 
@@ -161,9 +159,7 @@ namespace DirectoryService.Application.Locations
                     locations.ToList(),
                     totalCount,
                     request.Page,
-                    request.PageSize,
-                    totalPages
-                );
+                    request.PageSize);
         }
     }
 }

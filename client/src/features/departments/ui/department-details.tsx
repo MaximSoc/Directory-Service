@@ -17,7 +17,7 @@ import {
   Hash,
   Layers,
   GitGraph,
-  ChevronLeft,
+  Loader2,
 } from "lucide-react";
 import { Fragment, useState } from "react";
 import Link from "next/link";
@@ -25,7 +25,7 @@ import { cn } from "@/shared/lib/utils";
 import { useDepartment } from "@/features/locations/model/use-department";
 import { UpdateDepartmentLocationsDialog } from "../update-department-locations-dialog";
 import { UpdateDepartmentDialog } from "../update-department-dialog";
-import { useDepartmentChildren } from "../model/use-query-department-children";
+import { useDepartmentChildrenInfinite } from "../model/use-department-tree-queries";
 
 interface DepartmentDetailsProps {
   id: string;
@@ -36,14 +36,13 @@ export function DepartmentDetails({ id }: DepartmentDetailsProps) {
   const [openLocationsUpdate, setOpenLocationsUpdate] = useState(false);
   const { data, isLoading, isError } = useDepartment(id);
 
-  const [currentChildrenPage, setCurrentChildrenPage] = useState(1);
-  const childrenPageSize = 5;
-
-  const { data: childrenData, isLoading: isChildrenLoading } =
-    useDepartmentChildren(id, {
-      page: currentChildrenPage,
-      pageSize: childrenPageSize,
-    });
+  const {
+    children,
+    isLoading: isChildrenLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useDepartmentChildrenInfinite(id, true);
 
   if (isLoading) {
     return (
@@ -64,7 +63,7 @@ export function DepartmentDetails({ id }: DepartmentDetailsProps) {
     );
   }
 
-  const { department } = data;
+  const department = data;
 
   const pathSegments = department.path.split(".").filter(Boolean);
 
@@ -127,51 +126,37 @@ export function DepartmentDetails({ id }: DepartmentDetailsProps) {
                 <GitGraph className="h-5 w-5 text-primary" />
                 Дочерние подразделения
                 <Badge variant="secondary" className="ml-auto">
-                  {childrenData?.totalCount ?? 0}
+                  {/* totalCount берем из первого окна данных, если оно есть */}
+                  {children.length} {hasNextPage ? "+" : ""}
                 </Badge>
               </CardTitle>
 
-              {/* Мини-навигация в заголовке, если страниц много */}
-              {(childrenData?.totalPages ?? 0) > 1 && (
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() =>
-                      setCurrentChildrenPage((p) => Math.max(1, p - 1))
-                    }
-                    disabled={currentChildrenPage === 1 || isChildrenLoading}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="text-xs font-medium">
-                    {currentChildrenPage} / {childrenData?.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setCurrentChildrenPage((p) => p + 1)}
-                    disabled={
-                      currentChildrenPage >= (childrenData?.totalPages ?? 1) ||
-                      isChildrenLoading
-                    }
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
+              {/* Заменили пагинацию 1/10 на кнопку дозагрузки */}
+              {hasNextPage && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage && (
+                    <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                  )}
+                  Показать ещё
+                </Button>
               )}
             </CardHeader>
+
             <CardContent>
               <div
                 className={cn(
                   "grid gap-3 transition-opacity",
-                  isChildrenLoading && "opacity-50" // Визуальный фидбек при смене страницы
+                  isFetchingNextPage && "opacity-70"
                 )}
               >
-                {childrenData?.items && childrenData.items.length > 0
-                  ? childrenData.items.map((child) => (
+                {children.length > 0
+                  ? children.map((child) => (
                       <Link
                         key={child.id}
                         href={`/departments/${child.id}`}

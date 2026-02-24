@@ -3,19 +3,10 @@
 import DepartmentCard from "@/entities/departments/ui/department.card";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { useInfiniteQueryDepartmentsList } from "../model/use-infinite-query-departments-list";
-import { DepartmentsTree } from "./departments-tree";
 
-interface DepartmentsListProps {
-  viewMode: "list" | "tree";
-}
-
-export function DepartmentsList({ viewMode }: DepartmentsListProps) {
+export function DepartmentsList() {
   const { departments, error, isFetchingNextPage, cursorRef } =
     useInfiniteQueryDepartmentsList();
-
-  if (viewMode === "tree") {
-    return <DepartmentsTree isActive={true} />;
-  }
 
   if (error)
     return <div className="p-4 text-destructive">Ошибка: {error.message}</div>;

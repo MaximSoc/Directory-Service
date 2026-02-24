@@ -82,12 +82,12 @@ namespace DirectoryService.Presentation.Controllers
 
         [HttpGet("roots")]
         public async Task<EndpointResult<PaginationResponse<DepartmentWithHasMoreChildrenDto>>> GetRoots(
-            [FromServices] GetRootsHandler handler,
-            [FromQuery] GetRootsRequest request,
+            [FromServices] GetDepartmentRootsHandler handler,
+            [FromQuery] GetDepartmentRootsRequest request,
             CancellationToken cancellationToken
             )
         {
-            var command = new GetRootsQuery(request);
+            var command = new GetDepartmentRootsQuery(request);
 
             var result = await handler.Handle(command, cancellationToken);
 
@@ -110,15 +110,15 @@ namespace DirectoryService.Presentation.Controllers
         }
 
         [HttpGet("{departmentId}")]
-        public async Task<EndpointResult<GetDepartmentByIdResponse>> GetDepartmentById(
+        public async Task<EndpointResult<DepartmentDto>> GetDepartmentById(
             [FromRoute] Guid departmentId,
             [FromServices] GetDepartmentByIdHandler handler,
             CancellationToken cancellationToken
             )
         {
-            var request = new GetDepartmentByIdRequest(departmentId);
+            var query = new GetDepartmentByIdQuery(departmentId);
 
-            var department = await handler.Handle(request, cancellationToken);
+            var department = await handler.Handle(query, cancellationToken);
 
             return department;
         }

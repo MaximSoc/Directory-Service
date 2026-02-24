@@ -1,12 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-interface NodeMetadata {
-  isExpanded: boolean;
-}
-
 interface DepartmentTreeState {
-  expandedNodes: Record<string, NodeMetadata>;
+  expandedNodeIds: string[];
   toggleNode: (departmentId: string) => void;
   expandNode: (departmentId: string) => void;
   collapseNode: (departmentId: string) => void;
@@ -16,36 +12,30 @@ interface DepartmentTreeState {
 export const useDepartmentTreeStore = create<DepartmentTreeState>()(
   persist(
     (set) => ({
-      expandedNodes: {},
+      expandedNodeIds: [],
 
       toggleNode: (id) =>
         set((state) => ({
-          expandedNodes: {
-            ...state.expandedNodes,
-            [id]: {
-              ...state.expandedNodes[id],
-              isExpanded: !state.expandedNodes[id]?.isExpanded,
-            },
-          },
+          expandedNodeIds: state.expandedNodeIds.includes(id)
+            ? state.expandedNodeIds.filter((nodeId) => nodeId !== id)
+            : [...state.expandedNodeIds, id],
         })),
 
       expandNode: (id) =>
         set((state) => ({
-          expandedNodes: {
-            ...state.expandedNodes,
-            [id]: { ...state.expandedNodes[id], isExpanded: true },
-          },
+          expandedNodeIds: state.expandedNodeIds.includes(id)
+            ? state.expandedNodeIds
+            : [...state.expandedNodeIds, id],
         })),
 
       collapseNode: (id) =>
         set((state) => ({
-          expandedNodes: {
-            ...state.expandedNodes,
-            [id]: { ...state.expandedNodes[id], isExpanded: false },
-          },
+          expandedNodeIds: state.expandedNodeIds.filter(
+            (nodeId) => nodeId !== id
+          ),
         })),
 
-      resetTree: () => set({ expandedNodes: {} }),
+      resetTree: () => set({ expandedNodeIds: [] }),
     }),
     {
       name: "department-tree-storage",

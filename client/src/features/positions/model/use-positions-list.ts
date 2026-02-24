@@ -1,11 +1,11 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { RefCallback, useCallback } from "react";
 import { useDebounce } from "use-debounce";
 import {
   PositionsFilterState,
   useGetPositionFilter,
 } from "./positions-filter-store";
 import { positionsQueryOptions } from "@/entities/positions/api";
+import { useCursorRef } from "@/shared/hooks/use-cursor-ref";
 
 export function usePositionsList(params?: Partial<PositionsFilterState>) {
   const globalFilter = useGetPositionFilter();
@@ -37,27 +37,11 @@ export function usePositionsList(params?: Partial<PositionsFilterState>) {
     }),
   });
 
-  const cursorRef: RefCallback<HTMLDivElement> = useCallback(
-    (el) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-          }
-        },
-        {
-          threshold: 0.5,
-        }
-      );
-
-      if (el) {
-        observer.observe(el);
-
-        return () => observer.disconnect();
-      }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage]
-  );
+  const cursorRef = useCursorRef({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   return {
     positions: data?.items,

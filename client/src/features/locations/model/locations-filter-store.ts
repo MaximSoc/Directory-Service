@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SortDirection } from "@/shared/types/custom-types";
-import { PAGE_SIZE_LOCATIONS } from "@/shared/constants/constants";
+import { PAGINATION_CONFIG } from "@/shared/constants/constants";
 
 export type LocationSortField =
   | "name"
@@ -31,7 +31,7 @@ type LocationsFilterStore = LocationsFilterState & Actions;
 const initialState: LocationsFilterState = {
   search: "",
   isActive: undefined,
-  pageSize: PAGE_SIZE_LOCATIONS,
+  pageSize: PAGINATION_CONFIG.DEFAULT.PAGE_SIZE,
   sortBy: "name",
   sortDirection: "asc",
 };
