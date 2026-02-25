@@ -2,11 +2,11 @@
 using Framework.Middlewares;
 using Serilog;
 
-namespace FileService.Web
+namespace FileService.Web.Configuration
 {
     public static class AppExtensions
     {
-        public static IApplicationBuilder Configure (this WebApplication app)
+        public static IApplicationBuilder ConfigureApp (this WebApplication app)
         {
             app.UseHttpLogging();
 
