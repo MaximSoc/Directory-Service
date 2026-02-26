@@ -1,0 +1,42 @@
+﻿using CSharpFunctionalExtensions;
+using SharedKernel;
+
+namespace FileService.Domain
+{
+    public sealed record MediaOwner
+    {
+        private static readonly HashSet<string> AllowedContexts =["department"];
+        public string Context { get; }
+
+        public Guid EntityId { get; }
+
+        private MediaOwner(string context, Guid entityId)
+        {
+            Context = context;
+            EntityId = entityId;
+        }
+
+        public static Result<MediaOwner, Error> Create(string context, Guid entityId)
+        {
+            if (string.IsNullOrWhiteSpace(context) || context.Length > 50)
+            {
+                return GeneralErrors.ValueIsInvalid(nameof(context));
+            }
+
+            string normalizedContext = context.Trim().ToLowerInvariant();
+            if (!AllowedContexts.Contains(normalizedContext))
+            {
+                return GeneralErrors.ValueIsInvalid(nameof(context));
+            }
+
+            if (entityId == Guid.Empty)
+            {
+                return GeneralErrors.ValueIsInvalid(nameof(entityId));
+            }            
+
+            return new MediaOwner(normalizedContext, entityId);
+        }
+
+        public static Result<MediaOwner, Error> ForDepartment(Guid departmentId) => Create("department", departmentId);
+    }
+}
