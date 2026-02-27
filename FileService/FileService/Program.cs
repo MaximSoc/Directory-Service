@@ -1,7 +1,7 @@
 using Core.Database;
 using Core.Shared;
 using Core.Validation;
-using FileService.Web;
+using FileService.Web.Configuration;
 using FluentValidation;
 using Framework.Middlewares;
 using Microsoft.AspNetCore.Connections;
@@ -11,35 +11,44 @@ using Serilog;
 using System.Transactions;
 using static CSharpFunctionalExtensions.Result;
 
-var builder = WebApplication.CreateBuilder(args);
+Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine($"SERILOG ERROR: {msg}"));
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.Debug()
-    .WriteTo.Seq(builder.Configuration.GetConnectionString("Seq")
-    ?? throw new ArgumentNullException("Seq"))
-    .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", Serilog.Events.LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", Serilog.Events.LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore.Routing", Serilog.Events.LogEventLevel.Warning)
-    .CreateLogger();
+    .CreateBootstrapLogger();
 
-builder.Services.AddHttpLogging(o =>
+try
 {
-    o.CombineLogs = true;
-});
+    Log.Information("Starting web application");
 
-builder.Services.AddSerilog();
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSwaggerGen(c =>
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.Seq(context.Configuration.GetConnectionString("Seq")
+        ?? throw new ArgumentNullException("Seq")));
+
+    builder.Services.AddConfiguration(builder.Configuration);
+
+    var app = builder.Build();
+
+    app.ConfigureApp();
+
+    app.Run();
+}
+
+catch(Exception ex)
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-});
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
 
-var app = builder.Build();
-
-app.Configure();
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
 
 namespace FileService.Web
 {
