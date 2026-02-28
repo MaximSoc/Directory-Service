@@ -27,6 +27,9 @@ namespace FileService.Domain
         {
         }
 
+        private PreviewAsset()
+        {  
+        }
         public static UnitResult<Error> Validate(MediaData mediaData)
         {
             if (!AllowedExtensions.Contains(mediaData.FileName.Extension))
