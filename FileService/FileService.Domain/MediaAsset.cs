@@ -26,7 +26,7 @@ namespace FileService.Domain
 
         public MediaStatus Status { get; protected set; }
 
-        private MediaAsset()
+        protected MediaAsset()
         {
         }
 

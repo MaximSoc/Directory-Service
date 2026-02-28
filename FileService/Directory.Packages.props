@@ -10,6 +10,9 @@
     <PackageVersion Include="MaximSoc.SharedKernel" Version="0.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.13" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
