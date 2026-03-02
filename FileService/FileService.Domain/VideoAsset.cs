@@ -28,6 +28,10 @@ namespace FileService.Domain
         {
         }
 
+        private VideoAsset()
+        {   
+        }
+
         public static UnitResult<Error> Validate(MediaData mediaData)
         {
             if (!AllowedExtensions.Contains(mediaData.FileName.Extension))
