@@ -1,22 +1,22 @@
 services:
-  directoryservice:
-    build:
-      context: D:/Projects/Directory-Service
-      dockerfile: DirectoryService/src/DirectoryService.Presentation/Dockerfile
-      args:
-        GITHUB_USER: ${GITHUB_USER}
-        GITHUB_TOKEN: ${GITHUB_TOKEN}
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - seq
-      - redis
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;Database=directory_service_db;User Id=postgres;Password=postgres
-      - ConnectionStrings__Seq=http://seq:5341
-    restart: always
+#  directoryservice:
+#    build:
+#      context: D:/Projects/Directory-Service
+#      dockerfile: DirectoryService/src/DirectoryService.Presentation/Dockerfile
+#      args:
+#        GITHUB_USER: ${GITHUB_USER}
+#        GITHUB_TOKEN: ${GITHUB_TOKEN}
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#      - seq
+#      - redis
+#   environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#      - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;Database=directory_service_db;User Id=postgres;Password=postgres
+#      - ConnectionStrings__Seq=http://seq:5341
+#    restart: always
   postgres:
     container_name: postgres
     image: postgres
@@ -46,6 +46,17 @@ services:
     restart: always
     volumes:
       - redis-data:/data
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    restart: always
 volumes:
   postgres-data:
   redis-data:
