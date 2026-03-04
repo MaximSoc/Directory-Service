@@ -64,8 +64,8 @@ namespace FileService.Infrastructure.Postgres.Configuration
 
             builder.Property(x => x.Key)
                 .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<StorageKey>(v, (JsonSerializerOptions?)null)!)
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    v => JsonSerializer.Deserialize<StorageKey>(v, (JsonSerializerOptions?)null)!)
                 .HasColumnName("key")
                 .HasColumnType("jsonb");
         }

@@ -1,4 +1,5 @@
-﻿using FileService.Core.MediaAssets;
+﻿using Core.Shared;
+using FileService.Core.MediaAssets;
 using FileService.Infrastructure.Postgres.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace FileService.Infrastructure.Postgres
 {
@@ -25,6 +27,8 @@ namespace FileService.Infrastructure.Postgres
             });
 
             services.AddScoped<IMediaRepository, MediaRepository>();
+
+            services.AddScoped<ITransactionManager, TransactionManager>();
 
             return services;
         }

@@ -37,7 +37,7 @@ namespace FileService.Domain
                 return Error.Validation("preview.invalid.extension", $"File extension must be one of: {string.Join(", ", AllowedExtensions)}");
             }
 
-            if (mediaData.ContentType.Category != MediaType.VIDEO)
+            if (mediaData.ContentType.Category != MediaType.IMAGE)
             {
                 return Error.Validation("preview.invalid.content-type", $"File content type must be {ALLOWED_CONTENT_TYPE}");
             }

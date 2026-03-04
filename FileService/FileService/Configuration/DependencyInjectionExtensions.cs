@@ -1,5 +1,6 @@
 ﻿using FileService.Core;
 using FileService.Infrastructure.Postgres;
+using FileService.Infrastructure.S3;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -26,6 +27,8 @@ namespace FileService.Web.Configuration
             });
 
             services.AddInfrastructurePostgres(configuration);
+
+            services.AddS3(configuration);
 
             return services;
         }

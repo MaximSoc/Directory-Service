@@ -1,32 +1,34 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
+using System.Text.Json.Serialization;
 
 namespace FileService.Domain
 {
     public sealed record StorageKey
     {
-        public string Key { get; }
+        public string Key { get; init; } = null!;
 
-        public string? Prefix { get; }
+        public string? Prefix { get; init; }
 
-        public string Location { get; }
+        public string Bucket { get; init; } = null!;
 
-        public string Value { get; }
+        public string Value { get; init; } = null!;
 
-        public string FullPath { get; }
+        public string FullPath { get; init; } = null!;
 
-        private StorageKey(string location, string prefix, string key)
+        [JsonConstructor]
+        private StorageKey(string bucket, string prefix, string key)
         {
-            Location = location;
+            Bucket = bucket;
             Prefix = prefix;
             Key = key;
             Value = string.IsNullOrEmpty(Prefix) ? Key : $"{Prefix}/{Key}";
-            FullPath = $"{Location}/{Value}";
+            FullPath = $"{Bucket}/{Value}";
         }
 
-        public static Result<StorageKey, Error> Create(string location, string? prefix, string key)
+        public static Result<StorageKey, Error> Create(string bucket, string? prefix, string key)
         {
-            if (string.IsNullOrEmpty(location))
+            if (string.IsNullOrEmpty(bucket))
             {
                 return GeneralErrors.ValueIsInvalid("location");
             }
@@ -43,7 +45,7 @@ namespace FileService.Domain
                 return normalizedPrefixResult.Error;
             }
 
-            return new StorageKey(location.Trim(), normalizedPrefixResult.Value, normalizedKeyResult.Value);
+            return new StorageKey(bucket.Trim(), normalizedPrefixResult.Value, normalizedKeyResult.Value);
         }
 
         private static Result<string, Error> NormalizePrefix(string? prefix)
