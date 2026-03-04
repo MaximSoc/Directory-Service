@@ -14,33 +14,32 @@ using static FileService.Core.Features.GenerateDownloadUrls;
 using static FileService.Core.Features.GenerateUploadUrl;
 using static FileService.Core.Features.UploadFileEndPoint;
 
-namespace FileService.Core
+namespace FileService.Core;
+
+public static class DependencyInjectionCoreExtensions
 {
-    public static class DependencyInjectionCoreExtensions
+    public static IServiceCollection AddCore(this IServiceCollection services)
     {
-        public static IServiceCollection AddCore(this IServiceCollection services)
-        {
-            var assembly = typeof(DependencyInjectionCoreExtensions).Assembly;
+        var assembly = typeof(DependencyInjectionCoreExtensions).Assembly;
 
-            services.AddEndpoints(assembly);
+        services.AddEndpoints(assembly);
 
-            services.AddScoped<UploadFileHandler>();
+        services.AddScoped<UploadFileHandler>();
 
-            services.AddScoped<DownloadFileHandler>();
+        services.AddScoped<DownloadFileHandler>();
 
-            services.AddScoped<DeleteFileHandler>();
+        services.AddScoped<DeleteFileHandler>();
 
-            services.AddScoped<GeneratePresignedUploadUrlHandler>();
+        services.AddScoped<GeneratePresignedUploadUrlHandler>();
 
-            services.AddScoped<GeneratePresignedDownloadUrlHandler>();
+        services.AddScoped<GeneratePresignedDownloadUrlHandler>();
 
-            services.AddScoped<GeneratePresignedDownloadUrlsHandler>();
+        services.AddScoped<GeneratePresignedDownloadUrlsHandler>();
 
-            services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
+        services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
-            services.AddValidatorsFromAssemblyContaining<UploadFileHandler>();
+        services.AddValidatorsFromAssemblyContaining<UploadFileHandler>();
 
-            return services;
-        }
+        return services;
     }
 }

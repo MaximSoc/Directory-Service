@@ -1,37 +1,36 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
 
-namespace FileService.Domain
+namespace FileService.Domain;
+
+public sealed record FileName
 {
-    public sealed record FileName
+    public string Name { get; }
+
+    public string Extension { get; }
+
+    private FileName(string name, string extension)
     {
-        public string Name { get; }
+        Name = name;
+        Extension = extension;
+    }
 
-        public string Extension { get; }
-
-        private FileName(string name, string extension)
+    public static Result<FileName, Error> Create(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
         {
-            Name = name;
-            Extension = extension;
+            return GeneralErrors.ValueIsRequired("FileName");
         }
 
-        public static Result<FileName, Error> Create(string fileName)
+        int lasDot = fileName.LastIndexOf('.');
+        if (lasDot == -1 || lasDot == fileName.Length - 1)
         {
-            if (string.IsNullOrWhiteSpace(fileName))
-            {
-                return GeneralErrors.ValueIsRequired("FileName");
-            }
-
-            int lasDot = fileName.LastIndexOf('.');
-            if (lasDot == -1 || lasDot == fileName.Length - 1)
-            {
-                return GeneralErrors.ValueIsInvalid("File must have extension");
-            }
-
-            string extension = fileName[(lasDot + 1)..].ToLowerInvariant();
-
-
-            return new FileName(fileName, extension);
+            return GeneralErrors.ValueIsInvalid("File must have extension");
         }
+
+        string extension = fileName[(lasDot + 1)..].ToLowerInvariant();
+
+
+        return new FileName(fileName, extension);
     }
 }

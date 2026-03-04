@@ -1,15 +1,9 @@
-using Core.Database;
-using Core.Shared;
-using Core.Validation;
 using FileService.Web.Configuration;
-using FluentValidation;
-using Framework.Middlewares;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Transactions;
-using static CSharpFunctionalExtensions.Result;
 
 Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine($"SERILOG ERROR: {msg}"));
 

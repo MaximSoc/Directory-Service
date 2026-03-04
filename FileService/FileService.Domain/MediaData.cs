@@ -1,50 +1,49 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
 
-namespace FileService.Domain
+namespace FileService.Domain;
+
+public sealed record MediaData
 {
-    public sealed record MediaData
+    public FileName FileName { get; } = null!;
+
+    public ContentType ContentType { get; } = null!;
+
+    public long Size { get; }
+
+    public int ExpectedChunksCount { get; }
+
+    private MediaData() { }
+
+    private MediaData(
+        FileName fileName,
+        ContentType contentType,
+        long size,
+        int expectedChunksCount
+        )
     {
-        public FileName FileName { get; } = null!;
+        FileName = fileName;
+        ContentType = contentType;
+        Size = size;
+        ExpectedChunksCount = expectedChunksCount;            
+    }
 
-        public ContentType ContentType { get; } = null!;
-
-        public long Size { get; }
-
-        public int ExpectedChunksCount { get; }
-
-        private MediaData() { }
-
-        private MediaData(
-            FileName fileName,
-            ContentType contentType,
-            long size,
-            int expectedChunksCount
-            )
+    public static Result<MediaData, Error> Create(
+        FileName fileName,
+        ContentType contentType,
+        long size,
+        int expectedChunksCount)
+    {
+        if (size <= 0)
         {
-            FileName = fileName;
-            ContentType = contentType;
-            Size = size;
-            ExpectedChunksCount = expectedChunksCount;            
+            return GeneralErrors.ValueIsInvalid("size");
         }
 
-        public static Result<MediaData, Error> Create(
-            FileName fileName,
-            ContentType contentType,
-            long size,
-            int expectedChunksCount)
+        if (expectedChunksCount <= 0)
         {
-            if (size <= 0)
-            {
-                return GeneralErrors.ValueIsInvalid("size");
-            }
-
-            if (expectedChunksCount <= 0)
-            {
-                return GeneralErrors.ValueIsInvalid("expectedChunksCount");
-            }
-
-            return new MediaData(fileName, contentType, size, expectedChunksCount);
+            return GeneralErrors.ValueIsInvalid("expectedChunksCount");
         }
+
+        return new MediaData(fileName, contentType, size, expectedChunksCount);
     }
 }

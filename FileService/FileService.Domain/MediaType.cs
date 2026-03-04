@@ -1,11 +1,10 @@
-﻿namespace FileService.Domain
+﻿namespace FileService.Domain;
+
+public enum MediaType
 {
-    public enum MediaType
-    {
-        UNKNOWN,
-        VIDEO,
-        IMAGE,
-        AUDIO,
-        DOCUMENT,
-    }
+    UNKNOWN,
+    VIDEO,
+    IMAGE,
+    AUDIO,
+    DOCUMENT,
 }

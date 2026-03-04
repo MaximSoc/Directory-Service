@@ -7,22 +7,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileService.Infrastructure.Postgres
+namespace FileService.Infrastructure.Postgres;
+
+public class FileServiceDbContext : DbContext
 {
-    public class FileServiceDbContext : DbContext
+    public FileServiceDbContext(DbContextOptions<FileServiceDbContext> options)
+    : base(options)
     {
-        public FileServiceDbContext(DbContextOptions<FileServiceDbContext> options)
-        : base(options)
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(FileServiceDbContext).Assembly);
-        }
-
-        public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
-
-        public IQueryable<MediaAsset> MediaAssetsRead => Set<MediaAsset>().AsQueryable().AsNoTracking();
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FileServiceDbContext).Assembly);
+    }
+
+    public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
+
+    public IQueryable<MediaAsset> MediaAssetsRead => Set<MediaAsset>().AsQueryable().AsNoTracking();
 }
