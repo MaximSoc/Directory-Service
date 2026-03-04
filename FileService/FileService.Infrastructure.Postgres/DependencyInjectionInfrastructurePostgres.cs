@@ -1,4 +1,5 @@
-﻿using FileService.Core.MediaAssets;
+﻿using Core.Shared;
+using FileService.Core.MediaAssets;
 using FileService.Infrastructure.Postgres.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,25 +9,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
-namespace FileService.Infrastructure.Postgres
+namespace FileService.Infrastructure.Postgres;
+
+public static class DependencyInjectionInfrastructurePostgres
 {
-    public static class DependencyInjectionInfrastructurePostgres
+    public static IServiceCollection AddInfrastructurePostgres(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructurePostgres(this IServiceCollection services, IConfiguration configuration)
+        var connectionString = configuration.GetConnectionString("FileServiceDb");
+
+        services.AddDbContext<FileServiceDbContext>(options =>
         {
-            var connectionString = configuration.GetConnectionString("FileServiceDb");
+            options.UseNpgsql(connectionString);
+            options.EnableDetailedErrors();
+            options.EnableSensitiveDataLogging();
+        });
 
-            services.AddDbContext<FileServiceDbContext>(options =>
-            {
-                options.UseNpgsql(connectionString);
-                options.EnableDetailedErrors();
-                options.EnableSensitiveDataLogging();
-            });
+        services.AddScoped<IMediaRepository, MediaRepository>();
 
-            services.AddScoped<IMediaRepository, MediaRepository>();
+        services.AddScoped<ITransactionManager, TransactionManager>();
 
-            return services;
-        }
+        return services;
     }
 }

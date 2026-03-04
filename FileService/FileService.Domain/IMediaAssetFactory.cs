@@ -6,11 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileService.Domain
+namespace FileService.Domain;
+
+public interface IMediaAssetFactory
 {
-    public interface IMediaAssetFactory
-    {
-        Result<VideoAsset, Error> CreateVideoForUpload(MediaData mediaData, MediaOwner owner);
-        Result<PreviewAsset, Error> CreatePreviewForUpload(MediaData mediaData, MediaOwner owner);
-    }
+    Result<VideoAsset, Error> CreateVideoForUpload(MediaData mediaData, MediaOwner owner);
+    Result<PreviewAsset, Error> CreatePreviewForUpload(MediaData mediaData, MediaOwner owner);
 }

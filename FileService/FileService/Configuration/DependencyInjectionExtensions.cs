@@ -1,33 +1,35 @@
 ﻿using FileService.Core;
 using FileService.Infrastructure.Postgres;
+using FileService.Infrastructure.S3;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
-namespace FileService.Web.Configuration
+namespace FileService.Web.Configuration;
+
+public static class DependencyInjectionExtensions
 {
-    public static class DependencyInjectionExtensions
+    public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
+        services.AddHttpLogging(o =>
         {
-            services.AddHttpLogging(o =>
-            {
-                o.CombineLogs = true;
-            });
+            o.CombineLogs = true;
+        });
 
-            services.AddCore();
+        services.AddCore();
 
-            services.AddSerilog();
+        services.AddSerilog();
 
-            services.AddEndpointsApiExplorer();
+        services.AddEndpointsApiExplorer();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-            });
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+        });
 
-            services.AddInfrastructurePostgres(configuration);
+        services.AddInfrastructurePostgres(configuration);
 
-            return services;
-        }
+        services.AddS3(configuration);
+
+        return services;
     }
 }

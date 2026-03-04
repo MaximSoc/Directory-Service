@@ -1,37 +1,36 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
 
-namespace FileService.Domain
+namespace FileService.Domain;
+
+public sealed record ContentType
 {
-    public sealed record ContentType
+    public string Value { get; }
+
+    public MediaType Category { get; }
+
+    private ContentType(string value, MediaType category)
     {
-        public string Value { get; }
+        Value = value;
+        Category = category;
+    }
 
-        public MediaType Category { get; }
-
-        private ContentType(string value, MediaType category)
+    public static Result<ContentType, Error> Create(string contentType)
+    {
+        if (string.IsNullOrWhiteSpace(contentType))
         {
-            Value = value;
-            Category = category;
+            return GeneralErrors.ValueIsInvalid(nameof(contentType));
         }
 
-        public static Result<ContentType, Error> Create(string contentType)
+        MediaType category = contentType switch
         {
-            if (string.IsNullOrWhiteSpace(contentType))
-            {
-                return GeneralErrors.ValueIsInvalid(nameof(contentType));
-            }
+            _ when contentType.Contains("video", StringComparison.InvariantCultureIgnoreCase) => MediaType.VIDEO,
+            _ when contentType.Contains("image", StringComparison.InvariantCultureIgnoreCase) => MediaType.IMAGE,
+            _ when contentType.Contains("audio", StringComparison.InvariantCultureIgnoreCase) => MediaType.AUDIO,
+            _ when contentType.Contains("document", StringComparison.InvariantCultureIgnoreCase) => MediaType.DOCUMENT,
+            _ => MediaType.UNKNOWN
+        };
 
-            MediaType category = contentType switch
-            {
-                _ when contentType.Contains("video", StringComparison.InvariantCultureIgnoreCase) => MediaType.VIDEO,
-                _ when contentType.Contains("image", StringComparison.InvariantCultureIgnoreCase) => MediaType.IMAGE,
-                _ when contentType.Contains("audio", StringComparison.InvariantCultureIgnoreCase) => MediaType.AUDIO,
-                _ when contentType.Contains("document", StringComparison.InvariantCultureIgnoreCase) => MediaType.DOCUMENT,
-                _ => MediaType.UNKNOWN
-            };
-
-            return new ContentType(contentType, category);
-        }
+        return new ContentType(contentType, category);
     }
 }

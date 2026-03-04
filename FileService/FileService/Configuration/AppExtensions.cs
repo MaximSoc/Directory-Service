@@ -2,29 +2,28 @@
 using Framework.Middlewares;
 using Serilog;
 
-namespace FileService.Web.Configuration
+namespace FileService.Web.Configuration;
+
+public static class AppExtensions
 {
-    public static class AppExtensions
+    public static IApplicationBuilder ConfigureApp (this WebApplication app)
     {
-        public static IApplicationBuilder ConfigureApp (this WebApplication app)
-        {
-            app.UseHttpLogging();
+        app.UseHttpLogging();
 
-            app.UseExceptionMiddleware();
+        app.UseExceptionMiddleware();
 
-            app.UseRequestCorrelationId();
+        app.UseRequestCorrelationId();
 
-            app.UseSerilogRequestLogging();
+        app.UseSerilogRequestLogging();
 
-            app.MapOpenApi();
+        app.MapOpenApi();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "File Service v1"));
+        app.UseSwagger();
+        app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "File Service v1"));
 
-            RouteGroupBuilder apiGroup = app.MapGroup("/api").WithOpenApi();
-            app.MapEndpoints(apiGroup);
+        RouteGroupBuilder apiGroup = app.MapGroup("/api").WithOpenApi();
+        app.MapEndpoints(apiGroup);
 
-            return app;
-        }
+        return app;
     }
 }

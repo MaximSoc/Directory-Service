@@ -1,14 +1,13 @@
-﻿namespace FileService.Domain
+﻿namespace FileService.Domain;
+
+public abstract partial class MediaAsset
 {
-    public abstract partial class MediaAsset
+    public enum MediaStatus
     {
-        public enum MediaStatus
-        {
-            UPLOADING,
-            UPLOADED,
-            READY,
-            FAILED,
-            DELETED,
-        }
+        UPLOADING,
+        UPLOADED,
+        READY,
+        FAILED,
+        DELETED,
     }
 }
