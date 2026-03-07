@@ -3,6 +3,7 @@ using Core.Shared;
 using Core.Validation;
 using CSharpFunctionalExtensions;
 using FileService.Contracts.MediaAssets.Requests;
+using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
 using FileService.Domain;
 using FluentValidation;

@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
 using Framework.EndpointResults;
 using Framework.Endpoints;

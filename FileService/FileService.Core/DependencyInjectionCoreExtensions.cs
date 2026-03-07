@@ -1,4 +1,5 @@
 ﻿using Core.Validation;
+using FileService.Core.Features;
 using FluentValidation;
 using Framework.Endpoints;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,11 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static FileService.Core.Features.CompleteMultipartUpload;
 using static FileService.Core.Features.DeleteFile;
 using static FileService.Core.Features.DownloadFileEndPoint;
 using static FileService.Core.Features.GenerateDownloadUrl;
 using static FileService.Core.Features.GenerateDownloadUrls;
 using static FileService.Core.Features.GenerateUploadUrl;
+using static FileService.Core.Features.StartMultipartUpload;
 using static FileService.Core.Features.UploadFileEndPoint;
 
 namespace FileService.Core;
@@ -35,6 +38,14 @@ public static class DependencyInjectionCoreExtensions
         services.AddScoped<GeneratePresignedDownloadUrlHandler>();
 
         services.AddScoped<GeneratePresignedDownloadUrlsHandler>();
+
+        services.AddScoped<CompleteMultipartUploadHandler>();
+
+        services.AddScoped<GetChunckUploadUrlHandler>();
+
+        services.AddScoped<StartMultipartUploadHandler>();
+
+        services.AddScoped<AbortMultipartUploadHandler>();
 
         services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 

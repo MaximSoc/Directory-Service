@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FileService.Core.FilesStorage;
 
 namespace FileService.Core.Features;
 public sealed class DeleteFile : IEndpoint

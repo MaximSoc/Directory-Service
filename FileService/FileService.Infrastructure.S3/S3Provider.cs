@@ -1,7 +1,9 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
-using FileService.Core;
+using FileService.Contracts;
+using FileService.Contracts.Dtos;
+using FileService.Core.FilesStorage;
 using FileService.Domain;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -160,5 +162,144 @@ public class S3Provider : IS3Provider
 
             return S3ErrorMapper.ToError(ex);
         }
+    }
+
+    public async Task<Result<string, Error>> StartMultipartUpload(StorageKey key, MediaData mediaData, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var request = new InitiateMultipartUploadRequest
+            {
+                BucketName = key.Bucket,
+                Key = key.Key,
+                ContentType = mediaData.ContentType.Value,
+            };
+
+            var result =  await _s3Client.InitiateMultipartUploadAsync(request);
+
+            return result.UploadId;
+        }
+
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Error staring multipart upload");
+
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<Result<IReadOnlyList<ChunkUploadUrl>, Error>> GenerateAllChunksUploadUrls(
+        StorageKey key,
+        string uploadId,
+        int totalChunks,
+        CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Task<ChunkUploadUrl>> tasks = Enumerable.Range(1, totalChunks)
+            .Select(async partNumber =>
+            {
+                await _requestsSemaphore.WaitAsync(cancellationToken);
+
+                try
+                {
+                    var request = new GetPreSignedUrlRequest
+                    {
+                        BucketName = key.Bucket,
+                        Key = key.Key,
+                        Verb = HttpVerb.PUT,
+                        UploadId = uploadId,
+                        PartNumber = partNumber,
+                        Expires = DateTime.UtcNow.AddHours(_s3Options.UploadUrlExpirationHours),
+                        Protocol = _s3Options.WithSsl ? Protocol.HTTPS : Protocol.HTTP,
+                    };
+
+                    var url = await _s3Client.GetPreSignedURLAsync(request);
+
+                    return new ChunkUploadUrl(partNumber, url);
+                }
+
+                finally
+                {
+                    _requestsSemaphore.Release();
+                }
+            });
+
+        ChunkUploadUrl[] results = await Task.WhenAll(tasks);
+
+        return results;
+    }
+
+    public async Task<UnitResult<Error>> CompleteMultipartUploadAsync(
+        StorageKey key,
+        string uploadId,
+        List<PartETagDto> partETags,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var request = new CompleteMultipartUploadRequest
+            {
+                BucketName = key.Bucket,
+                Key = key.Key,
+                UploadId = uploadId,
+                PartETags = partETags.Select(p => new PartETag{ ETag = p.ETag, PartNumber = p.PartNumber}).ToList(),
+            };
+
+            var response = await _s3Client.CompleteMultipartUploadAsync(request, cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+
+        catch (Exception ex)
+        {
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<Result<ChunkUploadUrl, Error>> GenerateChunkUploadUrl(StorageKey key, string uploadId, int partNumber,
+        CancellationToken cancellationToken)
+    {
+        GetPreSignedUrlRequest request = new()
+        {
+            BucketName = key.Bucket,
+            Key = key.Value,
+            Verb = HttpVerb.PUT,
+            UploadId = uploadId,
+            PartNumber = partNumber,
+            Expires = DateTime.UtcNow.AddMinutes(_s3Options.UploadUrlExpirationHours),
+            Protocol = _s3Options.WithSsl ? Protocol.HTTPS : Protocol.HTTP,
+        };
+
+        try
+        {
+            return new ChunkUploadUrl(partNumber, await _s3Client.GetPreSignedURLAsync(request));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading chunk url");
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<UnitResult<Error>> AbortMultipartUploadAsync(StorageKey key, string uploadId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new AbortMultipartUploadRequest()
+        {
+            BucketName = key.Bucket,
+            Key = key.Value,
+            UploadId = uploadId
+        };
+
+        try
+        {
+            await _s3Client.AbortMultipartUploadAsync(request, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error abort multipart upload");
+            return S3ErrorMapper.ToError(ex);
+        }
+
+        return UnitResult.Success<Error>();
     }
 }
