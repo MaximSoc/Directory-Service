@@ -1,4 +1,5 @@
 ﻿using Core.Shared;
+using FileService.Core;
 using FileService.Core.MediaAssets;
 using FileService.Infrastructure.Postgres.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,8 @@ public static class DependencyInjectionInfrastructurePostgres
             options.EnableDetailedErrors();
             options.EnableSensitiveDataLogging();
         });
+
+        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<FileServiceDbContext>());
 
         services.AddScoped<IMediaRepository, MediaRepository>();
 

@@ -1,4 +1,5 @@
-﻿using FileService.Domain;
+﻿using FileService.Core;
+using FileService.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FileService.Infrastructure.Postgres;
 
-public class FileServiceDbContext : DbContext
+public class FileServiceDbContext : DbContext, IReadDbContext
 {
     public FileServiceDbContext(DbContextOptions<FileServiceDbContext> options)
     : base(options)

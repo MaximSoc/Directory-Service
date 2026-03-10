@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using FileService.Contracts;
 using FileService.Contracts.Dtos;
 using FileService.Core.FilesStorage;
+using FileService.Core.Models;
 using FileService.Domain;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -98,14 +99,15 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<IReadOnlyList<string>, Error>> GenerateDownloadUrlsAsync(IEnumerable<StorageKey> keys, CancellationToken cancellationToken = default)
+    public async Task<Result<IReadOnlyList<MediaUrl>, Error>> GenerateDownloadUrlsAsync(IEnumerable<StorageKey> keys, CancellationToken cancellationToken = default)
     {
         try
         {
-            IEnumerable<Task<string>> tasks = keys
+            IEnumerable<Task<MediaUrl>> tasks = keys
                 .Select(async key =>
                 {
                     await _requestsSemaphore.WaitAsync();
+
                     var request = new GetPreSignedUrlRequest
                     {
                         BucketName = key.Bucket,
@@ -119,7 +121,7 @@ public class S3Provider : IS3Provider
                     {
                         string? url = await _s3Client.GetPreSignedURLAsync(request);
 
-                        return url;
+                        return new MediaUrl(key, url);
                     }
                     finally
                     {
@@ -127,14 +129,13 @@ public class S3Provider : IS3Provider
                     }
                 });
 
-            string[] results = await Task.WhenAll(tasks);
+            MediaUrl[] results = await Task.WhenAll(tasks);
 
             return results;
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            throw;
+            return S3ErrorMapper.ToError(ex);
         }
     }
 

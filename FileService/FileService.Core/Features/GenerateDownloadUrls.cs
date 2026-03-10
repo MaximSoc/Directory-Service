@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
+using FileService.Core.Models;
 using Framework.EndpointResults;
 using Framework.Endpoints;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +20,7 @@ public sealed class GenerateDownloadUrls : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/files/download-urls", async Task<EndpointResult<IReadOnlyList<string>>> (
+        app.MapGet("/files/download-urls", async Task<EndpointResult<IReadOnlyList<MediaUrl>>> (
             [FromQuery] Guid[] fileIds,
             [FromServices] GeneratePresignedDownloadUrlsHandler handler,
             CancellationToken cancellationToken) =>
@@ -45,7 +46,7 @@ public sealed class GenerateDownloadUrls : IEndpoint
             _logger = logger;
         }
 
-        public async Task<Result<IReadOnlyList<string>, Errors>> Handle(GeneratePresignedDownloadUrlsRequest request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<MediaUrl>, Errors>> Handle(GeneratePresignedDownloadUrlsRequest request, CancellationToken cancellationToken)
         {
             var mediaAssetsResult = await _mediaRepository.GetListBy(x => request.FileIds.Contains(x.Id), cancellationToken);
             if (mediaAssetsResult.IsFailure)
@@ -61,7 +62,7 @@ public sealed class GenerateDownloadUrls : IEndpoint
 
             _logger.LogInformation("Generated download URLs for many files.");
 
-            return Result.Success<IReadOnlyList<string>, Errors>(downloadUrlsResult.Value);
+            return Result.Success<IReadOnlyList<MediaUrl>, Errors>(downloadUrlsResult.Value);
         }
     }
 }
