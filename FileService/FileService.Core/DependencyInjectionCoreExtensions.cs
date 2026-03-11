@@ -47,6 +47,10 @@ public static class DependencyInjectionCoreExtensions
 
         services.AddScoped<AbortMultipartUploadHandler>();
 
+        services.AddScoped<GetMediaAssetInfoBatchHandler>();
+
+        services.AddScoped<GetMediaAssetInfoHandler>();
+
         services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
         services.AddValidatorsFromAssemblyContaining<UploadFileHandler>();

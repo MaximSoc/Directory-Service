@@ -2,6 +2,7 @@
   <ItemGroup>
     <PackageReference Include="MaximSoc.Core" />
     <PackageReference Include="MaximSoc.Framework" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FileService.Contracts\FileService.Contracts.csproj" />

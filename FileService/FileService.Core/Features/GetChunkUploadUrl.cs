@@ -27,8 +27,8 @@ public sealed class GetChunckUploadUrlEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder builder)
     {
-        builder.MapGet("/files/multipart/url", async Task<EndpointResult<string>> (
-                [AsParameters] GetChunckUploadUrlRequest request,
+        builder.MapPost("/files/multipart/url", async Task<EndpointResult<string>> (
+                [FromBody] GetChunckUploadUrlRequest request,
                 [FromServices] GetChunckUploadUrlHandler handler,
                 CancellationToken cancellationToken) =>
             await handler.Handle(new GetChunckUploadUrlCommand(request), cancellationToken));
