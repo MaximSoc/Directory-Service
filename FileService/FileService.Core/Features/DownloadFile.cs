@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
+using FileService.Domain;
+using Framework.EndpointResults;
 using Framework.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +29,7 @@ public sealed class DownloadFileEndPoint : IEndpoint
         {
             var result = await handler.Handle(new DownloadFileRequest(fileId, path), cancellationToken);
 
-            return Results.Ok(result.Value);
+            return (EndpointResult<string>)result;
         });
     }
 
@@ -54,6 +56,20 @@ public sealed class DownloadFileEndPoint : IEndpoint
             var mediaAssetResult = await _mediaRepository.GetBy(x => x.Id == request.FileId, cancellationToken);
             if (mediaAssetResult.IsFailure)
                 return mediaAssetResult.Error;
+
+            var mediaAsset = mediaAssetResult.Value;
+
+            if (mediaAsset.Status != MediaAsset.MediaStatus.UPLOADED)
+            {
+                _logger.LogWarning("Download failed: File {fileId} has status {status}",
+                    request.FileId, mediaAsset.Status);
+
+                string errorMessage = mediaAsset.Status == MediaAsset.MediaStatus.DELETED
+                    ? "Файл был удален."
+                    : "Файл еще не готов к скачиванию.";
+
+                return GeneralErrors.Failure(errorMessage).ToErrors();
+            }
 
             var downloadResult = await _s3Provider.DownloadFileAsync(
                 mediaAssetResult.Value.Key,

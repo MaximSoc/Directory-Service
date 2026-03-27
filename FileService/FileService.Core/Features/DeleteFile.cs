@@ -1,20 +1,21 @@
 ﻿using Core.Handlers;
 using Core.Shared;
 using CSharpFunctionalExtensions;
+using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
+using FileService.Domain;
 using Framework.EndpointResults;
 using Framework.Endpoints;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Builder;
 using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FileService.Core.FilesStorage;
 
 namespace FileService.Core.Features;
 public sealed class DeleteFile : IEndpoint
@@ -54,6 +55,11 @@ public sealed class DeleteFile : IEndpoint
             var mediaAssetResult = await _mediaRepository.GetBy(x => x.Id == command.FileId, cancellationToken);
             if (mediaAssetResult.IsFailure)
                 return mediaAssetResult.Error;
+
+            if (mediaAssetResult.Value.Status == MediaAsset.MediaStatus.DELETED)
+            {
+                return GeneralErrors.Failure("Файл уже удален").ToErrors();
+            }
 
             var markDeletedResult = mediaAssetResult.Value.MarkDeleted();
             if (markDeletedResult.IsFailure)

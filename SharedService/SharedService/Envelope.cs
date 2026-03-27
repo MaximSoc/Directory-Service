@@ -9,19 +9,19 @@ namespace SharedKernel
 {
     public record Envelope
     {
-        public object? Result { get; }
+        public object? Result { get; init; }
 
-        public Errors? ErrorList { get; }
+        public Errors? ErrorList { get; init; }
 
         public bool IsError => ErrorList != null || ErrorList != null && ErrorList.Any();
 
-        public DateTime TimeGenerated { get; }
+        public DateTime TimeGenerated { get; init; }
 
         [JsonConstructor]
-        private Envelope(object? result, Errors? errors)
+        public Envelope(object? result, Errors? errorList)
         {
             Result = result;
-            ErrorList = errors;
+            ErrorList = errorList;
             TimeGenerated = DateTime.UtcNow;
         }
 
@@ -32,19 +32,19 @@ namespace SharedKernel
 
     public record Envelope<T>
     {
-        public T? Result { get; }
+        public T? Result { get; init; }
 
-        public Errors? ErrorList { get; }
+        public Errors? ErrorList { get; init; }
 
         public bool IsError => ErrorList != null || ErrorList != null && ErrorList.Any();
 
-        public DateTime TimeGenerated { get; }
+        public DateTime TimeGenerated { get; init; }
 
         [JsonConstructor]
-        private Envelope(T? result, Errors? errors)
+        public Envelope(T? result, Errors? errorList)
         {
             Result = result;
-            ErrorList = errors;
+            ErrorList = errorList;
             TimeGenerated = DateTime.UtcNow;
         }
 

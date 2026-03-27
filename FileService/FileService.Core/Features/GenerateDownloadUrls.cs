@@ -2,6 +2,7 @@
 using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
 using FileService.Core.Models;
+using FileService.Domain;
 using Framework.EndpointResults;
 using Framework.Endpoints;
 using Microsoft.AspNetCore.Builder;
@@ -52,7 +53,14 @@ public sealed class GenerateDownloadUrls : IEndpoint
             if (mediaAssetsResult.IsFailure)
                 return mediaAssetsResult.Error;
 
-            var keys = mediaAssetsResult.Value.Select(x => x.Key).ToList();
+            var readyAssets = mediaAssetsResult.Value
+                .Where(x => x.Status == MediaAsset.MediaStatus.UPLOADED)
+                .ToList();
+
+            if (!readyAssets.Any())
+                return Result.Success<IReadOnlyList<MediaUrl>, Errors>(new List<MediaUrl>());
+
+            var keys = readyAssets.Select(x => x.Key).ToList();
 
             var downloadUrlsResult = await _s3Provider.GenerateDownloadUrlsAsync(
                 keys,

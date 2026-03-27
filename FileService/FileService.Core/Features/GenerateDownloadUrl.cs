@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
+using FileService.Domain;
 using Framework.EndpointResults;
 using Framework.Endpoints;
 using Microsoft.AspNetCore.Builder;
@@ -51,6 +52,17 @@ public sealed class GenerateDownloadUrl : IEndpoint
             var mediaAssetResult = await _mediaRepository.GetBy(x => x.Id == request.FileId, cancellationToken);
             if (mediaAssetResult.IsFailure)
                 return mediaAssetResult.Error;
+
+            var mediaAsset = mediaAssetResult.Value;
+
+            if (mediaAsset.Status != MediaAsset.MediaStatus.UPLOADED)
+            {
+                _logger.LogWarning("Attempt to generate download URL for file {fileId} with status {status}",
+                    request.FileId, mediaAsset.Status);
+
+                return GeneralErrors.Failure($"Файл еще не загружен или недоступен. Текущий статус: {mediaAsset.Status}")
+                    .ToErrors();
+            }
 
             var downloadUrlResult = await _s3Provider.GenerateDownloadUrlAsync(
                 mediaAssetResult.Value.Key,

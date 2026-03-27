@@ -96,7 +96,7 @@ public sealed class StartMultipartUpload : IEndpoint
             if (contentTypeResult.IsFailure)
                 return contentTypeResult.Error.ToErrors();
 
-            Result<(long ChunkSize, int TotalChunks), Error> chunkCalculationResult = _chunkSizeCalculator.CalculateChunkSize(command.Request.Size);
+            Result<(int ChunkSize, int TotalChunks), Error> chunkCalculationResult = _chunkSizeCalculator.CalculateChunkSize(command.Request.Size);
             if (chunkCalculationResult.IsFailure)
                 return chunkCalculationResult.Error.ToErrors();
 
