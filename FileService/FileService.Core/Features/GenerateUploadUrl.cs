@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
+using FileService.Domain;
 using Framework.EndpointResults;
 using Framework.Endpoints;
 using Microsoft.AspNetCore.Builder;
@@ -50,6 +51,13 @@ public sealed class GenerateUploadUrl : IEndpoint
             var mediaAssetResult = await _mediaRepository.GetBy(x => x.Id == request.FileId, cancellationToken);
             if (mediaAssetResult.IsFailure)
                 return mediaAssetResult.Error;
+
+            var mediaAsset = mediaAssetResult.Value;
+
+            if (mediaAsset.Status == MediaAsset.MediaStatus.UPLOADED)
+            {
+                return GeneralErrors.Failure("Файл уже загружен. Перезапись запрещена.").ToErrors();
+            }
 
             var uploadUrlResult = await _s3Provider.GenerateUploadUrlAsync(
                 mediaAssetResult.Value.Key,

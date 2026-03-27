@@ -25,23 +25,27 @@ namespace FileService.IntegrationTests.Infrastructure;
 
 public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres")
         .WithDatabase("file_service_db_tests")
         .WithUsername("postgres")
         .WithPassword("postgres")
         .Build();
 
-    private readonly MinioContainer _minioContainer = new MinioBuilder()
-        .WithImage("minio/minio")
-        .WithUsername("minio")
-        .WithPassword("minio")
+    private readonly MinioContainer _minioContainer = new MinioBuilder("minio/minio")
+        .WithUsername("minioadmin")
+        .WithPassword("minioadmin")
         .Build();
 
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
         await _minioContainer.StartAsync();
+
+        await using AsyncServiceScope scope = Services.CreateAsyncScope();
+        FileServiceDbContext dbContext = scope.ServiceProvider.GetRequiredService<FileServiceDbContext>();
+
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

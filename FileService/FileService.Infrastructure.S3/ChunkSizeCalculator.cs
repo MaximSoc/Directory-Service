@@ -14,14 +14,14 @@ public class ChunkSizeCalculator : IChunkSizeCalculator
         _options = options.Value;
     }
 
-    public Result<(long ChunkSize, int TotalChunks), Error> CalculateChunkSize(
+    public Result<(int ChunkSize, int TotalChunks), Error> CalculateChunkSize(
         long fileSize)
     {
         if (_options.RecommendedChunkSizeBytes <= 0 || _options.MaxChunks <= 0)
             return GeneralErrors.ValueIsInvalid("Настроки чанков");
 
         if (fileSize <= _options.RecommendedChunkSizeBytes)
-            return (fileSize, 1);
+            return ((int)fileSize, 1);
 
         int calculatedChunks = (int)Math.Ceiling((double)fileSize / _options.RecommendedChunkSizeBytes);
 
@@ -29,6 +29,6 @@ public class ChunkSizeCalculator : IChunkSizeCalculator
 
         long chunkSize = (fileSize + actualChunks - 1) / actualChunks;
 
-        return (chunkSize, actualChunks);
+        return ((int)chunkSize, actualChunks);
     }
 }

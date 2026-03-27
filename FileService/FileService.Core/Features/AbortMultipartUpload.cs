@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using FileService.Contracts.MediaAssets.Requests;
 using FileService.Core.FilesStorage;
 using FileService.Core.MediaAssets;
+using FileService.Domain;
 using Framework.EndpointResults;
 using Framework.Endpoints;
 using Microsoft.AspNetCore.Builder;
@@ -59,6 +60,11 @@ public sealed class AbortMultipartUploadHandler : ICommandHandler<AbortMultipart
         var mediaAssetResult = await _mediaRepository.GetBy(ma => ma.Id == command.Request.MediaAssetId, cancellationToken);
         if (mediaAssetResult.IsFailure)
             return mediaAssetResult.Error;
+
+        if (mediaAssetResult.Value.Status == MediaAsset.MediaStatus.UPLOADED)
+        {
+            return GeneralErrors.Failure("Файл уже загружен").ToErrors();
+        }
 
         var abortResult = await _s3Provider.AbortMultipartUploadAsync(mediaAssetResult.Value.Key, command.Request.UploadId, cancellationToken);
         if (abortResult.IsFailure)

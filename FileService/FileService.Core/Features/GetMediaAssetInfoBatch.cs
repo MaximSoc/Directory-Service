@@ -40,7 +40,7 @@ public sealed class GetMediaAssetInfoBatchValidator : AbstractValidator<GetMedia
     public GetMediaAssetInfoBatchValidator()
     {
         RuleFor(x => x.Request.MediaAssetIds)
-                .NotNull()
+                .NotEmpty()
                 .WithError(GeneralErrors.ValueIsRequired("mediaAssetIds"));
     }
 }
@@ -75,9 +75,9 @@ public sealed class GetMediaAssetInfoBatchHandler : IQueryHandler<GetMediaAssetI
             .Where(m => query.Request.MediaAssetIds.Contains(m.Id) && m.Status != MediaAsset.MediaStatus.DELETED)
             .ToListAsync();
 
-        var readyMediaAssets = mediaAssets.Where(m => m.Status == MediaAsset.MediaStatus.READY).ToList();
+        var readyMediaAssets = mediaAssets.Where(m => m.Status == MediaAsset.MediaStatus.UPLOADED).ToList();
 
-        List<StorageKey> keys = mediaAssets.Select(m =>  m.Key).ToList();
+        List<StorageKey> keys = readyMediaAssets.Select(m =>  m.Key).ToList();
 
         var urlsResult = await _s3Provider.GenerateDownloadUrlsAsync(keys, cancellationToken);
         if (urlsResult.IsFailure)

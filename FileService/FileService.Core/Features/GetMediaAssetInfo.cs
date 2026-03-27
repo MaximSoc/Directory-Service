@@ -57,7 +57,7 @@ public sealed class GetMediaAssetInfoHandler : IQueryHandler<GetMediaAssetDto, G
 
         string? url = null;
 
-        if (mediaAsset.Status == MediaAsset.MediaStatus.READY)
+        if (mediaAsset.Status == MediaAsset.MediaStatus.UPLOADED)
         {
             var urlResult = await _s3Provider.GenerateDownloadUrlAsync(mediaAsset.Key, cancellationToken);
             if (urlResult.IsFailure)
