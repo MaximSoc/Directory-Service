@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\FileService.Communication\FileService.Communication.csproj" />
     <ProjectReference Include="..\..\FileService\FileService.Web.csproj" />
   </ItemGroup>
 

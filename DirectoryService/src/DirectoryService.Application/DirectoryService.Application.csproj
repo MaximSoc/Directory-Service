@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" />
+    <PackageReference Include="FileService.Communication" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="MaximSoc.Core" />

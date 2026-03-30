@@ -32,7 +32,7 @@ namespace DirectoryService.Presentation.Configuration
 
             services.AddCors();
 
-            services.AddApplication();
+            services.AddApplication(configuration);
 
             services.AddInfrastructure(configuration);
 

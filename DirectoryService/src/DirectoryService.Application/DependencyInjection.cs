@@ -1,7 +1,9 @@
 ﻿using Core.Handlers;
 using Core.Validation;
 using DirectoryService.Application.Locations;
+using FileService.Communication;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ namespace DirectoryService.Application
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services)
+        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             var assembly = typeof(DependencyInjection).Assembly;
 
@@ -25,6 +27,8 @@ namespace DirectoryService.Application
             services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
             services.AddValidatorsFromAssemblyContaining<CreateLocationHandler>();
+
+            services.AddFileServiceHttpCommunication(configuration);
 
             return services;
         }

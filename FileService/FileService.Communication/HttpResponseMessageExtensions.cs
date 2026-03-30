@@ -4,7 +4,7 @@ using SharedKernel;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace FileService.Core.HttpCommunication;
+namespace FileService.Communication;
 
 public static class HttpResponseMessageExtensions
 {
