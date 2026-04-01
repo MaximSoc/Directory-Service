@@ -3,6 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="FileService.Communication" Version="0.0.2" />
     <PackageVersion Include="FluentValidation" Version="12.0.0" />
     <PackageVersion Include="MaximSoc.Framework" Version="0.0.3" />
     <PackageVersion Include="MediatR" Version="13.1.0" />
@@ -28,7 +29,7 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="CSharpFunctionalExtensions" Version="3.6.0" />
     <PackageVersion Include="MaximSoc.SharedKernel" Version="0.0.3" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.14" />
     <PackageVersion Include="NodaTime" Version="3.2.2" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageVersion Include="MaximSoc.Core" Version="0.0.5" />
