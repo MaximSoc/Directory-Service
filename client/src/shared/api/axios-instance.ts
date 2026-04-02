@@ -7,8 +7,10 @@ import {
   BACKEND_TYPE_TO_FRONTEND,
 } from "./errors";
 
+const BASE_URL = "/api";
+
 export const apiClient = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: BASE_URL,
   paramsSerializer: {
     indexes: null,
   },
