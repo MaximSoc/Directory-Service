@@ -24,7 +24,7 @@ namespace DirectoryService.Presentation.Configuration
 
             app.UseSerilogRequestLogging();
 
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"));
