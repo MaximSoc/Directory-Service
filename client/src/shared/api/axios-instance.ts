@@ -8,7 +8,7 @@ import {
 } from "./errors";
 
 export const apiClient = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "http://localhost/api",
   paramsSerializer: {
     indexes: null,
   },
