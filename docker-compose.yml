@@ -82,6 +82,17 @@ services:
     command: server /data --console-address ":9001"
     restart: always
 
+  frontend:
+    container_name: frontend-directory-service
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./client/.env
+    restart: always
+
   nginx:
     image: nginx:alpine
     ports:
@@ -91,6 +102,7 @@ services:
     depends_on:
       - directoryservice
       - fileservice
+      - frontend
     restart: always
 volumes:
   postgres-data:

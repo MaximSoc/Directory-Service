@@ -14,7 +14,10 @@ namespace DirectoryService.Presentation.Configuration
 
             app.UseCors(builder =>
             {
-                builder.WithOrigins("http://localhost:3000")
+                builder.WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost",
+                    "http://frontend:3000")
                 .AllowCredentials()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
