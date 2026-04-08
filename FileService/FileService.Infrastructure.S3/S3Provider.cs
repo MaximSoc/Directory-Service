@@ -1,8 +1,10 @@
-﻿using Amazon.S3;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using Amazon.S3;
 using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
 using FileService.Contracts;
 using FileService.Contracts.Dtos;
+using FileService.Core;
 using FileService.Core.FilesStorage;
 using FileService.Core.Models;
 using FileService.Domain;
@@ -73,7 +75,10 @@ public class S3Provider : IS3Provider
         return UnitResult.Success<Error>();
     }
 
-    public async Task<Result<string, Error>> GenerateDownloadUrlAsync(StorageKey key, CancellationToken cancellationToken = default)
+    public async Task<Result<string, Error>> GenerateDownloadUrlAsync(
+        StorageKey key,
+        CancellationToken cancellationToken = default,
+        bool useExternalEndpoint = false)
     {
         var request = new GetPreSignedUrlRequest
         {
@@ -88,6 +93,9 @@ public class S3Provider : IS3Provider
         {
             string? response = await _s3Client.GetPreSignedURLAsync(request);
 
+            if (useExternalEndpoint)
+                response = ReplaceEndpoint(response);
+
             return response;
 
         }
@@ -99,7 +107,10 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<IReadOnlyList<MediaUrl>, Error>> GenerateDownloadUrlsAsync(IEnumerable<StorageKey> keys, CancellationToken cancellationToken = default)
+    public async Task<Result<IReadOnlyList<MediaUrl>, Error>> GenerateDownloadUrlsAsync(
+        IEnumerable<StorageKey> keys,
+        CancellationToken cancellationToken = default,
+        bool useExternalEndpoint = false)
     {
         try
         {
@@ -120,6 +131,9 @@ public class S3Provider : IS3Provider
                     try
                     {
                         string? url = await _s3Client.GetPreSignedURLAsync(request);
+
+                        if (useExternalEndpoint)
+                            url = ReplaceEndpoint(url);
 
                         return new MediaUrl(key, url);
                     }
@@ -193,7 +207,8 @@ public class S3Provider : IS3Provider
         StorageKey key,
         string uploadId,
         int totalChunks,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool useExternalEndpoint = false)
     {
         IEnumerable<Task<ChunkUploadUrl>> tasks = Enumerable.Range(1, totalChunks)
             .Select(async partNumber =>
@@ -214,6 +229,9 @@ public class S3Provider : IS3Provider
                     };
 
                     var url = await _s3Client.GetPreSignedURLAsync(request);
+
+                    if (useExternalEndpoint)
+                        url = ReplaceEndpoint(url);
 
                     return new ChunkUploadUrl(partNumber, url);
                 }
@@ -302,5 +320,10 @@ public class S3Provider : IS3Provider
         }
 
         return UnitResult.Success<Error>();
+    }
+
+    private string ReplaceEndpoint(string presignedUrl)
+    {
+        return presignedUrl.Replace(_s3Options.Endpoint, _s3Options.ExternalEndpoint, StringComparison.OrdinalIgnoreCase);
     }
 }

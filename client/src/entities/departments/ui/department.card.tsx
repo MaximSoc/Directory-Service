@@ -2,11 +2,12 @@
 
 import StatusBadge from "@/features/status/status.badge";
 import { Button } from "@/shared/components/ui/button";
-import { Trash2, Building2, ChevronRight } from "lucide-react";
+import { Trash2, Building2, ChevronRight, Video } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
-import { Department } from "../types"; // Предполагаем наличие типа
+import { Department } from "../types";
 import { DeleteDepartmentDialog } from "@/features/departments/model/delete-department-dialog";
+import { FileUploadDialog } from "@/entities/file/ui/file-upload-dialog";
 
 export default function DepartmentCard({
   department,
@@ -14,6 +15,7 @@ export default function DepartmentCard({
   department: Department;
 }) {
   const [openDelete, setOpenDelete] = useState(false);
+  const [openVideo, setOpenVideo] = useState(false);
 
   return (
     <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm transition-all hover:shadow-md hover:bg-accent/5">
@@ -36,6 +38,14 @@ export default function DepartmentCard({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-primary"
+              onClick={() => setOpenVideo(true)}
+            >
+              <Video className="h-4 w-4" />
+            </Button>
             <StatusBadge isActive={department.isActive} />
             <Button
               variant="ghost"
@@ -52,7 +62,6 @@ export default function DepartmentCard({
           <div className="bg-muted/50 p-2 rounded text-xs font-mono text-muted-foreground break-all">
             {department.path}
           </div>
-
           <div className="space-y-1 text-muted-foreground">
             <p className="flex items-center gap-2">
               <span className="font-medium">Уровень:</span>
@@ -75,6 +84,16 @@ export default function DepartmentCard({
         open={openDelete}
         onOpenChange={setOpenDelete}
         department={department}
+      />
+
+      <FileUploadDialog
+        open={openVideo}
+        onOpenChange={setOpenVideo}
+        ownerId={department.id}
+        ownerType="department"
+        assetType="video"
+        title="Загрузить видеоматериалы"
+        description={`Выберите файл для подразделения: ${department.name}`}
       />
     </div>
   );
