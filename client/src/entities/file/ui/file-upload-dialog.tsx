@@ -28,6 +28,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   title?: string;
   description?: string;
+  onSuccess?: (mediaAssetId: string) => Promise<void>;
 };
 
 export function FileUploadDialog({
@@ -38,6 +39,7 @@ export function FileUploadDialog({
   onOpenChange,
   title,
   description,
+  onSuccess,
 }: Props) {
   const [files, setFiles] = useState<File[]>([]);
   const config = getValidatorConfig(assetType);
@@ -56,6 +58,7 @@ export function FileUploadDialog({
     ownerType,
     assetType,
     onAbort: () => setFiles([]),
+    onSuccess,
   });
 
   const handleOpenChange = (newOpen: boolean) => {

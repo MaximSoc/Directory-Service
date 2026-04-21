@@ -14,6 +14,7 @@ export type Props = {
   ownerType: OwnerType;
   assetType: AssetType;
   onAbort?: () => void;
+  onSuccess?: (mediaAssetId: string) => Promise<void>;
 };
 
 export function useFileUpload({
@@ -21,6 +22,7 @@ export function useFileUpload({
   ownerType,
   assetType,
   onAbort,
+  onSuccess,
 }: Props) {
   const [uploadState, setUploadState] = useState<UploadProgress>({
     status: "idle",
@@ -125,6 +127,10 @@ export function useFileUpload({
         fileSize: file.size,
         mediaAssetId,
       });
+
+      if (onSuccess) {
+        await onSuccess(mediaAssetId);
+      }
 
       currentUploadRef.current = null;
 

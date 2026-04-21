@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <PackageId>FileService.Communication</PackageId>
-	  <Version>0.0.2</Version>
+	  <Version>0.0.9</Version>
 	  <Authors>MaximSoc</Authors>
 	  <Company>MaximSoc</Company>
 	  <PackageDescription>Communication</PackageDescription>

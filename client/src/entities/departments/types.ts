@@ -1,3 +1,5 @@
+import { FileStatus } from "../file/types";
+
 export type Department = {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ export type Department = {
   path: string;
   depth: number;
   isActive: boolean;
+  video?: MediaDto;
   hasMoreChildren: boolean;
   positions: DepartmentPositions[];
   locations: DepartmentLocations[];
@@ -19,4 +22,10 @@ type DepartmentPositions = {
 type DepartmentLocations = {
   id: string;
   name: string;
+};
+
+export type MediaDto = {
+  id: string;
+  url: string;
+  status: FileStatus;
 };

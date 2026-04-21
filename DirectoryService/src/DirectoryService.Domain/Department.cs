@@ -58,6 +58,8 @@ namespace DirectoryService.Domain
 
         public Guid Id { get; private set; }
 
+        public Guid? VideoId { get; private set; }
+
         public DepartmentName Name { get; private set; } = null!;
 
         public DepartmentIdentifier Identifier { get; private set; } = null!;
@@ -193,6 +195,12 @@ namespace DirectoryService.Domain
             IsActive = true;
 
             DeletedAt = DateTime.MinValue;
+        }
+
+        public void UpdateVideoId(Guid? videoId)
+        {
+            VideoId = videoId;
+            UpdatedAt = DateTime.UtcNow;
         }
     }
 }

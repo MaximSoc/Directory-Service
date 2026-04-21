@@ -11,4 +11,6 @@ public interface IFileCommunicationService
     Task<Result<GetMediaAssetDto?, Errors>> GetMediaAssetInfo(Guid mediaAssetId, CancellationToken ct);
 
     Task<Result<GetMediaAssetInfoBatchResponse, Errors>> GetMediaAssetsInfo(GetMediaAssetInfoBatchRequest request, CancellationToken ct);
+
+    Task<Result<CheckMediaAssetExistsResponse, Errors>> CheckMediaAssetExists(Guid mediaAssetId, CancellationToken ct);
 }

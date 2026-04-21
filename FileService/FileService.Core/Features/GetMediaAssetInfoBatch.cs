@@ -79,7 +79,7 @@ public sealed class GetMediaAssetInfoBatchHandler : IQueryHandler<GetMediaAssetI
 
         List<StorageKey> keys = readyMediaAssets.Select(m =>  m.Key).ToList();
 
-        var urlsResult = await _s3Provider.GenerateDownloadUrlsAsync(keys, cancellationToken);
+        var urlsResult = await _s3Provider.GenerateDownloadUrlsAsync(keys, cancellationToken, true);
         if (urlsResult.IsFailure)
             return urlsResult.Error.ToErrors();
 

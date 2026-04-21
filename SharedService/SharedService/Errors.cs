@@ -9,25 +9,19 @@ namespace SharedKernel
 {
     public class Errors : IEnumerable<Error>
     {
-        private readonly List<Error> _errors;
+        public List<Error> Items { get; init; } = new();
+
+        public Errors() { }
 
         public Errors(IEnumerable<Error> errors)
         {
-            _errors = errors.ToList();
+            Items = errors.ToList();
         }
+
+        public IEnumerator<Error> GetEnumerator() => Items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public static implicit operator Errors(List<Error> errors) => new(errors);
-
         public static implicit operator Errors(Error error) => new([error]);
-
-        public IEnumerator<Error> GetEnumerator()
-        {
-            return _errors.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
 }

@@ -27,6 +27,8 @@ namespace DirectoryService.Contracts.Departments
 
         public DateTime UpdatedAt { get; init; }
 
+        public MediaDto? Video { get; set; }
+
         public List<DepartmentPositionDto> Positions { get; set; } = [];
 
         public List<DepartmentLocationDto> Locations { get; set; } = [];
