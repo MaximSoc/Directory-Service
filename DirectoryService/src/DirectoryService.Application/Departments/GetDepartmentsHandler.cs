@@ -180,12 +180,6 @@ namespace DirectoryService.Application.Departments
             var receivedAssets = mediaAssets.Value.MediaAssets;
             _logger.LogInformation("Received {Count} assets from file service", receivedAssets.Count);
 
-            foreach (var asset in receivedAssets)
-            {
-                _logger.LogDebug("Asset received: ID={Id}, Status={Status}, Url={Url}",
-                    asset.Id, asset.Status, asset.DownloadUrl);
-            }
-
             var mediaAssetsDict = mediaAssets.Value.MediaAssets.ToDictionary(x => x.Id, x => x);
 
             foreach (DepartmentDto departmentDto in departmentDict.Values)
