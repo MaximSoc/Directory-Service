@@ -82,6 +82,10 @@ namespace DirectoryService.Infrastructure.Configurations
                 .WithOne()
                 .HasForeignKey(d => d.DepartmentId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(l => l.VideoId)
+                .IsRequired(false)
+                .HasColumnName("video_id");
         }
     }
 }

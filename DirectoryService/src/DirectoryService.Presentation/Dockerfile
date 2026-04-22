@@ -43,6 +43,7 @@ RUN echo '<?xml version="1.0" encoding="utf-8"?> \
   <packageSourceMapping> \
     <packageSource key="gitHub"> \
       <package pattern="MaximSoc.*" /> \
+      <package pattern="FileService.*" /> \
     </packageSource> \
     <packageSource key="nuget.org"> \
       <package pattern="*" /> \

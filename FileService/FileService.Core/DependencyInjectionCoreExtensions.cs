@@ -51,6 +51,8 @@ public static class DependencyInjectionCoreExtensions
 
         services.AddScoped<GetMediaAssetInfoHandler>();
 
+        services.AddScoped<CheckMediaAssetExistsHandler>();
+
         services.AddValidatorsFromAssembly(typeof(CustomValidators).Assembly);
 
         services.AddValidatorsFromAssemblyContaining<UploadFileHandler>();

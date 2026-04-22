@@ -14,7 +14,10 @@ namespace DirectoryService.Presentation.Configuration
 
             app.UseCors(builder =>
             {
-                builder.WithOrigins("http://localhost:3000")
+                builder.WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost",
+                    "http://frontend:3000")
                 .AllowCredentials()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
@@ -24,7 +27,7 @@ namespace DirectoryService.Presentation.Configuration
 
             app.UseSerilogRequestLogging();
 
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"));

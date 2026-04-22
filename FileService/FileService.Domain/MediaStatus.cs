@@ -6,6 +6,7 @@ public abstract partial class MediaAsset
     {
         UPLOADING,
         UPLOADED,
+        PROCESSING,
         READY,
         FAILED,
         DELETED,

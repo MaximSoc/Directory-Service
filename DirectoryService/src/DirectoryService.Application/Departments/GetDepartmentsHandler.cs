@@ -6,6 +6,9 @@ using DirectoryService.Application.Database;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Positions;
+using FileService.Communication;
+using FileService.Contracts.Dtos;
+using FileService.Contracts.MediaAssets.Requests;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 using System;
@@ -20,12 +23,19 @@ namespace DirectoryService.Application.Departments
     public class GetDepartmentsHandler : IQueryHandler<PaginationResponse<DepartmentDto>, GetDepartmentsRequest>
     {
         private readonly IReadDbContext _dbContext;
+
         private readonly ILogger<GetDepartmentsHandler> _logger;
 
-        public GetDepartmentsHandler(IReadDbContext dbContext, ILogger<GetDepartmentsHandler> logger)
+        private readonly IFileCommunicationService _fileCommunicationService;
+
+        public GetDepartmentsHandler(
+            IReadDbContext dbContext,
+            ILogger<GetDepartmentsHandler> logger,
+            IFileCommunicationService fileCommunicationService)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _fileCommunicationService = fileCommunicationService;
         }
 
         public async Task<Result<PaginationResponse<DepartmentDto>, Errors>> Handle(GetDepartmentsRequest request, CancellationToken cancellationToken)
@@ -92,7 +102,8 @@ namespace DirectoryService.Application.Departments
                     d.depth,
                     d.is_active,
                     d.created_at,
-                    d.updated_at
+                    d.updated_at,
+                    d.video_id
                     FROM departments d
                     {whereClause}
                     ORDER BY d.{orderByField} {direction}, d.id ASC
@@ -108,6 +119,7 @@ namespace DirectoryService.Application.Departments
                     pd.is_active AS isActive,
                     pd.created_at AS createdAt,
                     pd.updated_at AS updatedAt,
+                    pd.video_id AS videoId,
                     l.id,
                     l.name
                 FROM paginated_departments pd
@@ -118,13 +130,17 @@ namespace DirectoryService.Application.Departments
 
             var departmentDict = new Dictionary<Guid, DepartmentDto>();
 
-            await connection.QueryAsync<DepartmentDto, DepartmentLocationDto, DepartmentDto>(
+            var departments = await connection.QueryAsync<DepartmentDto, Guid?, DepartmentLocationDto, DepartmentDto>(
                 mainQuery,
-                (dept, loc) =>
+                (dept, videoId, loc) =>
                 {
                     if (!departmentDict.TryGetValue(dept.Id, out var existingDepartment))
                     {
                         existingDepartment = dept;
+                        if (videoId != null)
+                        {
+                            existingDepartment.Video = new MediaDto { Id = videoId.Value };
+                        }
                         departmentDict.Add(dept.Id, existingDepartment);
                     }
 
@@ -136,8 +152,50 @@ namespace DirectoryService.Application.Departments
                     return existingDepartment;
                 },
                 parameters,
-                splitOn: "id"
+                splitOn: "videoId,id"
             );
+
+            IReadOnlyList<Guid> mediaAssetIds = departments
+                .Where(d => d.Video != null && d.Video.Id.HasValue)
+                .Select(d => d.Video!.Id!.Value)
+                .ToList();
+
+            _logger.LogInformation("Found {Count} unique video IDs to fetch: {Ids}",
+                mediaAssetIds.Count, string.Join(", ", mediaAssetIds));
+
+            var mediaAssets = await _fileCommunicationService.GetMediaAssetsInfo(new GetMediaAssetInfoBatchRequest(mediaAssetIds), cancellationToken);
+
+            if (mediaAssets.IsFailure)
+            {
+                _logger.LogError("File service call failed: {Error}", mediaAssets.Error);
+                return new PaginationResponse<DepartmentDto>
+                (
+                    departmentDict.Values.ToList(),
+                    totalCount,
+                    request.Page,
+                    request.PageSize
+                );
+            }
+
+            var receivedAssets = mediaAssets.Value.MediaAssets;
+            _logger.LogInformation("Received {Count} assets from file service", receivedAssets.Count);
+
+            var mediaAssetsDict = mediaAssets.Value.MediaAssets.ToDictionary(x => x.Id, x => x);
+
+            foreach (DepartmentDto departmentDto in departmentDict.Values)
+            {
+                if (departmentDto.Video != null && departmentDto.Video.Id.HasValue
+                    && mediaAssetsDict.TryGetValue(departmentDto.Video.Id.Value, out GetMediaAssetsDto? mediaAsset))
+                {
+                    departmentDto.Video = new MediaDto
+                    {
+                        Id = mediaAsset.Id,
+                        Status = mediaAsset.Status,
+                        Url = mediaAsset.DownloadUrl,
+                    };
+                }
+            }
+
 
             return new PaginationResponse<DepartmentDto>
             (

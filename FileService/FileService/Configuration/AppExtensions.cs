@@ -8,6 +8,17 @@ public static class AppExtensions
 {
     public static IApplicationBuilder ConfigureApp (this WebApplication app)
     {
+        app.UseCors(builder =>
+        {
+            builder.WithOrigins(
+                "http://localhost:3000",
+                "http://localhost",
+                "http://frontend:3000")
+            .AllowCredentials()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        });
+
         app.UseHttpLogging();
 
         app.UseExceptionMiddleware();
@@ -21,8 +32,7 @@ public static class AppExtensions
         app.UseSwagger();
         app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "File Service v1"));
 
-        RouteGroupBuilder apiGroup = app.MapGroup("/api").WithOpenApi();
-        app.MapEndpoints(apiGroup);
+        app.MapEndpoints();
 
         return app;
     }

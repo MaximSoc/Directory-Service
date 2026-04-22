@@ -167,6 +167,14 @@ export const departmentsApi = {
 
     return response.data;
   },
+
+  updateDpartmentVideo: async (departmentId: string, videoId?: string) => {
+    const response = await apiClient.put<Envelope<string>>(
+      `/departments/${departmentId}/video`,
+      { videoId }
+    );
+    return response.data;
+  },
 };
 
 export const departmentsQueryOptions = {

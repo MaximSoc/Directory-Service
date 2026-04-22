@@ -148,5 +148,19 @@ namespace DirectoryService.Presentation.Controllers
 
             return result;
         }
+
+        [HttpPut("{departmentId}/video")]
+        public async Task<EndpointResult<Guid>> UpdateVideo(
+            [FromRoute] Guid departmentId,
+            [FromServices] UpdateVideoDepartmentHandler handler,
+            [FromBody] UpdateVideoDepartmentRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new UpdateVideoDepartmentCommand(departmentId, request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result;
+        }
     }
 }

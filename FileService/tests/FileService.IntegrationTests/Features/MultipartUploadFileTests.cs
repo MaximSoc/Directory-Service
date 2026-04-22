@@ -1,11 +1,11 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
+using FileService.Communication;
 using FileService.Contracts;
 using FileService.Contracts.Dtos;
 using FileService.Contracts.MediaAssets.Requests;
 using FileService.Contracts.MediaAssets.Responses;
-using FileService.Core.HttpCommunication;
 using FileService.Core.Models;
 using FileService.Domain;
 using FileService.Infrastructure.Postgres;

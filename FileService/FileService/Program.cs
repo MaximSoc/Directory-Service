@@ -27,6 +27,8 @@ try
 
     builder.Services.AddConfiguration(builder.Configuration);
 
+    builder.Services.AddCors();
+
     var app = builder.Build();
 
     app.ConfigureApp();
