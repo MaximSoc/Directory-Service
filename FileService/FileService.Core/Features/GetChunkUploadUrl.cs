@@ -88,7 +88,7 @@ public sealed class GetChunckUploadUrlHandler : ICommandHandler<string, GetChunc
             return GeneralErrors.Failure("Загрузка уже завершена или отменена.").ToErrors();
 
         var generateChunkUploadUrlResult = await _s3Provider.GenerateChunkUploadUrl(
-            mediaAssetResult.Value.Key,
+            mediaAssetResult.Value.UploadKey,
             command.Request.UploadId,
             command.Request.PartNumber,
             cancellationToken);

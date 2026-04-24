@@ -65,7 +65,7 @@ public sealed class GenerateDownloadUrl : IEndpoint
             }
 
             var downloadUrlResult = await _s3Provider.GenerateDownloadUrlAsync(
-                mediaAssetResult.Value.Key,
+                mediaAssetResult.Value.UploadKey,
                 cancellationToken);
             if (downloadUrlResult.IsFailure)
                 return downloadUrlResult.Error.ToErrors();

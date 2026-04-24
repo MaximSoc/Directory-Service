@@ -24,7 +24,7 @@ public class VideoAsset : MediaAsset
     MediaStatus status,
     MediaOwner owner,
     StorageKey key)
-    : base(id, mediaData, AssetType.VIDEO, status, owner, key)
+    : base(id, mediaData, AssetType.VIDEO, status, owner, key, true)
     {
     }
 
@@ -59,12 +59,14 @@ public class VideoAsset : MediaAsset
         if (validationResult.IsFailure)
             return validationResult.Error;
 
-        Result<StorageKey, Error> key = StorageKey.Create(LOCATION, null, id.ToString());
-        if (key.IsFailure)
+        Result<StorageKey, Error> rawKey = StorageKey.Create(LOCATION, RAW_PREFIX, id.ToString());
+        if (rawKey.IsFailure)
         {
-            return key.Error;
+            return rawKey.Error;
         }
 
-        return new VideoAsset(id, mediaData, MediaStatus.UPLOADING, owner, key.Value);
+        return new VideoAsset(id, mediaData, MediaStatus.UPLOADING, owner, rawKey.Value);
     }
+
+    public override bool RequiresProcessing() => true;
 }

@@ -66,7 +66,7 @@ public sealed class AbortMultipartUploadHandler : ICommandHandler<AbortMultipart
             return GeneralErrors.Failure("Файл уже загружен").ToErrors();
         }
 
-        var abortResult = await _s3Provider.AbortMultipartUploadAsync(mediaAssetResult.Value.Key, command.Request.UploadId, cancellationToken);
+        var abortResult = await _s3Provider.AbortMultipartUploadAsync(mediaAssetResult.Value.UploadKey, command.Request.UploadId, cancellationToken);
         if (abortResult.IsFailure)
             return abortResult.Error.ToErrors();
 

@@ -89,7 +89,7 @@ public sealed class CompleteMultipartUpload : IEndpoint
                 return GeneralErrors.Failure("Количество eTags не соответствует количеству чанков").ToErrors();
 
             var completeResult = await _s3Provider.CompleteMultipartUploadAsync(
-                mediaAssetResult.Value.Key,
+                mediaAssetResult.Value.UploadKey,
                 command.Request.UploadId,
                 command.Request.PartETags.ToList(),
                 cancellationToken

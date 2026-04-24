@@ -69,7 +69,7 @@ public sealed class DeleteFile : IEndpoint
             if (saveChangesResult.IsFailure)
                 return saveChangesResult.Error;
 
-            var deleteResult = await _s3Provider.DeleteFileAsync(mediaAssetResult.Value.Key, cancellationToken);
+            var deleteResult = await _s3Provider.DeleteFileAsync(mediaAssetResult.Value.UploadKey, cancellationToken);
             if (deleteResult.IsFailure)
                 return deleteResult.Error.ToErrors();
 
