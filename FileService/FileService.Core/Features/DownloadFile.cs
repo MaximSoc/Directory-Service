@@ -72,7 +72,7 @@ public sealed class DownloadFileEndPoint : IEndpoint
             }
 
             var downloadResult = await _s3Provider.DownloadFileAsync(
-                mediaAssetResult.Value.Key,
+                mediaAssetResult.Value.UploadKey,
                 request.Path,
                 cancellationToken);
             if (downloadResult.IsFailure)

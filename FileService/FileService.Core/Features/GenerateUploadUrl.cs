@@ -60,7 +60,7 @@ public sealed class GenerateUploadUrl : IEndpoint
             }
 
             var uploadUrlResult = await _s3Provider.GenerateUploadUrlAsync(
-                mediaAssetResult.Value.Key,
+                mediaAssetResult.Value.UploadKey,
                 mediaAssetResult.Value.MediaData,
                 cancellationToken);
             if (uploadUrlResult.IsFailure)

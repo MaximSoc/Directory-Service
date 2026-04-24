@@ -77,7 +77,7 @@ public sealed class GetMediaAssetInfoBatchHandler : IQueryHandler<GetMediaAssetI
 
         var readyMediaAssets = mediaAssets.Where(m => m.Status == MediaAsset.MediaStatus.UPLOADED).ToList();
 
-        List<StorageKey> keys = readyMediaAssets.Select(m =>  m.Key).ToList();
+        List<StorageKey> keys = readyMediaAssets.Select(m =>  m.UploadKey).ToList();
 
         var urlsResult = await _s3Provider.GenerateDownloadUrlsAsync(keys, cancellationToken, true);
         if (urlsResult.IsFailure)
@@ -89,7 +89,7 @@ public sealed class GetMediaAssetInfoBatchHandler : IQueryHandler<GetMediaAssetI
 
         foreach (MediaAsset mediaAsset in readyMediaAssets)
         {
-            urlsDict.TryGetValue(mediaAsset.Key, out string? url);
+            urlsDict.TryGetValue(mediaAsset.UploadKey, out string? url);
 
             var mediaAssetDto = new GetMediaAssetsDto(
                 mediaAsset.Id,

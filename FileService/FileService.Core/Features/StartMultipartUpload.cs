@@ -129,14 +129,14 @@ public sealed class StartMultipartUpload : IEndpoint
                 return saveChangesResultAfterAdding.Error;
 
             var startUploadResult = await _s3Provider.StartMultipartUpload(
-                mediaAssetResult.Value.Key,
+                mediaAssetResult.Value.UploadKey,
                 mediaDataResult.Value,
                 cancellationToken);
             if (startUploadResult.IsFailure)
                 return startUploadResult.Error.ToErrors();
 
             var chunkUploadUrlsResult = await _s3Provider.GenerateAllChunksUploadUrls(
-                mediaAssetResult.Value.Key,
+                mediaAssetResult.Value.UploadKey,
                 startUploadResult.Value,
                 chunkCalculationResult.Value.TotalChunks,
                 cancellationToken,

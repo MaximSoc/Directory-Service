@@ -22,31 +22,45 @@ public abstract partial class MediaAsset
 
     public DateTime UpdatedAt { get; protected set; }
 
-    public StorageKey Key { get; protected set; } = null!;
+    public StorageKey? Key { get; protected set; }
+
+    public StorageKey? RawKey { get; protected set; }
 
     public MediaOwner Owner { get; protected set; } = null!;
 
     public MediaStatus Status { get; protected set; }
 
+    public string? UploadId { get; protected set; }
+
+    public StorageKey UploadKey => RequiresProcessing() ? RawKey! : Key!;
+
     protected MediaAsset()
     {
     }
 
-    public MediaAsset(
+    protected MediaAsset(
         Guid id,
         MediaData mediaData,
         AssetType assetType,
         MediaStatus status,
         MediaOwner owner,
-        StorageKey key)
+        StorageKey key,
+        bool isDirectUpload = false)
     {
         Id = id;
         MediaData = mediaData;
         AssetType = assetType;
         Status = status;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = CreatedAt;
         Owner = owner;
-        Key = key;
+        if (isDirectUpload)
+            Key = key;
+        else
+            RawKey = key;
     }
+
+    public virtual bool RequiresProcessing() => false;
 
     public static Result<MediaAsset, Error> CreateForUpload(Guid id, MediaData mediaData, AssetType assetType, MediaOwner owner)
     {

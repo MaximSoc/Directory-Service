@@ -114,7 +114,7 @@ namespace FileService.Core.Features;
                 return saveChangesResultAfterAdding.Error;
 
             UnitResult<Error> uploadResult = await _s3Provider.UploadFileAsync(
-                mediaAssetResult.Value.Key,
+                mediaAssetResult.Value.UploadKey,
                 command.Request.File.OpenReadStream(),
                 mediaDataResult.Value,
                 cancellationToken);

@@ -60,7 +60,7 @@ public sealed class GenerateDownloadUrls : IEndpoint
             if (!readyAssets.Any())
                 return Result.Success<IReadOnlyList<MediaUrl>, Errors>(new List<MediaUrl>());
 
-            var keys = readyAssets.Select(x => x.Key).ToList();
+            var keys = readyAssets.Select(x => x.UploadKey).ToList();
 
             var downloadUrlsResult = await _s3Provider.GenerateDownloadUrlsAsync(
                 keys,
